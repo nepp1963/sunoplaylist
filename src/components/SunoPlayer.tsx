@@ -306,10 +306,12 @@ export default function SunoPlayer() {
 
       <div className="w-full max-w-2xl flex gap-2 mb-4">
         <input
+          ref={inputRef}
           type="text"
           placeholder="Paste a Suno song link (e.g. https://suno.com/song/...)"
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
+          onPaste={handlePaste}
           onKeyDown={handleKeyDown}
           className="flex-1 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
         />
