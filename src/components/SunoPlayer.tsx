@@ -14,8 +14,12 @@ interface Song {
 }
 
 function extractSunoId(url: string): string | null {
-  const match = url.match(/suno\.com\/song\/([a-f0-9-]+)/i);
-  return match ? match[1] : null;
+  // Support suno.com/song/ID, suno.ai/song/ID, and bare UUIDs
+  const match = url.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-f0-9-]+)/i);
+  if (match) return match[1];
+  // Also accept a bare UUID
+  const uuidMatch = url.match(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i);
+  return uuidMatch ? uuidMatch[0] : null;
 }
 
 function extractSunoTitle(url: string): string {
