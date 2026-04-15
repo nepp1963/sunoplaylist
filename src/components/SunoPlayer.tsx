@@ -54,9 +54,25 @@ export default function SunoPlayer() {
     return true;
   }, []);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const handleAddLink = () => {
-    if (addSong(linkInput)) {
+    // Use both state and ref value as fallback
+    const value = linkInput || inputRef.current?.value || "";
+    if (addSong(value)) {
       setLinkInput("");
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData("text/plain").trim();
+    if (pasted && extractSunoId(pasted)) {
+      e.preventDefault();
+      if (addSong(pasted)) {
+        setLinkInput("");
+        if (inputRef.current) inputRef.current.value = "";
+      }
     }
   };
 
