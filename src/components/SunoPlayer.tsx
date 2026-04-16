@@ -214,7 +214,7 @@ export default function SunoPlayer() {
     const blob = new Blob([data], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "suno-playlist.json";
+    a.download = "Lovable's_Suno_Playlist.json";
     a.click();
     URL.revokeObjectURL(a.href);
   };
