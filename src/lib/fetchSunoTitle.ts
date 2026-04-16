@@ -25,9 +25,9 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
       const ogImage = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
 
       const title = ogTitle
-        ? ogTitle[1]
+        ? decodeHtmlEntities(ogTitle[1])
         : titleTag
-          ? titleTag[1].replace(/ \| Suno$/i, "").trim()
+          ? decodeHtmlEntities(titleTag[1].replace(/ \| Suno$/i, "").trim())
           : null;
 
       const image = ogImage ? ogImage[1] : null;
