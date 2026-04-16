@@ -4,7 +4,7 @@ import { fetchSunoTitle } from "../lib/fetchSunoTitle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
-  Plus, Download, Upload, Music, ListMusic, Volume2
+  Plus, Download, Upload, Music, ListMusic, ExternalLink
 } from "lucide-react";
 
 interface Song {
