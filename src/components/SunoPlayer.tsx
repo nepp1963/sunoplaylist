@@ -411,15 +411,22 @@ export default function SunoPlayer() {
                             <div {...provided.dragHandleProps} className="text-muted-foreground hover:text-foreground transition-colors cursor-grab">
                               <GripVertical className="w-4 h-4" />
                             </div>
-                            <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center shrink-0 text-xs font-mono text-muted-foreground">
+                            <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
                               {index === currentIndex && isPlaying ? (
-                                <div className="flex items-end gap-px h-3">
-                                  <span className="w-0.5 bg-primary animate-bounce" style={{ height: "8px", animationDelay: "0ms" }} />
-                                  <span className="w-0.5 bg-primary animate-bounce" style={{ height: "12px", animationDelay: "150ms" }} />
-                                  <span className="w-0.5 bg-primary animate-bounce" style={{ height: "6px", animationDelay: "300ms" }} />
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                  {song.image ? (
+                                    <img src={song.image} alt="" className="w-full h-full object-cover" />
+                                  ) : null}
+                                  <div className="absolute inset-0 flex items-end justify-center gap-px pb-1 bg-black/30">
+                                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "8px", animationDelay: "0ms" }} />
+                                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "12px", animationDelay: "150ms" }} />
+                                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "6px", animationDelay: "300ms" }} />
+                                  </div>
                                 </div>
+                              ) : song.image ? (
+                                <img src={song.image} alt="" className="w-full h-full object-cover" />
                               ) : (
-                                index + 1
+                                <span className="text-xs font-mono text-muted-foreground">{index + 1}</span>
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
