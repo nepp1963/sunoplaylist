@@ -54,11 +54,15 @@ export default function SunoPlayer() {
       title: extractSunoTitle(trimmed),
     };
     setSongs((prev) => [...prev, song]);
-    // Fetch real title from Suno in background
-    fetchSunoTitle({ data: sunoId }).then((title) => {
-      if (title) {
+    // Fetch real title and image from Suno in background
+    fetchSunoMeta({ data: sunoId }).then((meta) => {
+      if (meta) {
         setSongs((prev) =>
-          prev.map((s) => (s.id === songId ? { ...s, title } : s))
+          prev.map((s) =>
+            s.id === songId
+              ? { ...s, ...(meta.title ? { title: meta.title } : {}), ...(meta.image ? { image: meta.image } : {}) }
+              : s
+          )
         );
       }
     });
