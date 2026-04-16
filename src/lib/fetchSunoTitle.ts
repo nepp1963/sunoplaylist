@@ -1,5 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&#x27;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"');
+}
+
 export const fetchSunoMeta = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => input as string)
   .handler(async ({ data: sunoId }) => {
@@ -15,9 +25,9 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
       const ogImage = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
 
       const title = ogTitle
-        ? ogTitle[1]
+        ? decodeHtmlEntities(ogTitle[1])
         : titleTag
-          ? titleTag[1].replace(/ \| Suno$/i, "").trim()
+          ? decodeHtmlEntities(titleTag[1].replace(/ \| Suno$/i, "").trim())
           : null;
 
       const image = ogImage ? ogImage[1] : null;
