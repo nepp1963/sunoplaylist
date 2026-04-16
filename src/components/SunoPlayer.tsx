@@ -4,7 +4,7 @@ import { fetchSunoTitle } from "../lib/fetchSunoTitle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
-  Plus, Download, Upload, Music, ListMusic, Volume2
+  Plus, Download, Upload, Music, ListMusic, ExternalLink
 } from "lucide-react";
 
 interface Song {
@@ -259,7 +259,7 @@ export default function SunoPlayer() {
             <Music className="w-5 h-5 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
-            Suno Playlist
+            SUNO Playlist
           </h1>
         </div>
         <p className="text-muted-foreground text-sm ml-[52px]">
@@ -279,12 +279,27 @@ export default function SunoPlayer() {
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Volume2 className="w-6 h-6 text-primary animate-pulse" />
+                <div className="flex items-end gap-[3px] h-6">
+                  <span className="w-[3px] bg-primary rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
+                  <span className="w-[3px] bg-primary rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
+                  <span className="w-[3px] bg-primary rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
+                  <span className="w-[3px] bg-primary rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
+                </div>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Now Playing</p>
                 <p className="text-foreground font-semibold truncate">{currentSong.title}</p>
               </div>
+              <a
+                href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                title="Open on Suno"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
             <div className="cursor-pointer" onClick={seekTo}>
               <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
@@ -402,6 +417,16 @@ export default function SunoPlayer() {
                                 {song.title}
                               </p>
                             </div>
+                            <a
+                              href={song.url.startsWith("http") ? song.url : `https://suno.com/song/${extractSunoId(song.url)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                              title="Open on Suno"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
                             <button
                               onClick={(e) => { e.stopPropagation(); removeSong(song.id); }}
                               className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
