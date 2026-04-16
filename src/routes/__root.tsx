@@ -32,11 +32,15 @@ export const Route = createRootRoute({
       { title: "Suno Playlist Player" },
       { name: "description", content: "Play and manage your Suno music collection" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Suno Playlist Player" },
+      { property: "og:description", content: "Play and manage your Suno music collection" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Suno Playlist Player" },
+      { name: "twitter:description", content: "Play and manage your Suno music collection" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/69ae00f3-76df-4b40-89df-ce976ac13b16" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/69ae00f3-76df-4b40-89df-ce976ac13b16" },
     ],
     links: [
       {
