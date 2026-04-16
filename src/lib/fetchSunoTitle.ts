@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 export const fetchSunoTitle = createServerFn({ method: "GET" })
-  .validator((input: unknown) => input as string)
+  .inputValidator((input: unknown) => input as string)
   .handler(async ({ data: sunoId }) => {
     try {
       const res = await fetch(`https://suno.com/song/${sunoId}`, {
