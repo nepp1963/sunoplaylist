@@ -283,12 +283,17 @@ export default function SunoPlayer() {
             style={{ boxShadow: "0 0 40px var(--glow)" }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <div className="flex items-end gap-[3px] h-6">
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+                {currentSong.image ? (
+                  <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
+                ) : (
+                  <Music className="w-6 h-6 text-primary/40" />
+                )}
+                <div className="absolute inset-0 flex items-end justify-center gap-[3px] pb-1 bg-black/30">
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
                 </div>
               </div>
               <div className="min-w-0 flex-1">
