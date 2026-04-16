@@ -453,6 +453,27 @@ export default function SunoPlayer() {
           </div>
         </div>
       )}
+
+      <footer className="mt-8 text-sm text-muted-foreground">
+        SUNO Player by{" "}
+        <a
+          href="https://suno.com/@nepp1963"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline"
+        >
+          nepp1963
+        </a>{" "}
+        - plays music from{" "}
+        <a
+          href="https://suno.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline"
+        >
+          suno.com
+        </a>
+      </footer>
     </div>
   );
 }
