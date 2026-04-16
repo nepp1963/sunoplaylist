@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export const fetchSunoTitle = createServerFn({ method: "GET" })
+export const fetchSunoMeta = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => input as string)
   .handler(async ({ data: sunoId }) => {
     try {
@@ -9,12 +9,29 @@ export const fetchSunoTitle = createServerFn({ method: "GET" })
       });
       if (!res.ok) return null;
       const html = await res.text();
-      const ogMatch = html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i);
-      if (ogMatch) return ogMatch[1];
-      const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
-      if (titleMatch) return titleMatch[1].replace(/ \| Suno$/i, "").trim();
-      return null;
+
+      const ogTitle = html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i);
+      const titleTag = html.match(/<title>([^<]+)<\/title>/i);
+      const ogImage = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
+
+      const title = ogTitle
+        ? ogTitle[1]
+        : titleTag
+          ? titleTag[1].replace(/ \| Suno$/i, "").trim()
+          : null;
+
+      const image = ogImage ? ogImage[1] : null;
+
+      return { title, image };
     } catch {
       return null;
     }
+  });
+
+// Keep backward compat alias
+export const fetchSunoTitle = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => input as string)
+  .handler(async ({ data: sunoId }) => {
+    const result = await fetchSunoMeta({ data: sunoId });
+    return result?.title ?? null;
   });

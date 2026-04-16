@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import { fetchSunoTitle } from "../lib/fetchSunoTitle";
+import { fetchSunoMeta } from "../lib/fetchSunoTitle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
@@ -12,6 +12,7 @@ interface Song {
   url: string;
   audioUrl: string;
   title: string;
+  image?: string;
 }
 
 function extractSunoId(url: string): string | null {
@@ -53,11 +54,15 @@ export default function SunoPlayer() {
       title: extractSunoTitle(trimmed),
     };
     setSongs((prev) => [...prev, song]);
-    // Fetch real title from Suno in background
-    fetchSunoTitle({ data: sunoId }).then((title) => {
-      if (title) {
+    // Fetch real title and image from Suno in background
+    fetchSunoMeta({ data: sunoId }).then((meta) => {
+      if (meta) {
         setSongs((prev) =>
-          prev.map((s) => (s.id === songId ? { ...s, title } : s))
+          prev.map((s) =>
+            s.id === songId
+              ? { ...s, ...(meta.title ? { title: meta.title } : {}), ...(meta.image ? { image: meta.image } : {}) }
+              : s
+          )
         );
       }
     });
@@ -278,12 +283,17 @@ export default function SunoPlayer() {
             style={{ boxShadow: "0 0 40px var(--glow)" }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <div className="flex items-end gap-[3px] h-6">
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
-                  <span className="w-[3px] bg-primary rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+                {currentSong.image ? (
+                  <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
+                ) : (
+                  <Music className="w-6 h-6 text-primary/40" />
+                )}
+                <div className="absolute inset-0 flex items-end justify-center gap-[3px] pb-1 bg-black/30">
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
+                  <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
                 </div>
               </div>
               <div className="min-w-0 flex-1">
@@ -401,15 +411,22 @@ export default function SunoPlayer() {
                             <div {...provided.dragHandleProps} className="text-muted-foreground hover:text-foreground transition-colors cursor-grab">
                               <GripVertical className="w-4 h-4" />
                             </div>
-                            <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center shrink-0 text-xs font-mono text-muted-foreground">
+                            <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
                               {index === currentIndex && isPlaying ? (
-                                <div className="flex items-end gap-px h-3">
-                                  <span className="w-0.5 bg-primary animate-bounce" style={{ height: "8px", animationDelay: "0ms" }} />
-                                  <span className="w-0.5 bg-primary animate-bounce" style={{ height: "12px", animationDelay: "150ms" }} />
-                                  <span className="w-0.5 bg-primary animate-bounce" style={{ height: "6px", animationDelay: "300ms" }} />
+                                <div className="relative w-full h-full flex items-center justify-center">
+                                  {song.image ? (
+                                    <img src={song.image} alt="" className="w-full h-full object-cover" />
+                                  ) : null}
+                                  <div className="absolute inset-0 flex items-end justify-center gap-px pb-1 bg-black/30">
+                                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "8px", animationDelay: "0ms" }} />
+                                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "12px", animationDelay: "150ms" }} />
+                                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "6px", animationDelay: "300ms" }} />
+                                  </div>
                                 </div>
+                              ) : song.image ? (
+                                <img src={song.image} alt="" className="w-full h-full object-cover" />
                               ) : (
-                                index + 1
+                                <span className="text-xs font-mono text-muted-foreground">{index + 1}</span>
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
