@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
+import { fetchSunoTitle } from "../lib/fetchSunoTitle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
@@ -44,13 +45,22 @@ export default function SunoPlayer() {
     const trimmed = url.trim();
     const sunoId = extractSunoId(trimmed);
     if (!sunoId) return false;
+    const songId = crypto.randomUUID();
     const song: Song = {
-      id: crypto.randomUUID(),
+      id: songId,
       url: trimmed,
       audioUrl: `https://cdn1.suno.ai/${sunoId}.mp3`,
       title: extractSunoTitle(trimmed),
     };
     setSongs((prev) => [...prev, song]);
+    // Fetch real title from Suno in background
+    fetchSunoTitle({ data: sunoId }).then((title) => {
+      if (title) {
+        setSongs((prev) =>
+          prev.map((s) => (s.id === songId ? { ...s, title } : s))
+        );
+      }
+    });
     return true;
   }, []);
 
