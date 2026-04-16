@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
-import { fetchSunoTitle } from "../lib/fetchSunoTitle";
+import { fetchSunoMeta } from "../lib/fetchSunoTitle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
@@ -12,6 +12,7 @@ interface Song {
   url: string;
   audioUrl: string;
   title: string;
+  image?: string;
 }
 
 function extractSunoId(url: string): string | null {
