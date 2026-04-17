@@ -6,7 +6,7 @@ import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
-  Pencil, Check, Undo2
+  Pencil, Check, Undo2, Volume2, VolumeX, Volume1
 } from "lucide-react";
 
 type PendingUndo =
@@ -58,6 +58,15 @@ export default function SunoPlayer() {
   const [hydrated, setHydrated] = useState(false);
   const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [volume, setVolume] = useState<number>(() => {
+    if (typeof window === "undefined") return 1;
+    const v = parseFloat(localStorage.getItem("suno-volume") || "1");
+    return isNaN(v) ? 1 : Math.min(1, Math.max(0, v));
+  });
+  const [muted, setMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("suno-muted") === "1";
+  });
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -354,6 +363,19 @@ export default function SunoPlayer() {
       audio.src = "";
     }
   }, [currentSong, isPlaying]);
+
+  // Apply & persist volume / mute
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = volume;
+      audio.muted = muted;
+    }
+    try {
+      localStorage.setItem("suno-volume", String(volume));
+      localStorage.setItem("suno-muted", muted ? "1" : "0");
+    } catch { /* ignore */ }
+  }, [volume, muted, currentSong]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -669,6 +691,38 @@ export default function SunoPlayer() {
             <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
               <span>{formatTime(progress)}</span>
               <span>{duration ? formatTime(duration) : "--:--"}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-3">
+              <button
+                onClick={() => setMuted((m) => !m)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                title={muted ? "Unmute" : "Mute"}
+              >
+                {muted || volume === 0 ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : volume < 0.5 ? (
+                  <Volume1 className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={muted ? 0 : volume}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  setVolume(v);
+                  if (muted && v > 0) setMuted(false);
+                }}
+                className="flex-1 h-1.5 accent-primary cursor-pointer"
+                aria-label="Volume"
+              />
+              <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
+                {Math.round((muted ? 0 : volume) * 100)}%
+              </span>
             </div>
           </motion.div>
         )}
