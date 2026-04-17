@@ -738,11 +738,12 @@ export default function SunoPlayer() {
             <p className="text-sm">Drop Suno links here or use the input above</p>
           </div>
         ) : (
-          <>
+          <DragDropContext onDragEnd={handleDragEnd}>
             {/* Folder sections */}
             {songsByFolder.map(({ name, songs: folderSongs }) => (
               <div key={name} className="px-3 mb-1">
-                <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer"
+                <div
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
                   onClick={() => toggleFolder(name)}
                 >
                   {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
@@ -752,60 +753,53 @@ export default function SunoPlayer() {
                   <div className="flex-1" />
                   <button
                     onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded text-muted-foreground hover:text-destructive transition-all"
+                    className="p-1 rounded text-muted-foreground hover:text-destructive transition-all"
                     title="Remove folder"
                   >
                     <X className="w-3 h-3" />
                   </button>
                 </div>
-                {expandedFolders.has(name) && folderSongs.length > 0 && (
-                  <div className="pl-4">
-                    {folderSongs.map((song) => {
-                      const globalIndex = songs.indexOf(song);
-                      return (
-                        <div
-                          key={song.id}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl mb-1 group cursor-pointer transition-colors ${
-                            globalIndex === currentIndex ? "bg-primary/10 border border-primary/20" : "hover:bg-secondary/60"
-                          }`}
-                          onClick={() => playSong(globalIndex)}
-                        >
-                          <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
-                            {song.image ? (
-                              <img src={song.image} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="text-[10px] font-mono text-muted-foreground">{globalIndex + 1}</span>
-                            )}
-                          </div>
-                          <p className={`text-sm truncate flex-1 ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
-                            {song.title}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <Droppable droppableId={`folder:${name}`}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}
+                    >
+                      {expandedFolders.has(name) && (
+                        <AnimatePresence>
+                          {folderSongs.map((song, index) => renderSongItem(song, index))}
+                        </AnimatePresence>
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               </div>
             ))}
 
             {/* Unfoldered songs */}
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="playlist">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className="px-3 pb-3">
-                    <AnimatePresence>
-                      {(folders.length > 0 ? unfoldered : songs).map((song, index) =>
-                        renderSongItem(song, index)
-                      )}
-                    </AnimatePresence>
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </>
+            <Droppable droppableId="unfoldered">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className="px-3 pb-3 min-h-[12px]">
+                  <AnimatePresence>
+                    {(folders.length > 0 ? unfoldered : songs).map((song, index) =>
+                      renderSongItem(song, index)
+                    )}
+                  </AnimatePresence>
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
       </div>
+
+      <p className="w-full max-w-2xl mt-3 text-xs text-muted-foreground text-center px-2">
+        💾 Your playlist is automatically saved in your browser. If you clear your browser cache, you'll need to load your playlist again.
+        <br />
+        ⚠️ Always click <span className="font-medium text-foreground">Save Playlist</span> to download a backup before exiting the site.
+      </p>
 
       {dragOver && (
         <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
