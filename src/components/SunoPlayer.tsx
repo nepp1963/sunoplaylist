@@ -223,6 +223,60 @@ export default function SunoPlayer() {
     setAssignFolderSongId(null);
   };
 
+  const startEditTitle = (song: Song) => {
+    setEditingSongId(song.id);
+    setEditingTitle(song.title);
+  };
+
+  const commitEditTitle = () => {
+    if (!editingSongId) return;
+    const newTitle = editingTitle.trim();
+    if (newTitle) {
+      setSongs((prev) => prev.map((s) => (s.id === editingSongId ? { ...s, title: newTitle } : s)));
+    }
+    setEditingSongId(null);
+    setEditingTitle("");
+  };
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && Array.isArray(data.songs)) {
+          setSongs(data.songs);
+          setOriginalOrder(data.originalOrder || data.songs.map((s: Song) => s.id));
+          if (Array.isArray(data.folders)) setFolders(data.folders);
+        }
+      }
+    } catch { /* ignore */ }
+    setHydrated(true);
+  }, []);
+
+  // Persist to localStorage whenever playlist or folders change
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ songs, folders, originalOrder })
+      );
+    } catch { /* ignore */ }
+  }, [songs, folders, originalOrder, hydrated]);
+
+  // Warn before exit
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (songs.length > 0) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [songs.length]);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
