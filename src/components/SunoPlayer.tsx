@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
-  ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X
+  ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
+  Pencil, Check
 } from "lucide-react";
+
+const STORAGE_KEY = "suno-playlist-v1";
 
 interface Song {
   id: string;
