@@ -443,11 +443,27 @@ export default function SunoPlayer() {
                 <span className="text-xs font-mono text-muted-foreground">{globalIndex + 1}</span>
               )}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className={`text-sm truncate ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
-                {song.title}
-              </p>
-              {song.folder && (
+            <div className="min-w-0 flex-1" onClick={(e) => editingSongId === song.id && e.stopPropagation()}>
+              {editingSongId === song.id ? (
+                <input
+                  autoFocus
+                  type="text"
+                  value={editingTitle}
+                  onChange={(e) => setEditingTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") commitEditTitle();
+                    if (e.key === "Escape") { setEditingSongId(null); setEditingTitle(""); }
+                  }}
+                  onBlur={commitEditTitle}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full rounded-md bg-input px-2 py-1 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+                />
+              ) : (
+                <p className={`text-sm truncate ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
+                  {song.title}
+                </p>
+              )}
+              {song.folder && !editingSongId && (
                 <p className="text-[10px] text-muted-foreground truncate">{song.folder}</p>
               )}
             </div>
@@ -456,7 +472,7 @@ export default function SunoPlayer() {
               <div className="relative">
                 <button
                   onClick={(e) => { e.stopPropagation(); setAssignFolderSongId(assignFolderSongId === song.id ? null : song.id); }}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                  className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                   title="Assign to folder"
                 >
                   <FolderOpen className="w-3.5 h-3.5" />
@@ -482,19 +498,37 @@ export default function SunoPlayer() {
                 )}
               </div>
             )}
+            {editingSongId === song.id ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); commitEditTitle(); }}
+                className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all"
+                title="Save title"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={(e) => { e.stopPropagation(); startEditTitle(song); }}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                title="Edit title"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
             <a
               href={song.url.startsWith("http") ? song.url : `https://suno.com/song/${extractSunoId(song.url)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
               title="Open on Suno"
             >
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
             <button
               onClick={(e) => { e.stopPropagation(); removeSong(song.id); }}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+              title="Remove song"
             >
               <Trash2 className="w-4 h-4" />
             </button>
