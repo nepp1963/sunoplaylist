@@ -104,9 +104,18 @@ export default function SunoPlayer() {
     if (e.key === "Enter") handleAddLink();
   };
 
+  const showUndo = (undo: PendingUndo) => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setPendingUndo(undo);
+    undoTimerRef.current = setTimeout(() => setPendingUndo(null), 8000);
+  };
+
   const removeSong = (id: string) => {
+    const idx = songs.findIndex((s) => s.id === id);
+    if (idx < 0) return;
+    const song = songs[idx];
+    const orderIndex = originalOrder.indexOf(id);
     setSongs((prev) => {
-      const idx = prev.findIndex((s) => s.id === id);
       const newSongs = prev.filter((s) => s.id !== id);
       if (currentIndex >= newSongs.length) {
         setCurrentIndex(newSongs.length - 1);
@@ -118,6 +127,34 @@ export default function SunoPlayer() {
       return newSongs;
     });
     setOriginalOrder((prev) => prev.filter((sid) => sid !== id));
+    showUndo({ kind: "song", song, index: idx, orderIndex, label: `Deleted "${song.title}"` });
+  };
+
+  const undoDelete = () => {
+    if (!pendingUndo) return;
+    if (pendingUndo.kind === "song") {
+      const { song, index, orderIndex } = pendingUndo;
+      setSongs((prev) => {
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, song);
+        return next;
+      });
+      setOriginalOrder((prev) => {
+        if (prev.includes(song.id)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(orderIndex < 0 ? next.length : orderIndex, next.length), 0, song.id);
+        return next;
+      });
+    } else {
+      const { name, affectedSongIds } = pendingUndo;
+      setFolders((prev) => (prev.includes(name) ? prev : [...prev, name]));
+      setExpandedFolders((prev) => new Set([...prev, name]));
+      setSongs((prev) =>
+        prev.map((s) => (affectedSongIds.includes(s.id) ? { ...s, folder: name } : s))
+      );
+    }
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setPendingUndo(null);
   };
 
   const handleDragEnd = (result: DropResult) => {
