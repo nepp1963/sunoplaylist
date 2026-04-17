@@ -692,6 +692,38 @@ export default function SunoPlayer() {
               <span>{formatTime(progress)}</span>
               <span>{duration ? formatTime(duration) : "--:--"}</span>
             </div>
+            <div className="flex items-center gap-2 mt-3">
+              <button
+                onClick={() => setMuted((m) => !m)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                title={muted ? "Unmute" : "Mute"}
+              >
+                {muted || volume === 0 ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : volume < 0.5 ? (
+                  <Volume1 className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={muted ? 0 : volume}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  setVolume(v);
+                  if (muted && v > 0) setMuted(false);
+                }}
+                className="flex-1 h-1.5 accent-primary cursor-pointer"
+                aria-label="Volume"
+              />
+              <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
+                {Math.round((muted ? 0 : volume) * 100)}%
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
