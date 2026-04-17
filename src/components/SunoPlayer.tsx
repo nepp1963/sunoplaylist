@@ -364,6 +364,19 @@ export default function SunoPlayer() {
     }
   }, [currentSong, isPlaying]);
 
+  // Apply & persist volume / mute
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = volume;
+      audio.muted = muted;
+    }
+    try {
+      localStorage.setItem("suno-volume", String(volume));
+      localStorage.setItem("suno-muted", muted ? "1" : "0");
+    } catch { /* ignore */ }
+  }, [volume, muted, currentSong]);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
