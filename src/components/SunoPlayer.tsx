@@ -56,6 +56,8 @@ export default function SunoPlayer() {
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [hydrated, setHydrated] = useState(false);
+  const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
