@@ -6,8 +6,12 @@ import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
-  Pencil, Check
+  Pencil, Check, Undo2
 } from "lucide-react";
+
+type PendingUndo =
+  | { kind: "song"; song: Song; index: number; orderIndex: number; label: string }
+  | { kind: "folder"; name: string; affectedSongIds: string[]; label: string };
 
 const STORAGE_KEY = "suno-playlist-v1";
 
