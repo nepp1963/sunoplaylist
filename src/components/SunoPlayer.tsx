@@ -6,8 +6,12 @@ import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
-  Pencil, Check
+  Pencil, Check, Undo2
 } from "lucide-react";
+
+type PendingUndo =
+  | { kind: "song"; song: Song; index: number; orderIndex: number; label: string }
+  | { kind: "folder"; name: string; affectedSongIds: string[]; label: string };
 
 const STORAGE_KEY = "suno-playlist-v1";
 
@@ -52,6 +56,8 @@ export default function SunoPlayer() {
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [hydrated, setHydrated] = useState(false);
+  const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,9 +104,18 @@ export default function SunoPlayer() {
     if (e.key === "Enter") handleAddLink();
   };
 
+  const showUndo = (undo: PendingUndo) => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setPendingUndo(undo);
+    undoTimerRef.current = setTimeout(() => setPendingUndo(null), 8000);
+  };
+
   const removeSong = (id: string) => {
+    const idx = songs.findIndex((s) => s.id === id);
+    if (idx < 0) return;
+    const song = songs[idx];
+    const orderIndex = originalOrder.indexOf(id);
     setSongs((prev) => {
-      const idx = prev.findIndex((s) => s.id === id);
       const newSongs = prev.filter((s) => s.id !== id);
       if (currentIndex >= newSongs.length) {
         setCurrentIndex(newSongs.length - 1);
@@ -112,6 +127,34 @@ export default function SunoPlayer() {
       return newSongs;
     });
     setOriginalOrder((prev) => prev.filter((sid) => sid !== id));
+    showUndo({ kind: "song", song, index: idx, orderIndex, label: `Deleted "${song.title}"` });
+  };
+
+  const undoDelete = () => {
+    if (!pendingUndo) return;
+    if (pendingUndo.kind === "song") {
+      const { song, index, orderIndex } = pendingUndo;
+      setSongs((prev) => {
+        const next = [...prev];
+        next.splice(Math.min(index, next.length), 0, song);
+        return next;
+      });
+      setOriginalOrder((prev) => {
+        if (prev.includes(song.id)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(orderIndex < 0 ? next.length : orderIndex, next.length), 0, song.id);
+        return next;
+      });
+    } else {
+      const { name, affectedSongIds } = pendingUndo;
+      setFolders((prev) => (prev.includes(name) ? prev : [...prev, name]));
+      setExpandedFolders((prev) => new Set([...prev, name]));
+      setSongs((prev) =>
+        prev.map((s) => (affectedSongIds.includes(s.id) ? { ...s, folder: name } : s))
+      );
+    }
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setPendingUndo(null);
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -217,6 +260,7 @@ export default function SunoPlayer() {
   };
 
   const removeFolder = (name: string) => {
+    const affectedSongIds = songs.filter((s) => s.folder === name).map((s) => s.id);
     setFolders((prev) => prev.filter((f) => f !== name));
     setSongs((prev) => prev.map((s) => (s.folder === name ? { ...s, folder: undefined } : s)));
     setExpandedFolders((prev) => {
@@ -224,6 +268,7 @@ export default function SunoPlayer() {
       next.delete(name);
       return next;
     });
+    showUndo({ kind: "folder", name, affectedSongIds, label: `Deleted folder "${name}"` });
   };
 
   const toggleFolder = (name: string) => {
@@ -808,6 +853,32 @@ export default function SunoPlayer() {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {pendingUndo && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl bg-card border border-border shadow-lg px-4 py-2.5"
+          >
+            <span className="text-sm text-foreground">{pendingUndo.label}</span>
+            <button
+              onClick={undoDelete}
+              className="flex items-center gap-1.5 rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+            >
+              <Undo2 className="w-3.5 h-3.5" /> Undo
+            </button>
+            <button
+              onClick={() => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); setPendingUndo(null); }}
+              className="p-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+              title="Dismiss"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <footer className="mt-8 text-sm text-muted-foreground">
         SUNO Player by{" "}
