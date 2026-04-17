@@ -116,28 +116,45 @@ export default function SunoPlayer() {
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-    const from = result.source.index;
-    const to = result.destination.index;
+    const srcId = result.source.droppableId;
+    const dstId = result.destination.droppableId;
+    const srcIdx = result.source.index;
+    const dstIdx = result.destination.index;
+
+    const getList = (id: string) =>
+      id === "unfoldered"
+        ? songs.filter((s) => !s.folder)
+        : songs.filter((s) => s.folder === id.replace(/^folder:/, ""));
+
+    const srcList = getList(srcId);
+    const moved = srcList[srcIdx];
+    if (!moved) return;
+    const targetFolder = dstId === "unfoldered" ? undefined : dstId.replace(/^folder:/, "");
+
     setSongs((prev) => {
-      const arr = [...prev];
-      const [moved] = arr.splice(from, 1);
-      arr.splice(to, 0, moved);
-      if (currentIndex === from) setCurrentIndex(to);
-      else if (from < currentIndex && to >= currentIndex) setCurrentIndex((i) => i - 1);
-      else if (from > currentIndex && to <= currentIndex) setCurrentIndex((i) => i + 1);
-      return arr;
+      const without = prev.filter((s) => s.id !== moved.id);
+      const updatedMoved = { ...moved, folder: targetFolder };
+      const dstList = without.filter((s) =>
+        targetFolder === undefined ? !s.folder : s.folder === targetFolder
+      );
+      const anchor = dstList[dstIdx];
+      let insertAt: number;
+      if (anchor) {
+        insertAt = without.indexOf(anchor);
+      } else if (dstList.length > 0) {
+        insertAt = without.indexOf(dstList[dstList.length - 1]) + 1;
+      } else {
+        insertAt = without.length;
+      }
+      const next = [...without];
+      next.splice(insertAt, 0, updatedMoved);
+      if (currentSong) {
+        const newIdx = next.findIndex((s) => s.id === currentSong.id);
+        if (newIdx >= 0) setCurrentIndex(newIdx);
+      }
+      return next;
     });
     setSortMode("original");
-    setOriginalOrder((prev) => {
-      const arr = [...prev];
-      const fromIdx = arr.indexOf(songs[from]?.id);
-      const toIdx = arr.indexOf(songs[to]?.id);
-      if (fromIdx >= 0) {
-        const [moved] = arr.splice(fromIdx, 1);
-        arr.splice(toIdx >= 0 ? toIdx : arr.length, 0, moved);
-      }
-      return arr;
-    });
   };
 
   const sortSongs = (mode: SortMode) => {
