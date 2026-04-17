@@ -260,6 +260,7 @@ export default function SunoPlayer() {
   };
 
   const removeFolder = (name: string) => {
+    const affectedSongIds = songs.filter((s) => s.folder === name).map((s) => s.id);
     setFolders((prev) => prev.filter((f) => f !== name));
     setSongs((prev) => prev.map((s) => (s.folder === name ? { ...s, folder: undefined } : s)));
     setExpandedFolders((prev) => {
@@ -267,6 +268,7 @@ export default function SunoPlayer() {
       next.delete(name);
       return next;
     });
+    showUndo({ kind: "folder", name, affectedSongIds, label: `Deleted folder "${name}"` });
   };
 
   const toggleFolder = (name: string) => {
