@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
-  ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X
+  ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
+  Pencil, Check
 } from "lucide-react";
+
+const STORAGE_KEY = "suno-playlist-v1";
 
 interface Song {
   id: string;
@@ -46,6 +49,9 @@ export default function SunoPlayer() {
   const [newFolderName, setNewFolderName] = useState("");
   const [showFolderInput, setShowFolderInput] = useState(false);
   const [assignFolderSongId, setAssignFolderSongId] = useState<string | null>(null);
+  const [editingSongId, setEditingSongId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+  const [hydrated, setHydrated] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,28 +116,45 @@ export default function SunoPlayer() {
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-    const from = result.source.index;
-    const to = result.destination.index;
+    const srcId = result.source.droppableId;
+    const dstId = result.destination.droppableId;
+    const srcIdx = result.source.index;
+    const dstIdx = result.destination.index;
+
+    const getList = (id: string) =>
+      id === "unfoldered"
+        ? songs.filter((s) => !s.folder)
+        : songs.filter((s) => s.folder === id.replace(/^folder:/, ""));
+
+    const srcList = getList(srcId);
+    const moved = srcList[srcIdx];
+    if (!moved) return;
+    const targetFolder = dstId === "unfoldered" ? undefined : dstId.replace(/^folder:/, "");
+
     setSongs((prev) => {
-      const arr = [...prev];
-      const [moved] = arr.splice(from, 1);
-      arr.splice(to, 0, moved);
-      if (currentIndex === from) setCurrentIndex(to);
-      else if (from < currentIndex && to >= currentIndex) setCurrentIndex((i) => i - 1);
-      else if (from > currentIndex && to <= currentIndex) setCurrentIndex((i) => i + 1);
-      return arr;
+      const without = prev.filter((s) => s.id !== moved.id);
+      const updatedMoved = { ...moved, folder: targetFolder };
+      const dstList = without.filter((s) =>
+        targetFolder === undefined ? !s.folder : s.folder === targetFolder
+      );
+      const anchor = dstList[dstIdx];
+      let insertAt: number;
+      if (anchor) {
+        insertAt = without.indexOf(anchor);
+      } else if (dstList.length > 0) {
+        insertAt = without.indexOf(dstList[dstList.length - 1]) + 1;
+      } else {
+        insertAt = without.length;
+      }
+      const next = [...without];
+      next.splice(insertAt, 0, updatedMoved);
+      if (currentSong) {
+        const newIdx = next.findIndex((s) => s.id === currentSong.id);
+        if (newIdx >= 0) setCurrentIndex(newIdx);
+      }
+      return next;
     });
     setSortMode("original");
-    setOriginalOrder((prev) => {
-      const arr = [...prev];
-      const fromIdx = arr.indexOf(songs[from]?.id);
-      const toIdx = arr.indexOf(songs[to]?.id);
-      if (fromIdx >= 0) {
-        const [moved] = arr.splice(fromIdx, 1);
-        arr.splice(toIdx >= 0 ? toIdx : arr.length, 0, moved);
-      }
-      return arr;
-    });
   };
 
   const sortSongs = (mode: SortMode) => {
@@ -216,6 +239,60 @@ export default function SunoPlayer() {
     setSongs((prev) => prev.map((s) => (s.id === songId ? { ...s, folder } : s)));
     setAssignFolderSongId(null);
   };
+
+  const startEditTitle = (song: Song) => {
+    setEditingSongId(song.id);
+    setEditingTitle(song.title);
+  };
+
+  const commitEditTitle = () => {
+    if (!editingSongId) return;
+    const newTitle = editingTitle.trim();
+    if (newTitle) {
+      setSongs((prev) => prev.map((s) => (s.id === editingSongId ? { ...s, title: newTitle } : s)));
+    }
+    setEditingSongId(null);
+    setEditingTitle("");
+  };
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && Array.isArray(data.songs)) {
+          setSongs(data.songs);
+          setOriginalOrder(data.originalOrder || data.songs.map((s: Song) => s.id));
+          if (Array.isArray(data.folders)) setFolders(data.folders);
+        }
+      }
+    } catch { /* ignore */ }
+    setHydrated(true);
+  }, []);
+
+  // Persist to localStorage whenever playlist or folders change
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ songs, folders, originalOrder })
+      );
+    } catch { /* ignore */ }
+  }, [songs, folders, originalOrder, hydrated]);
+
+  // Warn before exit
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (songs.length > 0) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [songs.length]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -383,11 +460,27 @@ export default function SunoPlayer() {
                 <span className="text-xs font-mono text-muted-foreground">{globalIndex + 1}</span>
               )}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className={`text-sm truncate ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
-                {song.title}
-              </p>
-              {song.folder && (
+            <div className="min-w-0 flex-1" onClick={(e) => editingSongId === song.id && e.stopPropagation()}>
+              {editingSongId === song.id ? (
+                <input
+                  autoFocus
+                  type="text"
+                  value={editingTitle}
+                  onChange={(e) => setEditingTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") commitEditTitle();
+                    if (e.key === "Escape") { setEditingSongId(null); setEditingTitle(""); }
+                  }}
+                  onBlur={commitEditTitle}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full rounded-md bg-input px-2 py-1 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+                />
+              ) : (
+                <p className={`text-sm truncate ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
+                  {song.title}
+                </p>
+              )}
+              {song.folder && !editingSongId && (
                 <p className="text-[10px] text-muted-foreground truncate">{song.folder}</p>
               )}
             </div>
@@ -396,7 +489,7 @@ export default function SunoPlayer() {
               <div className="relative">
                 <button
                   onClick={(e) => { e.stopPropagation(); setAssignFolderSongId(assignFolderSongId === song.id ? null : song.id); }}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                  className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                   title="Assign to folder"
                 >
                   <FolderOpen className="w-3.5 h-3.5" />
@@ -422,19 +515,37 @@ export default function SunoPlayer() {
                 )}
               </div>
             )}
+            {editingSongId === song.id ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); commitEditTitle(); }}
+                className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all"
+                title="Save title"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={(e) => { e.stopPropagation(); startEditTitle(song); }}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                title="Edit title"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
             <a
               href={song.url.startsWith("http") ? song.url : `https://suno.com/song/${extractSunoId(song.url)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
               title="Open on Suno"
             >
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
             <button
               onClick={(e) => { e.stopPropagation(); removeSong(song.id); }}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+              title="Remove song"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -627,11 +738,12 @@ export default function SunoPlayer() {
             <p className="text-sm">Drop Suno links here or use the input above</p>
           </div>
         ) : (
-          <>
+          <DragDropContext onDragEnd={handleDragEnd}>
             {/* Folder sections */}
             {songsByFolder.map(({ name, songs: folderSongs }) => (
               <div key={name} className="px-3 mb-1">
-                <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer"
+                <div
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
                   onClick={() => toggleFolder(name)}
                 >
                   {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
@@ -641,60 +753,53 @@ export default function SunoPlayer() {
                   <div className="flex-1" />
                   <button
                     onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded text-muted-foreground hover:text-destructive transition-all"
+                    className="p-1 rounded text-muted-foreground hover:text-destructive transition-all"
                     title="Remove folder"
                   >
                     <X className="w-3 h-3" />
                   </button>
                 </div>
-                {expandedFolders.has(name) && folderSongs.length > 0 && (
-                  <div className="pl-4">
-                    {folderSongs.map((song) => {
-                      const globalIndex = songs.indexOf(song);
-                      return (
-                        <div
-                          key={song.id}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl mb-1 group cursor-pointer transition-colors ${
-                            globalIndex === currentIndex ? "bg-primary/10 border border-primary/20" : "hover:bg-secondary/60"
-                          }`}
-                          onClick={() => playSong(globalIndex)}
-                        >
-                          <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
-                            {song.image ? (
-                              <img src={song.image} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="text-[10px] font-mono text-muted-foreground">{globalIndex + 1}</span>
-                            )}
-                          </div>
-                          <p className={`text-sm truncate flex-1 ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
-                            {song.title}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <Droppable droppableId={`folder:${name}`}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}
+                    >
+                      {expandedFolders.has(name) && (
+                        <AnimatePresence>
+                          {folderSongs.map((song, index) => renderSongItem(song, index))}
+                        </AnimatePresence>
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               </div>
             ))}
 
             {/* Unfoldered songs */}
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="playlist">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className="px-3 pb-3">
-                    <AnimatePresence>
-                      {(folders.length > 0 ? unfoldered : songs).map((song, index) =>
-                        renderSongItem(song, index)
-                      )}
-                    </AnimatePresence>
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </>
+            <Droppable droppableId="unfoldered">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className="px-3 pb-3 min-h-[12px]">
+                  <AnimatePresence>
+                    {(folders.length > 0 ? unfoldered : songs).map((song, index) =>
+                      renderSongItem(song, index)
+                    )}
+                  </AnimatePresence>
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         )}
       </div>
+
+      <p className="w-full max-w-2xl mt-3 text-xs text-muted-foreground text-center px-2">
+        💾 Your playlist is automatically saved in your browser. If you clear your browser cache, you'll need to load your playlist again.
+        <br />
+        ⚠️ Always click <span className="font-medium text-foreground">Save Playlist</span> to download a backup before exiting the site.
+      </p>
 
       {dragOver && (
         <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
