@@ -6,7 +6,7 @@ import {
   Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
-  Pencil, Check, Undo2
+  Pencil, Check, Undo2, Volume2, VolumeX, Volume1
 } from "lucide-react";
 
 type PendingUndo =
