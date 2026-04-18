@@ -245,6 +245,18 @@ export default function SunoPlayer() {
     playSong(next);
   };
 
+  const playPrev = () => {
+    const audio = audioRef.current;
+    if (audio && audio.currentTime > 3) {
+      audio.currentTime = 0;
+      setProgress(0);
+      return;
+    }
+    if (songs.length === 0) return;
+    const prev = currentIndex <= 0 ? songs.length - 1 : currentIndex - 1;
+    playSong(prev);
+  };
+
   const shufflePlay = () => {
     if (songs.length === 0) return;
     let next = Math.floor(Math.random() * songs.length);
