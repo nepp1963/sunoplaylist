@@ -1,9 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
 import { fetchSunoMeta } from "../lib/fetchSunoTitle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Play, Pause, SkipForward, Shuffle, Trash2, GripVertical,
+  Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Trash2, ChevronUp,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
   Pencil, Check, Undo2, Volume2, VolumeX, Volume1
