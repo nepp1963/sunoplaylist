@@ -787,15 +787,26 @@ export default function SunoPlayer() {
         )}
       </AnimatePresence>
 
-      <div className="w-full max-w-2xl flex items-center justify-center gap-3 mb-6">
+      <div className="w-full max-w-2xl flex items-center justify-center gap-2 sm:gap-3 mb-6 flex-wrap">
         <button onClick={shufflePlay} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title="Shuffle">
           <Shuffle className="w-5 h-5" />
+        </button>
+        <button onClick={playPrev} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title="Back (restart song / previous)">
+          <SkipBack className="w-5 h-5" />
         </button>
         <button onClick={togglePlay} className="p-4 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg" style={{ boxShadow: "0 0 24px var(--glow)" }}>
           {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
         </button>
         <button onClick={playNext} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title="Next">
           <SkipForward className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => setRepeat((r) => !r)}
+          className={`p-3 rounded-xl transition-colors ${repeat ? "bg-primary/20 text-primary ring-2 ring-primary/40" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"}`}
+          title={repeat ? "Repeat: on" : "Repeat: off"}
+          aria-pressed={repeat}
+        >
+          <Repeat className="w-5 h-5" />
         </button>
       </div>
 
