@@ -885,25 +885,60 @@ export default function SunoPlayer() {
           </div>
         )}
 
-        {songs.length === 0 ? (
+        {songs.length === 0 && folders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Music className="w-10 h-10 mb-3 opacity-30" />
             <p className="text-sm">Drop Suno links here or use the input above</p>
           </div>
         ) : (
-          <DragDropContext onDragEnd={handleDragEnd}>
+          <>
             {/* Folder sections */}
             {songsByFolder.map(({ name, songs: folderSongs }) => (
               <div key={name} className="px-3 mb-1">
                 <div
                   className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
-                  onClick={() => toggleFolder(name)}
+                  onClick={() => editingFolder !== name && toggleFolder(name)}
                 >
                   {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
                   <FolderOpen className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-xs font-medium text-foreground">{name}</span>
-                  <span className="text-[10px] text-muted-foreground">({folderSongs.length})</span>
+                  {editingFolder === name ? (
+                    <input
+                      autoFocus
+                      type="text"
+                      value={editingFolderName}
+                      onChange={(e) => setEditingFolderName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") commitEditFolder();
+                        if (e.key === "Escape") { setEditingFolder(null); setEditingFolderName(""); }
+                      }}
+                      onBlur={commitEditFolder}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  ) : (
+                    <>
+                      <span className="text-xs font-medium text-foreground">{name}</span>
+                      <span className="text-[10px] text-muted-foreground">({folderSongs.length})</span>
+                    </>
+                  )}
                   <div className="flex-1" />
+                  {editingFolder === name ? (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); commitEditFolder(); }}
+                      className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
+                      title="Save folder name"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); startEditFolder(name); }}
+                      className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
+                      title="Rename folder"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
+                  )}
                   <button
                     onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
                     className="p-1 rounded text-muted-foreground hover:text-destructive transition-all"
@@ -912,39 +947,29 @@ export default function SunoPlayer() {
                     <X className="w-3 h-3" />
                   </button>
                 </div>
-                <Droppable droppableId={`folder:${name}`}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}
-                    >
-                      {expandedFolders.has(name) && (
-                        <AnimatePresence>
-                          {folderSongs.map((song, index) => renderSongItem(song, index))}
-                        </AnimatePresence>
+                <div className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}>
+                  {expandedFolders.has(name) && (
+                    <AnimatePresence>
+                      {folderSongs.length === 0 ? (
+                        <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">Empty folder — assign songs to it from the playlist below.</p>
+                      ) : (
+                        folderSongs.map((song, index) => renderSongItem(song, index, folderSongs.length))
                       )}
-                      {provided.placeholder}
-                    </div>
+                    </AnimatePresence>
                   )}
-                </Droppable>
+                </div>
               </div>
             ))}
 
             {/* Unfoldered songs */}
-            <Droppable droppableId="unfoldered">
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className="px-3 pb-3 min-h-[12px]">
-                  <AnimatePresence>
-                    {(folders.length > 0 ? unfoldered : songs).map((song, index) =>
-                      renderSongItem(song, index)
-                    )}
-                  </AnimatePresence>
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+            <div className="px-3 pb-3 min-h-[12px]">
+              <AnimatePresence>
+                {(folders.length > 0 ? unfoldered : songs).map((song, index, arr) =>
+                  renderSongItem(song, index, arr.length)
+                )}
+              </AnimatePresence>
+            </div>
+          </>
         )}
       </div>
 
