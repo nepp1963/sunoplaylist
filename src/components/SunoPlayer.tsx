@@ -289,6 +289,31 @@ export default function SunoPlayer() {
     showUndo({ kind: "folder", name, affectedSongIds, label: `Deleted folder "${name}"` });
   };
 
+  const startEditFolder = (name: string) => {
+    setEditingFolder(name);
+    setEditingFolderName(name);
+  };
+
+  const commitEditFolder = () => {
+    if (!editingFolder) return;
+    const oldName = editingFolder;
+    const newName = editingFolderName.trim();
+    setEditingFolder(null);
+    setEditingFolderName("");
+    if (!newName || newName === oldName) return;
+    if (folders.includes(newName)) return;
+    setFolders((prev) => prev.map((f) => (f === oldName ? newName : f)));
+    setSongs((prev) => prev.map((s) => (s.folder === oldName ? { ...s, folder: newName } : s)));
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(oldName)) {
+        next.delete(oldName);
+        next.add(newName);
+      }
+      return next;
+    });
+  };
+
   const toggleFolder = (name: string) => {
     setExpandedFolders((prev) => {
       const next = new Set(prev);
