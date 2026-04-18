@@ -416,7 +416,14 @@ export default function SunoPlayer() {
     if (!audio) return;
     const onTime = () => setProgress(audio.currentTime);
     const onDur = () => setDuration(audio.duration || 0);
-    const onEnd = () => playNext();
+    const onEnd = () => {
+      if (repeat && audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+        return;
+      }
+      playNext();
+    };
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("durationchange", onDur);
     audio.addEventListener("ended", onEnd);
