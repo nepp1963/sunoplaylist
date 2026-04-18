@@ -165,47 +165,42 @@ export default function SunoPlayer() {
     setPendingUndo(null);
   };
 
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-    const srcId = result.source.droppableId;
-    const dstId = result.destination.droppableId;
-    const srcIdx = result.source.index;
-    const dstIdx = result.destination.index;
-
-    const getList = (id: string) =>
-      id === "unfoldered"
-        ? songs.filter((s) => !s.folder)
-        : songs.filter((s) => s.folder === id.replace(/^folder:/, ""));
-
-    const srcList = getList(srcId);
-    const moved = srcList[srcIdx];
-    if (!moved) return;
-    const targetFolder = dstId === "unfoldered" ? undefined : dstId.replace(/^folder:/, "");
-
+  const moveSong = (id: string, direction: -1 | 1) => {
+    let movedToIdx: number | null = null;
+    let movedFromIdx: number | null = null;
     setSongs((prev) => {
-      const without = prev.filter((s) => s.id !== moved.id);
-      const updatedMoved = { ...moved, folder: targetFolder };
-      const dstList = without.filter((s) =>
-        targetFolder === undefined ? !s.folder : s.folder === targetFolder
-      );
-      const anchor = dstList[dstIdx];
-      let insertAt: number;
-      if (anchor) {
-        insertAt = without.indexOf(anchor);
-      } else if (dstList.length > 0) {
-        insertAt = without.indexOf(dstList[dstList.length - 1]) + 1;
-      } else {
-        insertAt = without.length;
-      }
-      const next = [...without];
-      next.splice(insertAt, 0, updatedMoved);
-      if (currentSong) {
-        const newIdx = next.findIndex((s) => s.id === currentSong.id);
-        if (newIdx >= 0) setCurrentIndex(newIdx);
-      }
+      const idx = prev.findIndex((s) => s.id === id);
+      if (idx < 0) return prev;
+      const song = prev[idx];
+      const groupKey = song.folder ?? null;
+      const groupIndices = prev
+        .map((s, i) => ({ s, i }))
+        .filter(({ s }) => (s.folder ?? null) === groupKey)
+        .map(({ i }) => i);
+      const posInGroup = groupIndices.indexOf(idx);
+      const newPosInGroup = posInGroup + direction;
+      if (newPosInGroup < 0 || newPosInGroup >= groupIndices.length) return prev;
+      const swapWithIdx = groupIndices[newPosInGroup];
+      movedFromIdx = idx;
+      movedToIdx = swapWithIdx;
+      const next = [...prev];
+      [next[idx], next[swapWithIdx]] = [next[swapWithIdx], next[idx]];
       return next;
     });
+    if (movedFromIdx !== null && movedToIdx !== null) {
+      if (currentIndex === movedFromIdx) setCurrentIndex(movedToIdx);
+      else if (currentIndex === movedToIdx) setCurrentIndex(movedFromIdx);
+    }
     setSortMode("original");
+    setOriginalOrder((prev) => {
+      const a = prev.indexOf(id);
+      if (a < 0) return prev;
+      const target = a + direction;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[a], next[target]] = [next[target], next[a]];
+      return next;
+    });
   };
 
   const sortSongs = (mode: SortMode) => {
