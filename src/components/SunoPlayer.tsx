@@ -527,139 +527,152 @@ export default function SunoPlayer() {
     songs: songs.filter((s) => s.folder === f),
   }));
 
-  const renderSongItem = (song: Song, index: number) => {
+  const renderSongItem = (song: Song, posInGroup: number, groupSize: number) => {
     const globalIndex = songs.indexOf(song);
+    const isFirst = posInGroup === 0;
+    const isLast = posInGroup === groupSize - 1;
     return (
-      <Draggable key={song.id} draggableId={song.id} index={index}>
-        {(provided, snapshot) => (
-          <motion.div
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
-              globalIndex === currentIndex
-                ? "bg-primary/10 border border-primary/20"
-                : snapshot.isDragging
-                  ? "bg-secondary"
-                  : "hover:bg-secondary/60"
-            }`}
-            onClick={() => playSong(globalIndex)}
+      <motion.div
+        key={song.id}
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, x: -50 }}
+        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
+          globalIndex === currentIndex
+            ? "bg-primary/10 border border-primary/20"
+            : "hover:bg-secondary/60"
+        }`}
+        onClick={() => playSong(globalIndex)}
+      >
+        {/* Up/Down move buttons */}
+        <div className="flex flex-col gap-0.5 shrink-0">
+          <button
+            onClick={(e) => { e.stopPropagation(); moveSong(song.id, -1); }}
+            disabled={isFirst}
+            className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            title="Move up"
+            aria-label="Move up"
           >
-            <div {...provided.dragHandleProps} className="text-muted-foreground hover:text-foreground transition-colors cursor-grab">
-              <GripVertical className="w-4 h-4" />
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
-              {globalIndex === currentIndex && isPlaying ? (
-                <div className="relative w-full h-full flex items-center justify-center">
-                  {song.image ? (
-                    <img src={song.image} alt="" className="w-full h-full object-cover" />
-                  ) : null}
-                  <div className="absolute inset-0 flex items-end justify-center gap-px pb-1 bg-black/30">
-                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "8px", animationDelay: "0ms" }} />
-                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "12px", animationDelay: "150ms" }} />
-                    <span className="w-0.5 bg-white animate-bounce" style={{ height: "6px", animationDelay: "300ms" }} />
-                  </div>
-                </div>
-              ) : song.image ? (
+            <ChevronUp className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); moveSong(song.id, 1); }}
+            disabled={isLast}
+            className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            title="Move down"
+            aria-label="Move down"
+          >
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
+          {globalIndex === currentIndex && isPlaying ? (
+            <div className="relative w-full h-full flex items-center justify-center">
+              {song.image ? (
                 <img src={song.image} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-xs font-mono text-muted-foreground">{globalIndex + 1}</span>
-              )}
+              ) : null}
+              <div className="absolute inset-0 flex items-end justify-center gap-px pb-1 bg-black/30">
+                <span className="w-0.5 bg-white animate-bounce" style={{ height: "8px", animationDelay: "0ms" }} />
+                <span className="w-0.5 bg-white animate-bounce" style={{ height: "12px", animationDelay: "150ms" }} />
+                <span className="w-0.5 bg-white animate-bounce" style={{ height: "6px", animationDelay: "300ms" }} />
+              </div>
             </div>
-            <div className="min-w-0 flex-1" onClick={(e) => editingSongId === song.id && e.stopPropagation()}>
-              {editingSongId === song.id ? (
-                <input
-                  autoFocus
-                  type="text"
-                  value={editingTitle}
-                  onChange={(e) => setEditingTitle(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") commitEditTitle();
-                    if (e.key === "Escape") { setEditingSongId(null); setEditingTitle(""); }
-                  }}
-                  onBlur={commitEditTitle}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full rounded-md bg-input px-2 py-1 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
-                />
-              ) : (
-                <p className={`text-sm truncate ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
-                  {song.title}
-                </p>
-              )}
-              {song.folder && !editingSongId && (
-                <p className="text-[10px] text-muted-foreground truncate">{song.folder}</p>
-              )}
-            </div>
-            {/* Folder assign button */}
-            {folders.length > 0 && (
-              <div className="relative">
+          ) : song.image ? (
+            <img src={song.image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-xs font-mono text-muted-foreground">{globalIndex + 1}</span>
+          )}
+        </div>
+        <div className="min-w-0 flex-1" onClick={(e) => editingSongId === song.id && e.stopPropagation()}>
+          {editingSongId === song.id ? (
+            <input
+              autoFocus
+              type="text"
+              value={editingTitle}
+              onChange={(e) => setEditingTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitEditTitle();
+                if (e.key === "Escape") { setEditingSongId(null); setEditingTitle(""); }
+              }}
+              onBlur={commitEditTitle}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full rounded-md bg-input px-2 py-1 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+            />
+          ) : (
+            <p className={`text-sm truncate ${globalIndex === currentIndex ? "text-primary font-medium" : "text-foreground"}`}>
+              {song.title}
+            </p>
+          )}
+          {song.folder && !editingSongId && (
+            <p className="text-[10px] text-muted-foreground truncate">{song.folder}</p>
+          )}
+        </div>
+        {folders.length > 0 && (
+          <div className="relative">
+            <button
+              onClick={(e) => { e.stopPropagation(); setAssignFolderSongId(assignFolderSongId === song.id ? null : song.id); }}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+              title="Assign to folder"
+            >
+              <FolderOpen className="w-3.5 h-3.5" />
+            </button>
+            {assignFolderSongId === song.id && (
+              <div className="absolute right-0 top-8 z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px]">
                 <button
-                  onClick={(e) => { e.stopPropagation(); setAssignFolderSongId(assignFolderSongId === song.id ? null : song.id); }}
-                  className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-                  title="Assign to folder"
+                  onClick={(e) => { e.stopPropagation(); assignToFolder(song.id, undefined); }}
+                  className="w-full text-left px-3 py-1.5 text-xs hover:bg-secondary transition-colors text-muted-foreground"
                 >
-                  <FolderOpen className="w-3.5 h-3.5" />
+                  No folder
                 </button>
-                {assignFolderSongId === song.id && (
-                  <div className="absolute right-0 top-8 z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px]">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); assignToFolder(song.id, undefined); }}
-                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-secondary transition-colors text-muted-foreground"
-                    >
-                      No folder
-                    </button>
-                    {folders.map((f) => (
-                      <button
-                        key={f}
-                        onClick={(e) => { e.stopPropagation(); assignToFolder(song.id, f); }}
-                        className={`w-full text-left px-3 py-1.5 text-xs hover:bg-secondary transition-colors ${song.folder === f ? "text-primary font-medium" : "text-foreground"}`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {folders.map((f) => (
+                  <button
+                    key={f}
+                    onClick={(e) => { e.stopPropagation(); assignToFolder(song.id, f); }}
+                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-secondary transition-colors ${song.folder === f ? "text-primary font-medium" : "text-foreground"}`}
+                  >
+                    {f}
+                  </button>
+                ))}
               </div>
             )}
-            {editingSongId === song.id ? (
-              <button
-                onClick={(e) => { e.stopPropagation(); commitEditTitle(); }}
-                className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all"
-                title="Save title"
-              >
-                <Check className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={(e) => { e.stopPropagation(); startEditTitle(song); }}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-                title="Edit title"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
-            )}
-            <a
-              href={song.url.startsWith("http") ? song.url : `https://suno.com/song/${extractSunoId(song.url)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-              title="Open on Suno"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-            <button
-              onClick={(e) => { e.stopPropagation(); removeSong(song.id); }}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-              title="Remove song"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </motion.div>
+          </div>
         )}
-      </Draggable>
+        {editingSongId === song.id ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); commitEditTitle(); }}
+            className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all"
+            title="Save title"
+          >
+            <Check className="w-4 h-4" />
+          </button>
+        ) : (
+          <button
+            onClick={(e) => { e.stopPropagation(); startEditTitle(song); }}
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+            title="Edit title"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        )}
+        <a
+          href={song.url.startsWith("http") ? song.url : `https://suno.com/song/${extractSunoId(song.url)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+          title="Open on Suno"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+        <button
+          onClick={(e) => { e.stopPropagation(); removeSong(song.id); }}
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+          title="Remove song"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </motion.div>
     );
   };
 
