@@ -141,7 +141,7 @@ export default function SunoPlayer() {
       return newSongs;
     });
     setOriginalOrder((prev) => prev.filter((sid) => sid !== id));
-    showUndo({ kind: "song", song, index: idx, orderIndex, label: `Deleted "${song.title}"` });
+    showUndo({ kind: "song", song, index: idx, orderIndex, label: `${t("deletedSong")} "${song.title}"` });
   };
 
   const undoDelete = () => {
@@ -289,7 +289,7 @@ export default function SunoPlayer() {
       next.delete(name);
       return next;
     });
-    showUndo({ kind: "folder", name, affectedSongIds, label: `Deleted folder "${name}"` });
+    showUndo({ kind: "folder", name, affectedSongIds, label: `${t("deletedFolder")} "${name}"` });
   };
 
   const startEditFolder = (name: string) => {
@@ -554,8 +554,8 @@ export default function SunoPlayer() {
             onClick={(e) => { e.stopPropagation(); moveSong(song.id, -1); }}
             disabled={isFirst}
             className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Move up"
-            aria-label="Move up"
+            title={t("moveUp")}
+            aria-label={t("moveUp")}
           >
             <ChevronUp className="w-3.5 h-3.5" />
           </button>
@@ -563,8 +563,8 @@ export default function SunoPlayer() {
             onClick={(e) => { e.stopPropagation(); moveSong(song.id, 1); }}
             disabled={isLast}
             className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Move down"
-            aria-label="Move down"
+            title={t("moveDown")}
+            aria-label={t("moveDown")}
           >
             <ChevronDown className="w-3.5 h-3.5" />
           </button>
@@ -616,7 +616,7 @@ export default function SunoPlayer() {
             <button
               onClick={(e) => { e.stopPropagation(); setAssignFolderSongId(assignFolderSongId === song.id ? null : song.id); }}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-              title="Assign to folder"
+              title={t("assignToFolder")}
             >
               <FolderOpen className="w-3.5 h-3.5" />
             </button>
@@ -626,7 +626,7 @@ export default function SunoPlayer() {
                   onClick={(e) => { e.stopPropagation(); assignToFolder(song.id, undefined); }}
                   className="w-full text-left px-3 py-1.5 text-xs hover:bg-secondary transition-colors text-muted-foreground"
                 >
-                  No folder
+                  {t("noFolder")}
                 </button>
                 {folders.map((f) => (
                   <button
@@ -645,7 +645,7 @@ export default function SunoPlayer() {
           <button
             onClick={(e) => { e.stopPropagation(); commitEditTitle(); }}
             className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all"
-            title="Save title"
+            title={t("saveTitle")}
           >
             <Check className="w-4 h-4" />
           </button>
@@ -653,7 +653,7 @@ export default function SunoPlayer() {
           <button
             onClick={(e) => { e.stopPropagation(); startEditTitle(song); }}
             className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-            title="Edit title"
+            title={t("editTitle")}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
@@ -664,14 +664,14 @@ export default function SunoPlayer() {
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
           className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-          title="Open on Suno"
+          title={t("openOnSuno")}
         >
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
         <button
           onClick={(e) => { e.stopPropagation(); removeSong(song.id); }}
           className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-          title="Remove song"
+          title={t("removeSong")}
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -684,17 +684,19 @@ export default function SunoPlayer() {
       <audio ref={audioRef} preload="auto" />
       <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={loadPlaylist} />
 
-      <div className="w-full max-w-2xl mb-8">
+      <div className="w-full max-w-2xl mb-8 mt-12 sm:mt-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-            <Music className="w-5 h-5 text-primary" />
-          </div>
+          <img
+            src={nepp1963Logo}
+            alt="nepp1963 logo"
+            className="w-10 h-10 rounded-xl object-contain shrink-0"
+          />
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
-            SUNO Playlist
+            <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
           </h1>
         </div>
         <p className="text-muted-foreground text-sm ml-[52px]">
-          Drop Suno links or paste them below to build your playlist
+          {t("subtitle")}
         </p>
       </div>
 
@@ -723,7 +725,7 @@ export default function SunoPlayer() {
                 </div>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">Now Playing</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
                 <div className="marquee-mask">
                   <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
                     {currentSong.title}
@@ -737,7 +739,7 @@ export default function SunoPlayer() {
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title="Open on Suno"
+                title={t("openOnSuno")}
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -758,7 +760,7 @@ export default function SunoPlayer() {
               <button
                 onClick={() => setMuted((m) => !m)}
                 className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={muted ? "Unmute" : "Mute"}
+                title={muted ? t("unmute") : t("mute")}
               >
                 {muted || volume === 0 ? (
                   <VolumeX className="w-4 h-4" />
@@ -780,7 +782,7 @@ export default function SunoPlayer() {
                   if (muted && v > 0) setMuted(false);
                 }}
                 className="flex-1 h-1.5 accent-primary cursor-pointer"
-                aria-label="Volume"
+                aria-label={t("volume")}
               />
               <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
                 {Math.round((muted ? 0 : volume) * 100)}%
@@ -791,22 +793,22 @@ export default function SunoPlayer() {
       </AnimatePresence>
 
       <div className="w-full max-w-2xl flex items-center justify-center gap-2 sm:gap-3 mb-6 flex-wrap">
-        <button onClick={shufflePlay} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title="Shuffle">
+        <button onClick={shufflePlay} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("shuffle")}>
           <Shuffle className="w-5 h-5" />
         </button>
-        <button onClick={playPrev} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title="Back (restart song / previous)">
+        <button onClick={playPrev} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("back")}>
           <SkipBack className="w-5 h-5" />
         </button>
-        <button onClick={togglePlay} className="p-4 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg" style={{ boxShadow: "0 0 24px var(--glow)" }}>
+        <button onClick={togglePlay} className="p-4 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg" style={{ boxShadow: "0 0 24px var(--glow)" }} title={isPlaying ? t("pause") : t("play")}>
           {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
         </button>
-        <button onClick={playNext} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title="Next">
+        <button onClick={playNext} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("next")}>
           <SkipForward className="w-5 h-5" />
         </button>
         <button
           onClick={() => setRepeat((r) => !r)}
           className={`p-3 rounded-xl transition-colors ${repeat ? "bg-primary/20 text-primary ring-2 ring-primary/40" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"}`}
-          title={repeat ? "Repeat: on" : "Repeat: off"}
+          title={repeat ? t("repeatOn") : t("repeatOff")}
           aria-pressed={repeat}
         >
           <Repeat className="w-5 h-5" />
@@ -821,7 +823,7 @@ export default function SunoPlayer() {
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
-          placeholder="Paste a Suno song link (e.g. https://suno.com/song/...)"
+          placeholder={t("pasteLink")}
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -839,16 +841,16 @@ export default function SunoPlayer() {
           className="flex-1 min-w-0 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
         />
         <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
-          <Plus className="w-4 h-4" /> Add
+          <Plus className="w-4 h-4" /> {t("add")}
         </button>
       </div>
 
       <div className="w-full max-w-2xl flex gap-2 mb-6">
         <button onClick={savePlaylist} disabled={songs.length === 0} className="flex-1 rounded-xl bg-secondary text-secondary-foreground px-4 py-2.5 text-sm font-medium flex items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-40">
-          <Download className="w-4 h-4" /> Save Playlist
+          <Download className="w-4 h-4" /> {t("savePlaylist")}
         </button>
         <button onClick={() => fileInputRef.current?.click()} className="flex-1 rounded-xl bg-secondary text-secondary-foreground px-4 py-2.5 text-sm font-medium flex items-center justify-center gap-2 hover:bg-accent hover:text-accent-foreground transition-colors">
-          <Upload className="w-4 h-4" /> Load Playlist
+          <Upload className="w-4 h-4" /> {t("loadPlaylist")}
         </button>
       </div>
 
@@ -863,7 +865,7 @@ export default function SunoPlayer() {
         <div className="flex items-center gap-2 px-5 pt-4 pb-2 flex-wrap">
           <ListMusic className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium text-muted-foreground">
-            Playlist ({songs.length} {songs.length === 1 ? "track" : "tracks"})
+            {t("playlist")} ({songs.length} {songs.length === 1 ? t("track") : t("tracks")})
           </span>
           <div className="flex-1" />
           {/* Sort buttons */}
@@ -872,21 +874,21 @@ export default function SunoPlayer() {
               <button
                 onClick={() => sortSongs("az")}
                 className={`p-1.5 rounded-lg transition-colors ${sortMode === "az" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-                title="Sort A–Z"
+                title={t("sortAZ")}
               >
                 <ArrowDownAZ className="w-4 h-4" />
               </button>
               <button
                 onClick={() => sortSongs("za")}
                 className={`p-1.5 rounded-lg transition-colors ${sortMode === "za" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-                title="Sort Z–A"
+                title={t("sortZA")}
               >
                 <ArrowUpZA className="w-4 h-4" />
               </button>
               <button
                 onClick={() => sortSongs("original")}
                 className={`p-1.5 rounded-lg transition-colors ${sortMode === "original" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-                title="Original order"
+                title={t("originalOrder")}
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -896,7 +898,7 @@ export default function SunoPlayer() {
           <button
             onClick={() => setShowFolderInput(!showFolderInput)}
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-            title="Create folder"
+            title={t("createFolder")}
           >
             <FolderPlus className="w-4 h-4" />
           </button>
@@ -907,14 +909,14 @@ export default function SunoPlayer() {
           <div className="flex gap-2 px-5 pb-2">
             <input
               type="text"
-              placeholder="Folder name (e.g. Rock, Jazz, Pop)"
+              placeholder={t("folderPlaceholder")}
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addFolder()}
               className="flex-1 rounded-lg bg-input px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring"
             />
             <button onClick={addFolder} className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
-              Create
+              {t("create")}
             </button>
           </div>
         )}
@@ -922,7 +924,7 @@ export default function SunoPlayer() {
         {songs.length === 0 && folders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Music className="w-10 h-10 mb-3 opacity-30" />
-            <p className="text-sm">Drop Suno links here or use the input above</p>
+            <p className="text-sm">{t("dropHint")}</p>
           </div>
         ) : (
           <>
@@ -960,7 +962,7 @@ export default function SunoPlayer() {
                     <button
                       onClick={(e) => { e.stopPropagation(); commitEditFolder(); }}
                       className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
-                      title="Save folder name"
+                      title={t("saveFolderName")}
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
@@ -968,7 +970,7 @@ export default function SunoPlayer() {
                     <button
                       onClick={(e) => { e.stopPropagation(); startEditFolder(name); }}
                       className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
-                      title="Rename folder"
+                      title={t("renameFolder")}
                     >
                       <Pencil className="w-3 h-3" />
                     </button>
@@ -976,7 +978,7 @@ export default function SunoPlayer() {
                   <button
                     onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
                     className="p-1 rounded text-muted-foreground hover:text-destructive transition-all"
-                    title="Remove folder"
+                    title={t("removeFolder")}
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -985,7 +987,7 @@ export default function SunoPlayer() {
                   {expandedFolders.has(name) && (
                     <AnimatePresence>
                       {folderSongs.length === 0 ? (
-                        <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">Empty folder — assign songs to it from the playlist below.</p>
+                        <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">{t("emptyFolder")}</p>
                       ) : (
                         folderSongs.map((song, index) => renderSongItem(song, index, folderSongs.length))
                       )}
@@ -1008,15 +1010,20 @@ export default function SunoPlayer() {
       </div>
 
       <p className="w-full max-w-2xl mt-3 text-xs text-muted-foreground text-center px-2">
-        💾 Your playlist is automatically saved in your browser. If you clear your browser cache, you'll need to load your playlist again.
+        {t("autosaveNote")}
         <br />
-        ⚠️ Always click <span className="font-medium text-foreground">Save Playlist</span> to download a backup before exiting the site.
+        {t("warnSaveNote").split("{save}").map((part, i, arr) => (
+          <span key={i}>
+            {part}
+            {i < arr.length - 1 && <span className="font-medium text-foreground">{t("saveLabel")}</span>}
+          </span>
+        ))}
       </p>
 
       {dragOver && (
         <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
           <div className="bg-primary/20 backdrop-blur-sm rounded-3xl px-8 py-6 border-2 border-primary">
-            <p className="text-primary font-semibold text-lg">Drop Suno links here</p>
+            <p className="text-primary font-semibold text-lg">{t("dropOverlay")}</p>
           </div>
         </div>
       )}
@@ -1034,12 +1041,12 @@ export default function SunoPlayer() {
               onClick={undoDelete}
               className="flex items-center gap-1.5 rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
             >
-              <Undo2 className="w-3.5 h-3.5" /> Undo
+              <Undo2 className="w-3.5 h-3.5" /> {t("undo")}
             </button>
             <button
               onClick={() => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); setPendingUndo(null); }}
               className="p-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
-              title="Dismiss"
+              title={t("dismiss")}
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -1047,8 +1054,8 @@ export default function SunoPlayer() {
         )}
       </AnimatePresence>
 
-      <footer className="mt-8 text-sm text-muted-foreground">
-        SUNO Player by{" "}
+      <footer className="mt-8 text-sm text-muted-foreground text-center">
+        {t("playerBy")}{" "}
         <a
           href="https://suno.com/@nepp1963"
           target="_blank"
@@ -1057,7 +1064,7 @@ export default function SunoPlayer() {
         >
           nepp1963
         </a>{" "}
-        - plays music from{" "}
+        {t("playsMusicFrom")}{" "}
         <a
           href="https://suno.com/"
           target="_blank"
