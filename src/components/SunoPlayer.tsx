@@ -721,7 +721,12 @@ export default function SunoPlayer() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Now Playing</p>
-                <p className="text-foreground font-semibold truncate">{currentSong.title}</p>
+                <div className="marquee-mask">
+                  <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
+                    {currentSong.title}
+                    {isPlaying && <span aria-hidden="true">{"   •   "}{currentSong.title}</span>}
+                  </span>
+                </div>
               </div>
               <a
                 href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
