@@ -813,12 +813,27 @@ export default function SunoPlayer() {
       <div className="w-full max-w-2xl flex gap-2 mb-4">
         <input
           ref={inputRef}
-          type="text"
+          type="url"
+          inputMode="url"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           placeholder="Paste a Suno song link (e.g. https://suno.com/song/...)"
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
+          onPaste={(e) => {
+            const text = e.clipboardData.getData("text");
+            if (!text) return;
+            const lines = text.split(/[\s,]+/).filter(Boolean);
+            const sunoLines = lines.filter((l) => extractSunoId(l));
+            if (sunoLines.length === 0) return;
+            e.preventDefault();
+            sunoLines.forEach((l) => addSong(l));
+            setLinkInput("");
+            if (inputRef.current) inputRef.current.value = "";
+          }}
+          className="flex-1 min-w-0 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
         />
         <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
           <Plus className="w-4 h-4" /> Add
