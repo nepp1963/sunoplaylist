@@ -47,6 +47,8 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", type: "image/webp", href: "/nepp1963-logo.webp" },
+      { rel: "apple-touch-icon", href: "/nepp1963-logo.webp" },
     ],
   }),
   shellComponent: RootShell,
