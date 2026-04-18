@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { fetchSunoMeta } from "../lib/fetchSunoTitle";
+import { useI18n } from "../lib/i18n";
+import nepp1963Logo from "../assets/nepp1963-logo.webp";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Trash2, ChevronUp,
@@ -34,10 +36,11 @@ function extractSunoId(url: string): string | null {
 
 function extractSunoTitle(url: string): string {
   const id = extractSunoId(url);
-  return id ? `Suno Track — ${id.slice(0, 8)}` : "Unknown Track";
+  return id ? `SUNO Track — ${id.slice(0, 8)}` : "Unknown Track";
 }
 
 export default function SunoPlayer() {
+  const { t } = useI18n();
   const [songs, setSongs] = useState<Song[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState(false);
