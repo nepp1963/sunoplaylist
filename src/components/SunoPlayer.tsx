@@ -432,7 +432,7 @@ export default function SunoPlayer() {
       audio.removeEventListener("durationchange", onDur);
       audio.removeEventListener("ended", onEnd);
     };
-  }, [songs.length, currentIndex]);
+  }, [songs.length, currentIndex, repeat]);
 
   const seekTo = (e: React.MouseEvent<HTMLDivElement>) => {
     const audio = audioRef.current;
