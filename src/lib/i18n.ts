@@ -15,6 +15,7 @@ export const LANGUAGES = [
   { code: "th", english: "Thai", native: "ไทย" },
   { code: "ja", english: "Japanese", native: "日本語" },
   { code: "zh", english: "Chinese", native: "中文" },
+  { code: "yue", english: "Cantonese", native: "粵語" },
   { code: "ko", english: "Korean", native: "한국어" },
 ] as const;
 
@@ -74,7 +75,18 @@ export type TranslationKey =
   | "playsMusicFrom"
   | "language"
   | "followNepp"
-  | "dropOverlay";
+  | "dropOverlay"
+  | "lockFolder"
+  | "unlockFolder"
+  | "lockedFolderHint"
+  | "moveFolderUp"
+  | "moveFolderDown"
+  | "sortFoldersAZ"
+  | "sortFoldersZA"
+  | "originalFolderOrder"
+  | "parentFolder"
+  | "noParent"
+  | "createSubfolder";
 
 type Dict = Record<TranslationKey, string>;
 
