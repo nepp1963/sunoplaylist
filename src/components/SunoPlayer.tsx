@@ -617,6 +617,7 @@ export default function SunoPlayer() {
           });
           if (loadedFolders.size > 0) {
             setFolders((prev) => [...new Set([...prev, ...loadedFolders])]);
+            setFolderOrder((prev) => [...new Set([...prev, ...loadedFolders])]);
           }
           // Assign folders after songs are added
           setTimeout(() => {
