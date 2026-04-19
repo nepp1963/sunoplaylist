@@ -89,6 +89,7 @@ export type TranslationKey =
   | "createSubfolder";
 
 type Dict = Record<TranslationKey, string>;
+type PartialDict = Partial<Dict>;
 
 const en: Dict = {
   title: "SUNO Playlist",
