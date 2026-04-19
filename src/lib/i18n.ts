@@ -146,6 +146,17 @@ const en: Dict = {
   language: "Language",
   followNepp: "Follow nepp1963",
   dropOverlay: "Drop SUNO links here",
+  lockFolder: "Lock folder",
+  unlockFolder: "Unlock folder",
+  lockedFolderHint: "Folder is locked. Unlock to delete.",
+  moveFolderUp: "Move folder up",
+  moveFolderDown: "Move folder down",
+  sortFoldersAZ: "Sort folders A–Z",
+  sortFoldersZA: "Sort folders Z–A",
+  originalFolderOrder: "Original folder order",
+  parentFolder: "Parent folder",
+  noParent: "(top level)",
+  createSubfolder: "Create subfolder",
 };
 
 const es: Dict = {
