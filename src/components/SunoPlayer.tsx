@@ -7,12 +7,12 @@ import {
   Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Trash2, ChevronUp,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
-  Pencil, Check, Undo2, Volume2, VolumeX, Volume1
+  Pencil, Check, Undo2, Volume2, VolumeX, Volume1, Lock, Unlock
 } from "lucide-react";
 
 type PendingUndo =
   | { kind: "song"; song: Song; index: number; orderIndex: number; label: string }
-  | { kind: "folder"; name: string; affectedSongIds: string[]; label: string };
+  | { kind: "folder"; name: string; affectedSongIds: string[]; folderIndex: number; folderOrderIndex: number; label: string };
 
 const STORAGE_KEY = "suno-playlist-v1";
 
@@ -26,6 +26,7 @@ interface Song {
 }
 
 type SortMode = "original" | "az" | "za";
+type FolderSortMode = "original" | "az" | "za";
 
 function extractSunoId(url: string): string | null {
   const match = url.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-f0-9-]+)/i);
@@ -51,8 +52,12 @@ export default function SunoPlayer() {
   const [sortMode, setSortMode] = useState<SortMode>("original");
   const [originalOrder, setOriginalOrder] = useState<string[]>([]);
   const [folders, setFolders] = useState<string[]>([]);
+  const [folderOrder, setFolderOrder] = useState<string[]>([]);
+  const [folderSortMode, setFolderSortMode] = useState<FolderSortMode>("original");
+  const [lockedFolders, setLockedFolders] = useState<string[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderParent, setNewFolderParent] = useState<string>("");
   const [showFolderInput, setShowFolderInput] = useState(false);
   const [assignFolderSongId, setAssignFolderSongId] = useState<string | null>(null);
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
@@ -160,8 +165,19 @@ export default function SunoPlayer() {
         return next;
       });
     } else {
-      const { name, affectedSongIds } = pendingUndo;
-      setFolders((prev) => (prev.includes(name) ? prev : [...prev, name]));
+      const { name, affectedSongIds, folderIndex, folderOrderIndex } = pendingUndo;
+      setFolders((prev) => {
+        if (prev.includes(name)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(folderIndex, next.length), 0, name);
+        return next;
+      });
+      setFolderOrder((prev) => {
+        if (prev.includes(name)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(folderOrderIndex < 0 ? next.length : folderOrderIndex, next.length), 0, name);
+        return next;
+      });
       setExpandedFolders((prev) => new Set([...prev, name]));
       setSongs((prev) =>
         prev.map((s) => (affectedSongIds.includes(s.id) ? { ...s, folder: name } : s))
@@ -270,49 +286,138 @@ export default function SunoPlayer() {
   };
 
   // Folder management
+  const buildFolderName = (parent: string, leaf: string) =>
+    parent ? `${parent}/${leaf}` : leaf;
+  const folderLeaf = (full: string) => full.split("/").pop() || full;
+  const folderDepth = (full: string) => full.split("/").length - 1;
+  const folderParent = (full: string) => {
+    const parts = full.split("/");
+    parts.pop();
+    return parts.join("/");
+  };
+
   const addFolder = () => {
-    const name = newFolderName.trim();
-    if (name && !folders.includes(name)) {
-      setFolders((prev) => [...prev, name]);
-      setExpandedFolders((prev) => new Set([...prev, name]));
+    const leaf = newFolderName.trim();
+    if (!leaf || leaf.includes("/")) {
+      setNewFolderName("");
+      setNewFolderParent("");
+      setShowFolderInput(false);
+      return;
+    }
+    const full = buildFolderName(newFolderParent, leaf);
+    if (!folders.includes(full)) {
+      setFolders((prev) => [...prev, full]);
+      setFolderOrder((prev) => [...prev, full]);
+      setExpandedFolders((prev) => {
+        const next = new Set([...prev, full]);
+        if (newFolderParent) next.add(newFolderParent);
+        return next;
+      });
     }
     setNewFolderName("");
+    setNewFolderParent("");
     setShowFolderInput(false);
   };
 
   const removeFolder = (name: string) => {
-    const affectedSongIds = songs.filter((s) => s.folder === name).map((s) => s.id);
-    setFolders((prev) => prev.filter((f) => f !== name));
-    setSongs((prev) => prev.map((s) => (s.folder === name ? { ...s, folder: undefined } : s)));
+    if (lockedFolders.includes(name)) return;
+    // Collect this folder + all descendants
+    const affectedFolders = folders.filter((f) => f === name || f.startsWith(name + "/"));
+    const affectedSongIds = songs.filter((s) => s.folder && affectedFolders.includes(s.folder)).map((s) => s.id);
+    const folderIndex = folders.indexOf(name);
+    const folderOrderIndex = folderOrder.indexOf(name);
+    setFolders((prev) => prev.filter((f) => !affectedFolders.includes(f)));
+    setFolderOrder((prev) => prev.filter((f) => !affectedFolders.includes(f)));
+    setSongs((prev) => prev.map((s) => (s.folder && affectedFolders.includes(s.folder) ? { ...s, folder: undefined } : s)));
     setExpandedFolders((prev) => {
       const next = new Set(prev);
-      next.delete(name);
+      affectedFolders.forEach((f) => next.delete(f));
       return next;
     });
-    showUndo({ kind: "folder", name, affectedSongIds, label: `${t("deletedFolder")} "${name}"` });
+    showUndo({ kind: "folder", name, affectedSongIds, folderIndex, folderOrderIndex, label: `${t("deletedFolder")} "${folderLeaf(name)}"` });
+  };
+
+  const toggleLockFolder = (name: string) => {
+    setLockedFolders((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
+  };
+
+  const moveFolder = (name: string, direction: -1 | 1) => {
+    setFolderSortMode("original");
+    setFolders((prev) => {
+      // Move within same parent group
+      const parent = folderParent(name);
+      const siblings = prev.filter((f) => folderParent(f) === parent);
+      const i = siblings.indexOf(name);
+      const target = i + direction;
+      if (target < 0 || target >= siblings.length) return prev;
+      const swapName = siblings[target];
+      // Find indices in prev and swap
+      const next = [...prev];
+      const a = next.indexOf(name);
+      const b = next.indexOf(swapName);
+      [next[a], next[b]] = [next[b], next[a]];
+      return next;
+    });
+    setFolderOrder((prev) => {
+      const parent = folderParent(name);
+      const siblings = prev.filter((f) => folderParent(f) === parent);
+      const i = siblings.indexOf(name);
+      const target = i + direction;
+      if (target < 0 || target >= siblings.length) return prev;
+      const swapName = siblings[target];
+      const next = [...prev];
+      const a = next.indexOf(name);
+      const b = next.indexOf(swapName);
+      [next[a], next[b]] = [next[b], next[a]];
+      return next;
+    });
+  };
+
+  const sortFolders = (mode: FolderSortMode) => {
+    setFolderSortMode(mode);
+    setFolders((prev) => {
+      if (mode === "original") {
+        return [...prev].sort((a, b) => folderOrder.indexOf(a) - folderOrder.indexOf(b));
+      }
+      // Sort hierarchically: keep parent before children, sort siblings by leaf name
+      const sorted = [...prev].sort((a, b) => {
+        const da = folderDepth(a);
+        const db = folderDepth(b);
+        if (da !== db) {
+          // If different depths, sort by full path so parents come before children
+          return a.localeCompare(b);
+        }
+        const cmp = folderLeaf(a).localeCompare(folderLeaf(b));
+        return mode === "az" ? cmp : -cmp;
+      });
+      return sorted;
+    });
   };
 
   const startEditFolder = (name: string) => {
     setEditingFolder(name);
-    setEditingFolderName(name);
+    setEditingFolderName(folderLeaf(name));
   };
 
   const commitEditFolder = () => {
     if (!editingFolder) return;
     const oldName = editingFolder;
-    const newName = editingFolderName.trim();
+    const newLeaf = editingFolderName.trim();
     setEditingFolder(null);
     setEditingFolderName("");
-    if (!newName || newName === oldName) return;
+    if (!newLeaf || newLeaf.includes("/") || newLeaf === folderLeaf(oldName)) return;
+    const parent = folderParent(oldName);
+    const newName = buildFolderName(parent, newLeaf);
     if (folders.includes(newName)) return;
-    setFolders((prev) => prev.map((f) => (f === oldName ? newName : f)));
-    setSongs((prev) => prev.map((s) => (s.folder === oldName ? { ...s, folder: newName } : s)));
+    const renameOne = (f: string) =>
+      f === oldName ? newName : f.startsWith(oldName + "/") ? newName + f.slice(oldName.length) : f;
+    setFolders((prev) => prev.map(renameOne));
+    setFolderOrder((prev) => prev.map(renameOne));
+    setSongs((prev) => prev.map((s) => (s.folder ? { ...s, folder: renameOne(s.folder) } : s)));
+    setLockedFolders((prev) => prev.map(renameOne));
     setExpandedFolders((prev) => {
-      const next = new Set(prev);
-      if (next.has(oldName)) {
-        next.delete(oldName);
-        next.add(newName);
-      }
+      const next = new Set<string>();
+      prev.forEach((f) => next.add(renameOne(f)));
       return next;
     });
   };
@@ -356,6 +461,9 @@ export default function SunoPlayer() {
           setSongs(data.songs);
           setOriginalOrder(data.originalOrder || data.songs.map((s: Song) => s.id));
           if (Array.isArray(data.folders)) setFolders(data.folders);
+          if (Array.isArray(data.folderOrder)) setFolderOrder(data.folderOrder);
+          else if (Array.isArray(data.folders)) setFolderOrder(data.folders);
+          if (Array.isArray(data.lockedFolders)) setLockedFolders(data.lockedFolders);
         }
       }
     } catch { /* ignore */ }
@@ -368,10 +476,10 @@ export default function SunoPlayer() {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ songs, folders, originalOrder })
+        JSON.stringify({ songs, folders, folderOrder, lockedFolders, originalOrder })
       );
     } catch { /* ignore */ }
-  }, [songs, folders, originalOrder, hydrated]);
+  }, [songs, folders, folderOrder, lockedFolders, originalOrder, hydrated]);
 
   // Warn before exit
   useEffect(() => {
@@ -389,12 +497,16 @@ export default function SunoPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     if (currentSong) {
-      if (audio.src !== currentSong.audioUrl) {
+      const sameSrc = audio.src.endsWith(currentSong.audioUrl) || audio.src === currentSong.audioUrl;
+      if (!sameSrc) {
         audio.src = currentSong.audioUrl;
         audio.load();
       }
-      if (isPlaying) audio.play().catch(() => {});
-      else audio.pause();
+      if (isPlaying) {
+        if (audio.paused) audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
     } else {
       audio.pause();
       audio.src = "";
@@ -505,6 +617,7 @@ export default function SunoPlayer() {
           });
           if (loadedFolders.size > 0) {
             setFolders((prev) => [...new Set([...prev, ...loadedFolders])]);
+            setFolderOrder((prev) => [...new Set([...prev, ...loadedFolders])]);
           }
           // Assign folders after songs are added
           setTimeout(() => {
@@ -529,6 +642,23 @@ export default function SunoPlayer() {
     name: f,
     songs: songs.filter((s) => s.folder === f),
   }));
+
+  // Hide folder rows whose ancestor is collapsed
+  const isFolderVisible = (name: string): boolean => {
+    let parent = folderParent(name);
+    while (parent) {
+      if (!expandedFolders.has(parent)) return false;
+      parent = folderParent(parent);
+    }
+    return true;
+  };
+
+  // Position-in-siblings helpers for the per-folder up/down buttons
+  const siblingPos = (name: string): { idx: number; total: number } => {
+    const parent = folderParent(name);
+    const siblings = folders.filter((f) => folderParent(f) === parent);
+    return { idx: siblings.indexOf(name), total: siblings.length };
+  };
 
   const renderSongItem = (song: Song, posInGroup: number, groupSize: number) => {
     const globalIndex = songs.indexOf(song);
@@ -689,7 +819,7 @@ export default function SunoPlayer() {
           <img
             src={nepp1963Logo}
             alt="nepp1963 logo"
-            className="w-10 h-10 rounded-xl object-contain shrink-0"
+            className="w-9 h-9 rounded-xl object-cover shrink-0 ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
             <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
@@ -894,6 +1024,35 @@ export default function SunoPlayer() {
               </button>
             </div>
           )}
+          {/* Folder sort buttons */}
+          {folders.length > 1 && (
+            <div className="flex gap-1">
+              <button
+                onClick={() => sortFolders("az")}
+                className={`p-1.5 rounded-lg transition-colors ${folderSortMode === "az" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                title={t("sortFoldersAZ")}
+              >
+                <FolderOpen className="w-3.5 h-3.5 inline" />
+                <ArrowDownAZ className="w-3 h-3 inline -ml-0.5" />
+              </button>
+              <button
+                onClick={() => sortFolders("za")}
+                className={`p-1.5 rounded-lg transition-colors ${folderSortMode === "za" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                title={t("sortFoldersZA")}
+              >
+                <FolderOpen className="w-3.5 h-3.5 inline" />
+                <ArrowUpZA className="w-3 h-3 inline -ml-0.5" />
+              </button>
+              <button
+                onClick={() => sortFolders("original")}
+                className={`p-1.5 rounded-lg transition-colors ${folderSortMode === "original" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                title={t("originalFolderOrder")}
+              >
+                <FolderOpen className="w-3.5 h-3.5 inline" />
+                <RotateCcw className="w-3 h-3 inline -ml-0.5" />
+              </button>
+            </div>
+          )}
           {/* Folder create button */}
           <button
             onClick={() => setShowFolderInput(!showFolderInput)}
@@ -906,7 +1065,20 @@ export default function SunoPlayer() {
 
         {/* Folder creation input */}
         {showFolderInput && (
-          <div className="flex gap-2 px-5 pb-2">
+          <div className="flex flex-col sm:flex-row gap-2 px-5 pb-2">
+            {folders.length > 0 && (
+              <select
+                value={newFolderParent}
+                onChange={(e) => setNewFolderParent(e.target.value)}
+                className="rounded-lg bg-input px-2 py-1.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring max-w-[40%]"
+                title={t("parentFolder")}
+              >
+                <option value="">{t("noParent")}</option>
+                {folders.map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            )}
             <input
               type="text"
               placeholder={t("folderPlaceholder")}
@@ -916,7 +1088,7 @@ export default function SunoPlayer() {
               className="flex-1 rounded-lg bg-input px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring"
             />
             <button onClick={addFolder} className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
-              {t("create")}
+              {newFolderParent ? t("createSubfolder") : t("create")}
             </button>
           </div>
         )}
@@ -928,74 +1100,113 @@ export default function SunoPlayer() {
           </div>
         ) : (
           <>
-            {/* Folder sections */}
-            {songsByFolder.map(({ name, songs: folderSongs }) => (
-              <div key={name} className="px-3 mb-1">
-                <div
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
-                  onClick={() => editingFolder !== name && toggleFolder(name)}
-                >
-                  {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
-                  <FolderOpen className="w-3.5 h-3.5 text-primary" />
-                  {editingFolder === name ? (
-                    <input
-                      autoFocus
-                      type="text"
-                      value={editingFolderName}
-                      onChange={(e) => setEditingFolderName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") commitEditFolder();
-                        if (e.key === "Escape") { setEditingFolder(null); setEditingFolderName(""); }
-                      }}
-                      onBlur={commitEditFolder}
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  ) : (
-                    <>
-                      <span className="text-xs font-medium text-foreground">{name}</span>
-                      <span className="text-[10px] text-muted-foreground">({folderSongs.length})</span>
-                    </>
-                  )}
-                  <div className="flex-1" />
-                  {editingFolder === name ? (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); commitEditFolder(); }}
-                      className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
-                      title={t("saveFolderName")}
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); startEditFolder(name); }}
-                      className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
-                      title={t("renameFolder")}
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </button>
-                  )}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
-                    className="p-1 rounded text-muted-foreground hover:text-destructive transition-all"
-                    title={t("removeFolder")}
+            {/* Folder sections (hierarchical) */}
+            {songsByFolder.map(({ name, songs: folderSongs }) => {
+              if (!isFolderVisible(name)) return null;
+              const depth = folderDepth(name);
+              const { idx: sIdx, total: sTotal } = siblingPos(name);
+              const isLocked = lockedFolders.includes(name);
+              const leaf = folderLeaf(name);
+              return (
+                <div key={name} className="px-3 mb-1" style={{ paddingLeft: `${12 + depth * 16}px` }}>
+                  <div
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
+                    onClick={() => editingFolder !== name && toggleFolder(name)}
                   >
-                    <X className="w-3 h-3" />
-                  </button>
+                    {/* Move buttons for folders */}
+                    <div className="flex flex-col gap-0.5 shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveFolder(name, -1); }}
+                        disabled={sIdx === 0}
+                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={t("moveFolderUp")}
+                        aria-label={t("moveFolderUp")}
+                      >
+                        <ChevronUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveFolder(name, 1); }}
+                        disabled={sIdx === sTotal - 1}
+                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={t("moveFolderDown")}
+                        aria-label={t("moveFolderDown")}
+                      >
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                    {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
+                    <FolderOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                    {editingFolder === name ? (
+                      <input
+                        autoFocus
+                        type="text"
+                        value={editingFolderName}
+                        onChange={(e) => setEditingFolderName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") commitEditFolder();
+                          if (e.key === "Escape") { setEditingFolder(null); setEditingFolderName(""); }
+                        }}
+                        onBlur={commitEditFolder}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    ) : (
+                      <>
+                        <span className="text-xs font-medium text-foreground truncate">{leaf}</span>
+                        <span className="text-[10px] text-muted-foreground">({folderSongs.length})</span>
+                      </>
+                    )}
+                    <div className="flex-1" />
+                    {/* Lock toggle */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleLockFolder(name); }}
+                      className={`p-1 rounded transition-all ${isLocked ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                      title={isLocked ? t("unlockFolder") : t("lockFolder")}
+                      aria-pressed={isLocked}
+                    >
+                      {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                    </button>
+                    {editingFolder === name ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); commitEditFolder(); }}
+                        className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
+                        title={t("saveFolderName")}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); startEditFolder(name); }}
+                        className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
+                        title={t("renameFolder")}
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
+                      disabled={isLocked}
+                      className="p-1 rounded text-muted-foreground hover:text-destructive transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      title={isLocked ? t("lockedFolderHint") : t("removeFolder")}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <div className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}>
+                    {expandedFolders.has(name) && (
+                      <AnimatePresence>
+                        {folderSongs.length === 0 ? (
+                          <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">{t("emptyFolder")}</p>
+                        ) : (
+                          folderSongs.map((song, index) => renderSongItem(song, index, folderSongs.length))
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </div>
                 </div>
-                <div className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}>
-                  {expandedFolders.has(name) && (
-                    <AnimatePresence>
-                      {folderSongs.length === 0 ? (
-                        <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">{t("emptyFolder")}</p>
-                      ) : (
-                        folderSongs.map((song, index) => renderSongItem(song, index, folderSongs.length))
-                      )}
-                    </AnimatePresence>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
+
 
             {/* Unfoldered songs */}
             <div className="px-3 pb-3 min-h-[12px]">

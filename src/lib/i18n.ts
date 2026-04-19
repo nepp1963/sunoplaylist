@@ -15,6 +15,7 @@ export const LANGUAGES = [
   { code: "th", english: "Thai", native: "ไทย" },
   { code: "ja", english: "Japanese", native: "日本語" },
   { code: "zh", english: "Chinese", native: "中文" },
+  { code: "yue", english: "Cantonese", native: "粵語" },
   { code: "ko", english: "Korean", native: "한국어" },
 ] as const;
 
@@ -74,9 +75,21 @@ export type TranslationKey =
   | "playsMusicFrom"
   | "language"
   | "followNepp"
-  | "dropOverlay";
+  | "dropOverlay"
+  | "lockFolder"
+  | "unlockFolder"
+  | "lockedFolderHint"
+  | "moveFolderUp"
+  | "moveFolderDown"
+  | "sortFoldersAZ"
+  | "sortFoldersZA"
+  | "originalFolderOrder"
+  | "parentFolder"
+  | "noParent"
+  | "createSubfolder";
 
 type Dict = Record<TranslationKey, string>;
+type PartialDict = Partial<Dict>;
 
 const en: Dict = {
   title: "SUNO Playlist",
@@ -133,9 +146,20 @@ const en: Dict = {
   language: "Language",
   followNepp: "Follow nepp1963",
   dropOverlay: "Drop SUNO links here",
+  lockFolder: "Lock folder",
+  unlockFolder: "Unlock folder",
+  lockedFolderHint: "Folder is locked. Unlock to delete.",
+  moveFolderUp: "Move folder up",
+  moveFolderDown: "Move folder down",
+  sortFoldersAZ: "Sort folders A–Z",
+  sortFoldersZA: "Sort folders Z–A",
+  originalFolderOrder: "Original folder order",
+  parentFolder: "Parent folder",
+  noParent: "(top level)",
+  createSubfolder: "Create subfolder",
 };
 
-const es: Dict = {
+const es: PartialDict = {
   title: "Lista SUNO",
   subtitle: "Suelta enlaces de SUNO o pégalos abajo para crear tu lista",
   nowPlaying: "Reproduciendo",
@@ -192,7 +216,7 @@ const es: Dict = {
   dropOverlay: "Suelta enlaces de SUNO aquí",
 };
 
-const pt: Dict = {
+const pt: PartialDict = {
   title: "Lista SUNO",
   subtitle: "Solte links do SUNO ou cole abaixo para criar sua lista",
   nowPlaying: "Tocando agora",
@@ -249,7 +273,7 @@ const pt: Dict = {
   dropOverlay: "Solte links do SUNO aqui",
 };
 
-const it: Dict = {
+const it: PartialDict = {
   title: "Playlist SUNO",
   subtitle: "Trascina link SUNO o incollali qui sotto per creare la tua playlist",
   nowPlaying: "In riproduzione",
@@ -306,7 +330,7 @@ const it: Dict = {
   dropOverlay: "Trascina link SUNO qui",
 };
 
-const de: Dict = {
+const de: PartialDict = {
   title: "SUNO Playlist",
   subtitle: "Ziehe SUNO-Links hierher oder füge sie unten ein, um deine Playlist zu erstellen",
   nowPlaying: "Wird gespielt",
@@ -363,7 +387,7 @@ const de: Dict = {
   dropOverlay: "SUNO-Links hier ablegen",
 };
 
-const fr: Dict = {
+const fr: PartialDict = {
   title: "Playlist SUNO",
   subtitle: "Déposez des liens SUNO ou collez-les ci-dessous pour créer votre playlist",
   nowPlaying: "En lecture",
@@ -420,7 +444,7 @@ const fr: Dict = {
   dropOverlay: "Déposez les liens SUNO ici",
 };
 
-const hi: Dict = {
+const hi: PartialDict = {
   title: "SUNO प्लेलिस्ट",
   subtitle: "अपनी प्लेलिस्ट बनाने के लिए SUNO लिंक यहाँ छोड़ें या नीचे पेस्ट करें",
   nowPlaying: "अभी चल रहा है",
@@ -477,7 +501,7 @@ const hi: Dict = {
   dropOverlay: "SUNO लिंक यहाँ छोड़ें",
 };
 
-const ar: Dict = {
+const ar: PartialDict = {
   title: "قائمة SUNO",
   subtitle: "أسقط روابط SUNO أو الصقها أدناه لإنشاء قائمتك",
   nowPlaying: "يُشغَّل الآن",
@@ -534,7 +558,7 @@ const ar: Dict = {
   dropOverlay: "أسقط روابط SUNO هنا",
 };
 
-const ms: Dict = {
+const ms: PartialDict = {
   title: "Senarai Main SUNO",
   subtitle: "Lepaskan pautan SUNO atau tampal di bawah untuk membina senarai main anda",
   nowPlaying: "Sedang Dimainkan",
@@ -591,7 +615,7 @@ const ms: Dict = {
   dropOverlay: "Lepaskan pautan SUNO di sini",
 };
 
-const id: Dict = {
+const id: PartialDict = {
   title: "Daftar Putar SUNO",
   subtitle: "Letakkan tautan SUNO atau tempel di bawah untuk membuat daftar putar Anda",
   nowPlaying: "Sedang Diputar",
@@ -648,7 +672,7 @@ const id: Dict = {
   dropOverlay: "Letakkan tautan SUNO di sini",
 };
 
-const vi: Dict = {
+const vi: PartialDict = {
   title: "Danh sách SUNO",
   subtitle: "Thả liên kết SUNO hoặc dán bên dưới để tạo danh sách phát",
   nowPlaying: "Đang phát",
@@ -705,7 +729,7 @@ const vi: Dict = {
   dropOverlay: "Thả liên kết SUNO tại đây",
 };
 
-const th: Dict = {
+const th: PartialDict = {
   title: "เพลย์ลิสต์ SUNO",
   subtitle: "วางลิงก์ SUNO หรือวางด้านล่างเพื่อสร้างเพลย์ลิสต์",
   nowPlaying: "กำลังเล่น",
@@ -762,7 +786,7 @@ const th: Dict = {
   dropOverlay: "วางลิงก์ SUNO ที่นี่",
 };
 
-const ja: Dict = {
+const ja: PartialDict = {
   title: "SUNO プレイリスト",
   subtitle: "SUNO のリンクをドロップするか、下に貼り付けてプレイリストを作成",
   nowPlaying: "再生中",
@@ -819,7 +843,7 @@ const ja: Dict = {
   dropOverlay: "SUNO リンクをここにドロップ",
 };
 
-const zh: Dict = {
+const zh: PartialDict = {
   title: "SUNO 播放列表",
   subtitle: "拖入 SUNO 链接或在下方粘贴以建立你的播放列表",
   nowPlaying: "正在播放",
@@ -876,7 +900,7 @@ const zh: Dict = {
   dropOverlay: "在此拖入 SUNO 链接",
 };
 
-const ko: Dict = {
+const ko: PartialDict = {
   title: "SUNO 재생목록",
   subtitle: "SUNO 링크를 끌어다 놓거나 아래에 붙여넣어 재생목록을 만드세요",
   nowPlaying: "재생 중",
@@ -933,8 +957,76 @@ const ko: Dict = {
   dropOverlay: "SUNO 링크를 여기에 놓으세요",
 };
 
-export const TRANSLATIONS: Record<LangCode, Dict> = {
-  en, es, pt, it, de, fr, hi, ar, ms, id, vi, th, ja, zh, ko,
+const yue: PartialDict = {
+  title: "SUNO 播放清單",
+  subtitle: "拖入 SUNO 連結或喺下面貼上嚟整你嘅播放清單",
+  nowPlaying: "正在播放",
+  openOnSuno: "喺 SUNO 打開",
+  mute: "靜音",
+  unmute: "取消靜音",
+  volume: "音量",
+  shuffle: "隨機",
+  back: "返去(重播 / 上一首)",
+  next: "下一首",
+  repeatOn: "重複:開",
+  repeatOff: "重複:閂",
+  play: "播放",
+  pause: "暫停",
+  pasteLink: "貼上 SUNO 歌曲連結(例如 https://suno.com/song/...)",
+  add: "加入",
+  savePlaylist: "儲存播放清單",
+  loadPlaylist: "載入播放清單",
+  playlist: "播放清單",
+  track: "首",
+  tracks: "首",
+  sortAZ: "排序 A–Z",
+  sortZA: "排序 Z–A",
+  originalOrder: "原本次序",
+  createFolder: "新建資料夾",
+  folderPlaceholder: "資料夾名(例如 Rock, Jazz, Pop)",
+  create: "建立",
+  dropHere: "喺呢度拖入 SUNO 連結",
+  dropHint: "喺呢度拖入 SUNO 連結或者用上面嘅輸入欄",
+  emptyFolder: "空資料夾 — 從清單度分配歌曲。",
+  noFolder: "冇資料夾",
+  assignToFolder: "分配到資料夾",
+  renameFolder: "改資料夾名",
+  removeFolder: "刪除資料夾",
+  moveUp: "上移",
+  moveDown: "下移",
+  editTitle: "編輯標題",
+  saveTitle: "儲存標題",
+  saveFolderName: "儲存名",
+  removeSong: "刪除歌曲",
+  lightMode: "淺色模式",
+  darkMode: "深色模式",
+  undo: "撤銷",
+  dismiss: "閂",
+  deletedSong: "已刪除",
+  deletedFolder: "已刪除資料夾",
+  autosaveNote: "💾 你嘅播放清單會自動存喺瀏覽器度。如果清咗快取,要重新載入。",
+  warnSaveNote: "⚠️ 離開網站之前,記得撳 {save} 落載一份備份。",
+  saveLabel: "儲存播放清單",
+  playerBy: "SUNO 播放器作者:",
+  playsMusicFrom: "- 播放音樂嚟自",
+  language: "語言",
+  followNepp: "追蹤 nepp1963",
+  dropOverlay: "喺呢度拖入 SUNO 連結",
+  lockFolder: "鎖定資料夾",
+  unlockFolder: "解鎖資料夾",
+  lockedFolderHint: "資料夾已鎖定,解鎖先可以刪除。",
+  moveFolderUp: "資料夾上移",
+  moveFolderDown: "資料夾下移",
+  sortFoldersAZ: "資料夾排序 A–Z",
+  sortFoldersZA: "資料夾排序 Z–A",
+  originalFolderOrder: "原本資料夾次序",
+  parentFolder: "上層資料夾",
+  noParent: "(最頂層)",
+  createSubfolder: "新建子資料夾",
+};
+
+export const TRANSLATIONS: Record<LangCode, PartialDict> & { en: Dict } = {
+  en, es, pt, it, de, fr, hi, ar, ms, id, vi, th, ja, zh, yue, ko,
 };
 
 export const RTL_LANGS: LangCode[] = ["ar"];
