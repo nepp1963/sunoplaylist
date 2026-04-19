@@ -86,7 +86,7 @@
   --ring: oklch(0.55 0.22 150);
   --surface: oklch(0.95 0.005 270);
   --surface-foreground: oklch(0.2 0.02 270);
-  --glow: oklch(0.55 0.22 150 / 15%);
+  --glow: oklch(0.55 0.22 150 / 45%);
 }
 
 @layer base {
