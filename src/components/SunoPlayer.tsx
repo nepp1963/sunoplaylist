@@ -286,49 +286,138 @@ export default function SunoPlayer() {
   };
 
   // Folder management
+  const buildFolderName = (parent: string, leaf: string) =>
+    parent ? `${parent}/${leaf}` : leaf;
+  const folderLeaf = (full: string) => full.split("/").pop() || full;
+  const folderDepth = (full: string) => full.split("/").length - 1;
+  const folderParent = (full: string) => {
+    const parts = full.split("/");
+    parts.pop();
+    return parts.join("/");
+  };
+
   const addFolder = () => {
-    const name = newFolderName.trim();
-    if (name && !folders.includes(name)) {
-      setFolders((prev) => [...prev, name]);
-      setExpandedFolders((prev) => new Set([...prev, name]));
+    const leaf = newFolderName.trim();
+    if (!leaf || leaf.includes("/")) {
+      setNewFolderName("");
+      setNewFolderParent("");
+      setShowFolderInput(false);
+      return;
+    }
+    const full = buildFolderName(newFolderParent, leaf);
+    if (!folders.includes(full)) {
+      setFolders((prev) => [...prev, full]);
+      setFolderOrder((prev) => [...prev, full]);
+      setExpandedFolders((prev) => {
+        const next = new Set([...prev, full]);
+        if (newFolderParent) next.add(newFolderParent);
+        return next;
+      });
     }
     setNewFolderName("");
+    setNewFolderParent("");
     setShowFolderInput(false);
   };
 
   const removeFolder = (name: string) => {
-    const affectedSongIds = songs.filter((s) => s.folder === name).map((s) => s.id);
-    setFolders((prev) => prev.filter((f) => f !== name));
-    setSongs((prev) => prev.map((s) => (s.folder === name ? { ...s, folder: undefined } : s)));
+    if (lockedFolders.includes(name)) return;
+    // Collect this folder + all descendants
+    const affectedFolders = folders.filter((f) => f === name || f.startsWith(name + "/"));
+    const affectedSongIds = songs.filter((s) => s.folder && affectedFolders.includes(s.folder)).map((s) => s.id);
+    const folderIndex = folders.indexOf(name);
+    const folderOrderIndex = folderOrder.indexOf(name);
+    setFolders((prev) => prev.filter((f) => !affectedFolders.includes(f)));
+    setFolderOrder((prev) => prev.filter((f) => !affectedFolders.includes(f)));
+    setSongs((prev) => prev.map((s) => (s.folder && affectedFolders.includes(s.folder) ? { ...s, folder: undefined } : s)));
     setExpandedFolders((prev) => {
       const next = new Set(prev);
-      next.delete(name);
+      affectedFolders.forEach((f) => next.delete(f));
       return next;
     });
-    showUndo({ kind: "folder", name, affectedSongIds, label: `${t("deletedFolder")} "${name}"` });
+    showUndo({ kind: "folder", name, affectedSongIds, folderIndex, folderOrderIndex, label: `${t("deletedFolder")} "${folderLeaf(name)}"` });
+  };
+
+  const toggleLockFolder = (name: string) => {
+    setLockedFolders((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
+  };
+
+  const moveFolder = (name: string, direction: -1 | 1) => {
+    setFolderSortMode("original");
+    setFolders((prev) => {
+      // Move within same parent group
+      const parent = folderParent(name);
+      const siblings = prev.filter((f) => folderParent(f) === parent);
+      const i = siblings.indexOf(name);
+      const target = i + direction;
+      if (target < 0 || target >= siblings.length) return prev;
+      const swapName = siblings[target];
+      // Find indices in prev and swap
+      const next = [...prev];
+      const a = next.indexOf(name);
+      const b = next.indexOf(swapName);
+      [next[a], next[b]] = [next[b], next[a]];
+      return next;
+    });
+    setFolderOrder((prev) => {
+      const parent = folderParent(name);
+      const siblings = prev.filter((f) => folderParent(f) === parent);
+      const i = siblings.indexOf(name);
+      const target = i + direction;
+      if (target < 0 || target >= siblings.length) return prev;
+      const swapName = siblings[target];
+      const next = [...prev];
+      const a = next.indexOf(name);
+      const b = next.indexOf(swapName);
+      [next[a], next[b]] = [next[b], next[a]];
+      return next;
+    });
+  };
+
+  const sortFolders = (mode: FolderSortMode) => {
+    setFolderSortMode(mode);
+    setFolders((prev) => {
+      if (mode === "original") {
+        return [...prev].sort((a, b) => folderOrder.indexOf(a) - folderOrder.indexOf(b));
+      }
+      // Sort hierarchically: keep parent before children, sort siblings by leaf name
+      const sorted = [...prev].sort((a, b) => {
+        const da = folderDepth(a);
+        const db = folderDepth(b);
+        if (da !== db) {
+          // If different depths, sort by full path so parents come before children
+          return a.localeCompare(b);
+        }
+        const cmp = folderLeaf(a).localeCompare(folderLeaf(b));
+        return mode === "az" ? cmp : -cmp;
+      });
+      return sorted;
+    });
   };
 
   const startEditFolder = (name: string) => {
     setEditingFolder(name);
-    setEditingFolderName(name);
+    setEditingFolderName(folderLeaf(name));
   };
 
   const commitEditFolder = () => {
     if (!editingFolder) return;
     const oldName = editingFolder;
-    const newName = editingFolderName.trim();
+    const newLeaf = editingFolderName.trim();
     setEditingFolder(null);
     setEditingFolderName("");
-    if (!newName || newName === oldName) return;
+    if (!newLeaf || newLeaf.includes("/") || newLeaf === folderLeaf(oldName)) return;
+    const parent = folderParent(oldName);
+    const newName = buildFolderName(parent, newLeaf);
     if (folders.includes(newName)) return;
-    setFolders((prev) => prev.map((f) => (f === oldName ? newName : f)));
-    setSongs((prev) => prev.map((s) => (s.folder === oldName ? { ...s, folder: newName } : s)));
+    const renameOne = (f: string) =>
+      f === oldName ? newName : f.startsWith(oldName + "/") ? newName + f.slice(oldName.length) : f;
+    setFolders((prev) => prev.map(renameOne));
+    setFolderOrder((prev) => prev.map(renameOne));
+    setSongs((prev) => prev.map((s) => (s.folder ? { ...s, folder: renameOne(s.folder) } : s)));
+    setLockedFolders((prev) => prev.map(renameOne));
     setExpandedFolders((prev) => {
-      const next = new Set(prev);
-      if (next.has(oldName)) {
-        next.delete(oldName);
-        next.add(newName);
-      }
+      const next = new Set<string>();
+      prev.forEach((f) => next.add(renameOne(f)));
       return next;
     });
   };
