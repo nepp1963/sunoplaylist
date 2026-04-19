@@ -964,9 +964,15 @@ export default function SunoPlayer() {
             const sunoLines = lines.filter((l) => extractSunoId(l));
             if (sunoLines.length === 0) return;
             e.preventDefault();
+            // Force the pasted text to visibly appear in the input box
+            setLinkInput(text);
+            if (inputRef.current) inputRef.current.value = text;
             sunoLines.forEach((l) => addSong(l));
-            setLinkInput("");
-            if (inputRef.current) inputRef.current.value = "";
+            // Clear shortly after so the user sees the paste registered
+            window.setTimeout(() => {
+              setLinkInput("");
+              if (inputRef.current) inputRef.current.value = "";
+            }, 600);
           }}
           className="flex-1 min-w-0 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
         />
