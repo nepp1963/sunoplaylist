@@ -1099,74 +1099,113 @@ export default function SunoPlayer() {
           </div>
         ) : (
           <>
-            {/* Folder sections */}
-            {songsByFolder.map(({ name, songs: folderSongs }) => (
-              <div key={name} className="px-3 mb-1">
-                <div
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
-                  onClick={() => editingFolder !== name && toggleFolder(name)}
-                >
-                  {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
-                  <FolderOpen className="w-3.5 h-3.5 text-primary" />
-                  {editingFolder === name ? (
-                    <input
-                      autoFocus
-                      type="text"
-                      value={editingFolderName}
-                      onChange={(e) => setEditingFolderName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") commitEditFolder();
-                        if (e.key === "Escape") { setEditingFolder(null); setEditingFolderName(""); }
-                      }}
-                      onBlur={commitEditFolder}
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  ) : (
-                    <>
-                      <span className="text-xs font-medium text-foreground">{name}</span>
-                      <span className="text-[10px] text-muted-foreground">({folderSongs.length})</span>
-                    </>
-                  )}
-                  <div className="flex-1" />
-                  {editingFolder === name ? (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); commitEditFolder(); }}
-                      className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
-                      title={t("saveFolderName")}
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); startEditFolder(name); }}
-                      className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
-                      title={t("renameFolder")}
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </button>
-                  )}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
-                    className="p-1 rounded text-muted-foreground hover:text-destructive transition-all"
-                    title={t("removeFolder")}
+            {/* Folder sections (hierarchical) */}
+            {songsByFolder.map(({ name, songs: folderSongs }) => {
+              if (!isFolderVisible(name)) return null;
+              const depth = folderDepth(name);
+              const { idx: sIdx, total: sTotal } = siblingPos(name);
+              const isLocked = lockedFolders.includes(name);
+              const leaf = folderLeaf(name);
+              return (
+                <div key={name} className="px-3 mb-1" style={{ paddingLeft: `${12 + depth * 16}px` }}>
+                  <div
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
+                    onClick={() => editingFolder !== name && toggleFolder(name)}
                   >
-                    <X className="w-3 h-3" />
-                  </button>
+                    {/* Move buttons for folders */}
+                    <div className="flex flex-col gap-0.5 shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveFolder(name, -1); }}
+                        disabled={sIdx === 0}
+                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={t("moveFolderUp")}
+                        aria-label={t("moveFolderUp")}
+                      >
+                        <ChevronUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveFolder(name, 1); }}
+                        disabled={sIdx === sTotal - 1}
+                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={t("moveFolderDown")}
+                        aria-label={t("moveFolderDown")}
+                      >
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                    {expandedFolders.has(name) ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
+                    <FolderOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                    {editingFolder === name ? (
+                      <input
+                        autoFocus
+                        type="text"
+                        value={editingFolderName}
+                        onChange={(e) => setEditingFolderName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") commitEditFolder();
+                          if (e.key === "Escape") { setEditingFolder(null); setEditingFolderName(""); }
+                        }}
+                        onBlur={commitEditFolder}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    ) : (
+                      <>
+                        <span className="text-xs font-medium text-foreground truncate">{leaf}</span>
+                        <span className="text-[10px] text-muted-foreground">({folderSongs.length})</span>
+                      </>
+                    )}
+                    <div className="flex-1" />
+                    {/* Lock toggle */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleLockFolder(name); }}
+                      className={`p-1 rounded transition-all ${isLocked ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                      title={isLocked ? t("unlockFolder") : t("lockFolder")}
+                      aria-pressed={isLocked}
+                    >
+                      {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                    </button>
+                    {editingFolder === name ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); commitEditFolder(); }}
+                        className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
+                        title={t("saveFolderName")}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); startEditFolder(name); }}
+                        className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
+                        title={t("renameFolder")}
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeFolder(name); }}
+                      disabled={isLocked}
+                      className="p-1 rounded text-muted-foreground hover:text-destructive transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                      title={isLocked ? t("lockedFolderHint") : t("removeFolder")}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <div className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}>
+                    {expandedFolders.has(name) && (
+                      <AnimatePresence>
+                        {folderSongs.length === 0 ? (
+                          <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">{t("emptyFolder")}</p>
+                        ) : (
+                          folderSongs.map((song, index) => renderSongItem(song, index, folderSongs.length))
+                        )}
+                      </AnimatePresence>
+                    )}
+                  </div>
                 </div>
-                <div className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}>
-                  {expandedFolders.has(name) && (
-                    <AnimatePresence>
-                      {folderSongs.length === 0 ? (
-                        <p className="text-[11px] text-muted-foreground italic px-2 py-1.5">{t("emptyFolder")}</p>
-                      ) : (
-                        folderSongs.map((song, index) => renderSongItem(song, index, folderSongs.length))
-                      )}
-                    </AnimatePresence>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
+
 
             {/* Unfoldered songs */}
             <div className="px-3 pb-3 min-h-[12px]">
