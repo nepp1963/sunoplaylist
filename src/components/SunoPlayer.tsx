@@ -589,7 +589,14 @@ export default function SunoPlayer() {
   };
 
   const savePlaylist = () => {
-    const data = JSON.stringify(songs.map((s) => ({ url: s.url, title: s.title, folder: s.folder })), null, 2);
+    const payload = {
+      version: 2,
+      songs: songs.map((s) => ({ url: s.url, title: s.title, folder: s.folder })),
+      folders,
+      folderOrder,
+      lockedFolders,
+    };
+    const data = JSON.stringify(payload, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -604,32 +611,44 @@ export default function SunoPlayer() {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const data = JSON.parse(reader.result as string);
-        if (Array.isArray(data)) {
-          setSongs([]);
-          setCurrentIndex(-1);
-          setIsPlaying(false);
-          setOriginalOrder([]);
-          const loadedFolders = new Set<string>();
-          data.forEach((s: any) => {
-            if (s.folder) loadedFolders.add(s.folder);
-            if (s.url) addSong(s.url);
-          });
-          if (loadedFolders.size > 0) {
-            setFolders((prev) => [...new Set([...prev, ...loadedFolders])]);
-            setFolderOrder((prev) => [...new Set([...prev, ...loadedFolders])]);
-          }
-          // Assign folders after songs are added
-          setTimeout(() => {
-            setSongs((prev) =>
-              prev.map((song, i) => {
-                const matchingData = data[i];
-                if (matchingData?.folder) return { ...song, folder: matchingData.folder };
-                return song;
-              })
-            );
-          }, 100);
+        const raw = JSON.parse(reader.result as string);
+        const songList: any[] = Array.isArray(raw) ? raw : Array.isArray(raw?.songs) ? raw.songs : [];
+        const explicitFolders: string[] | null = !Array.isArray(raw) && Array.isArray(raw?.folders) ? raw.folders : null;
+        const explicitFolderOrder: string[] | null = !Array.isArray(raw) && Array.isArray(raw?.folderOrder) ? raw.folderOrder : null;
+        const explicitLocked: string[] | null = !Array.isArray(raw) && Array.isArray(raw?.lockedFolders) ? raw.lockedFolders : null;
+
+        setSongs([]);
+        setCurrentIndex(-1);
+        setIsPlaying(false);
+        setOriginalOrder([]);
+        const loadedFolders = new Set<string>();
+        songList.forEach((s: any) => {
+          if (s?.folder) loadedFolders.add(s.folder);
+          if (s?.url) addSong(s.url);
+        });
+        // Merge song-derived folders with explicitly saved (possibly empty) folders
+        const allFolders = new Set<string>([
+          ...loadedFolders,
+          ...(explicitFolders ?? []),
+        ]);
+        if (allFolders.size > 0) {
+          setFolders((prev) => [...new Set([...prev, ...allFolders])]);
+          const orderSeed = explicitFolderOrder ?? [...allFolders];
+          setFolderOrder((prev) => [...new Set([...prev, ...orderSeed, ...allFolders])]);
         }
+        if (explicitLocked && explicitLocked.length > 0) {
+          setLockedFolders((prev) => [...new Set([...prev, ...explicitLocked])]);
+        }
+        // Assign folders after songs are added
+        setTimeout(() => {
+          setSongs((prev) =>
+            prev.map((song, i) => {
+              const matchingData = songList[i];
+              if (matchingData?.folder) return { ...song, folder: matchingData.folder };
+              return song;
+            })
+          );
+        }, 100);
       } catch { /* ignore */ }
     };
     reader.readAsText(file);
