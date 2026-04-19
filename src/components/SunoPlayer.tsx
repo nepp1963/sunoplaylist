@@ -461,6 +461,9 @@ export default function SunoPlayer() {
           setSongs(data.songs);
           setOriginalOrder(data.originalOrder || data.songs.map((s: Song) => s.id));
           if (Array.isArray(data.folders)) setFolders(data.folders);
+          if (Array.isArray(data.folderOrder)) setFolderOrder(data.folderOrder);
+          else if (Array.isArray(data.folders)) setFolderOrder(data.folders);
+          if (Array.isArray(data.lockedFolders)) setLockedFolders(data.lockedFolders);
         }
       }
     } catch { /* ignore */ }
@@ -473,10 +476,10 @@ export default function SunoPlayer() {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ songs, folders, originalOrder })
+        JSON.stringify({ songs, folders, folderOrder, lockedFolders, originalOrder })
       );
     } catch { /* ignore */ }
-  }, [songs, folders, originalOrder, hydrated]);
+  }, [songs, folders, folderOrder, lockedFolders, originalOrder, hydrated]);
 
   // Warn before exit
   useEffect(() => {
@@ -494,12 +497,16 @@ export default function SunoPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     if (currentSong) {
-      if (audio.src !== currentSong.audioUrl) {
+      const sameSrc = audio.src.endsWith(currentSong.audioUrl) || audio.src === currentSong.audioUrl;
+      if (!sameSrc) {
         audio.src = currentSong.audioUrl;
         audio.load();
       }
-      if (isPlaying) audio.play().catch(() => {});
-      else audio.pause();
+      if (isPlaying) {
+        if (audio.paused) audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
     } else {
       audio.pause();
       audio.src = "";
