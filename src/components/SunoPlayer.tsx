@@ -642,6 +642,23 @@ export default function SunoPlayer() {
     songs: songs.filter((s) => s.folder === f),
   }));
 
+  // Hide folder rows whose ancestor is collapsed
+  const isFolderVisible = (name: string): boolean => {
+    let parent = folderParent(name);
+    while (parent) {
+      if (!expandedFolders.has(parent)) return false;
+      parent = folderParent(parent);
+    }
+    return true;
+  };
+
+  // Position-in-siblings helpers for the per-folder up/down buttons
+  const siblingPos = (name: string): { idx: number; total: number } => {
+    const parent = folderParent(name);
+    const siblings = folders.filter((f) => folderParent(f) === parent);
+    return { idx: siblings.indexOf(name), total: siblings.length };
+  };
+
   const renderSongItem = (song: Song, posInGroup: number, groupSize: number) => {
     const globalIndex = songs.indexOf(song);
     const isFirst = posInGroup === 0;
@@ -801,7 +818,7 @@ export default function SunoPlayer() {
           <img
             src={nepp1963Logo}
             alt="nepp1963 logo"
-            className="w-10 h-10 rounded-xl object-contain shrink-0"
+            className="w-9 h-9 rounded-xl object-cover shrink-0 ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
             <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
