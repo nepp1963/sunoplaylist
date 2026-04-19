@@ -159,7 +159,7 @@ const en: Dict = {
   createSubfolder: "Create subfolder",
 };
 
-const es: Dict = {
+const es: PartialDict = {
   title: "Lista SUNO",
   subtitle: "Suelta enlaces de SUNO o pégalos abajo para crear tu lista",
   nowPlaying: "Reproduciendo",
@@ -216,7 +216,7 @@ const es: Dict = {
   dropOverlay: "Suelta enlaces de SUNO aquí",
 };
 
-const pt: Dict = {
+const pt: PartialDict = {
   title: "Lista SUNO",
   subtitle: "Solte links do SUNO ou cole abaixo para criar sua lista",
   nowPlaying: "Tocando agora",
@@ -273,7 +273,7 @@ const pt: Dict = {
   dropOverlay: "Solte links do SUNO aqui",
 };
 
-const it: Dict = {
+const it: PartialDict = {
   title: "Playlist SUNO",
   subtitle: "Trascina link SUNO o incollali qui sotto per creare la tua playlist",
   nowPlaying: "In riproduzione",
@@ -330,7 +330,7 @@ const it: Dict = {
   dropOverlay: "Trascina link SUNO qui",
 };
 
-const de: Dict = {
+const de: PartialDict = {
   title: "SUNO Playlist",
   subtitle: "Ziehe SUNO-Links hierher oder füge sie unten ein, um deine Playlist zu erstellen",
   nowPlaying: "Wird gespielt",
@@ -387,7 +387,7 @@ const de: Dict = {
   dropOverlay: "SUNO-Links hier ablegen",
 };
 
-const fr: Dict = {
+const fr: PartialDict = {
   title: "Playlist SUNO",
   subtitle: "Déposez des liens SUNO ou collez-les ci-dessous pour créer votre playlist",
   nowPlaying: "En lecture",
@@ -444,7 +444,7 @@ const fr: Dict = {
   dropOverlay: "Déposez les liens SUNO ici",
 };
 
-const hi: Dict = {
+const hi: PartialDict = {
   title: "SUNO प्लेलिस्ट",
   subtitle: "अपनी प्लेलिस्ट बनाने के लिए SUNO लिंक यहाँ छोड़ें या नीचे पेस्ट करें",
   nowPlaying: "अभी चल रहा है",
@@ -501,7 +501,7 @@ const hi: Dict = {
   dropOverlay: "SUNO लिंक यहाँ छोड़ें",
 };
 
-const ar: Dict = {
+const ar: PartialDict = {
   title: "قائمة SUNO",
   subtitle: "أسقط روابط SUNO أو الصقها أدناه لإنشاء قائمتك",
   nowPlaying: "يُشغَّل الآن",
@@ -558,7 +558,7 @@ const ar: Dict = {
   dropOverlay: "أسقط روابط SUNO هنا",
 };
 
-const ms: Dict = {
+const ms: PartialDict = {
   title: "Senarai Main SUNO",
   subtitle: "Lepaskan pautan SUNO atau tampal di bawah untuk membina senarai main anda",
   nowPlaying: "Sedang Dimainkan",
@@ -615,7 +615,7 @@ const ms: Dict = {
   dropOverlay: "Lepaskan pautan SUNO di sini",
 };
 
-const id: Dict = {
+const id: PartialDict = {
   title: "Daftar Putar SUNO",
   subtitle: "Letakkan tautan SUNO atau tempel di bawah untuk membuat daftar putar Anda",
   nowPlaying: "Sedang Diputar",
@@ -672,7 +672,7 @@ const id: Dict = {
   dropOverlay: "Letakkan tautan SUNO di sini",
 };
 
-const vi: Dict = {
+const vi: PartialDict = {
   title: "Danh sách SUNO",
   subtitle: "Thả liên kết SUNO hoặc dán bên dưới để tạo danh sách phát",
   nowPlaying: "Đang phát",
@@ -729,7 +729,7 @@ const vi: Dict = {
   dropOverlay: "Thả liên kết SUNO tại đây",
 };
 
-const th: Dict = {
+const th: PartialDict = {
   title: "เพลย์ลิสต์ SUNO",
   subtitle: "วางลิงก์ SUNO หรือวางด้านล่างเพื่อสร้างเพลย์ลิสต์",
   nowPlaying: "กำลังเล่น",
@@ -786,7 +786,7 @@ const th: Dict = {
   dropOverlay: "วางลิงก์ SUNO ที่นี่",
 };
 
-const ja: Dict = {
+const ja: PartialDict = {
   title: "SUNO プレイリスト",
   subtitle: "SUNO のリンクをドロップするか、下に貼り付けてプレイリストを作成",
   nowPlaying: "再生中",
@@ -843,7 +843,7 @@ const ja: Dict = {
   dropOverlay: "SUNO リンクをここにドロップ",
 };
 
-const zh: Dict = {
+const zh: PartialDict = {
   title: "SUNO 播放列表",
   subtitle: "拖入 SUNO 链接或在下方粘贴以建立你的播放列表",
   nowPlaying: "正在播放",
@@ -900,7 +900,7 @@ const zh: Dict = {
   dropOverlay: "在此拖入 SUNO 链接",
 };
 
-const ko: Dict = {
+const ko: PartialDict = {
   title: "SUNO 재생목록",
   subtitle: "SUNO 링크를 끌어다 놓거나 아래에 붙여넣어 재생목록을 만드세요",
   nowPlaying: "재생 중",
