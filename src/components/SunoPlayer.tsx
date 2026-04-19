@@ -7,12 +7,12 @@ import {
   Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Trash2, ChevronUp,
   Plus, Download, Upload, Music, ListMusic, ExternalLink,
   ArrowDownAZ, ArrowUpZA, RotateCcw, FolderPlus, FolderOpen, ChevronDown, ChevronRight, X,
-  Pencil, Check, Undo2, Volume2, VolumeX, Volume1
+  Pencil, Check, Undo2, Volume2, VolumeX, Volume1, Lock, Unlock
 } from "lucide-react";
 
 type PendingUndo =
   | { kind: "song"; song: Song; index: number; orderIndex: number; label: string }
-  | { kind: "folder"; name: string; affectedSongIds: string[]; label: string };
+  | { kind: "folder"; name: string; affectedSongIds: string[]; folderIndex: number; folderOrderIndex: number; label: string };
 
 const STORAGE_KEY = "suno-playlist-v1";
 
@@ -26,6 +26,7 @@ interface Song {
 }
 
 type SortMode = "original" | "az" | "za";
+type FolderSortMode = "original" | "az" | "za";
 
 function extractSunoId(url: string): string | null {
   const match = url.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-f0-9-]+)/i);
@@ -51,8 +52,12 @@ export default function SunoPlayer() {
   const [sortMode, setSortMode] = useState<SortMode>("original");
   const [originalOrder, setOriginalOrder] = useState<string[]>([]);
   const [folders, setFolders] = useState<string[]>([]);
+  const [folderOrder, setFolderOrder] = useState<string[]>([]);
+  const [folderSortMode, setFolderSortMode] = useState<FolderSortMode>("original");
+  const [lockedFolders, setLockedFolders] = useState<string[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderParent, setNewFolderParent] = useState<string>("");
   const [showFolderInput, setShowFolderInput] = useState(false);
   const [assignFolderSongId, setAssignFolderSongId] = useState<string | null>(null);
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
