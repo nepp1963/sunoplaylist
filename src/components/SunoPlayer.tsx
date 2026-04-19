@@ -165,8 +165,19 @@ export default function SunoPlayer() {
         return next;
       });
     } else {
-      const { name, affectedSongIds } = pendingUndo;
-      setFolders((prev) => (prev.includes(name) ? prev : [...prev, name]));
+      const { name, affectedSongIds, folderIndex, folderOrderIndex } = pendingUndo;
+      setFolders((prev) => {
+        if (prev.includes(name)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(folderIndex, next.length), 0, name);
+        return next;
+      });
+      setFolderOrder((prev) => {
+        if (prev.includes(name)) return prev;
+        const next = [...prev];
+        next.splice(Math.min(folderOrderIndex < 0 ? next.length : folderOrderIndex, next.length), 0, name);
+        return next;
+      });
       setExpandedFolders((prev) => new Set([...prev, name]));
       setSongs((prev) =>
         prev.map((s) => (affectedSongIds.includes(s.id) ? { ...s, folder: name } : s))
