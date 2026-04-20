@@ -1370,7 +1370,7 @@ export default function SunoPlayer() {
         )}
       </AnimatePresence>
 
-      <footer className="mt-6 text-sm text-muted-foreground text-center">
+      <footer className="mt-6 mb-0 text-sm text-muted-foreground text-center">
         {t("playerBy")}{" "}
         <a
           href="https://suno.com/@nepp1963"
