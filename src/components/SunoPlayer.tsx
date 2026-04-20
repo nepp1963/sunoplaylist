@@ -972,40 +972,84 @@ export default function SunoPlayer() {
         </button>
       </div>
 
-      <div className="w-full max-w-2xl flex gap-2 mb-4">
-        <input
-          ref={inputRef}
-          type="url"
-          inputMode="url"
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          placeholder={t("pasteLink")}
-          value={linkInput}
-          onChange={(e) => setLinkInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onPaste={(e) => {
-            const text = e.clipboardData.getData("text");
-            if (!text) return;
-            const lines = text.split(/[\s,]+/).filter(Boolean);
-            const sunoLines = lines.filter((l) => extractSunoId(l));
-            if (sunoLines.length === 0) return;
-            e.preventDefault();
-            // Force the pasted text to visibly appear in the input box
-            setLinkInput(text);
-            if (inputRef.current) inputRef.current.value = text;
-            sunoLines.forEach((l) => addSong(l));
-            // Clear shortly after so the user sees the paste registered
-            window.setTimeout(() => {
-              setLinkInput("");
-              if (inputRef.current) inputRef.current.value = "";
-            }, 600);
-          }}
-          className="flex-1 min-w-0 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
-        />
-        <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
-          <Plus className="w-4 h-4" /> {t("add")}
-        </button>
+      <div className="w-full max-w-2xl flex flex-col gap-2 mb-4">
+        <div className="flex gap-2">
+          <div className="flex-1 min-w-0 relative">
+            <input
+              ref={inputRef}
+              type="url"
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={t("pasteLink")}
+              value={linkInput}
+              onChange={(e) => setLinkInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text");
+                if (!text) return;
+                e.preventDefault();
+                // Always show what was pasted in the box (longer visibility)
+                setLinkInput(text);
+                if (inputRef.current) inputRef.current.value = text;
+                if (pasteMode === "auto") {
+                  const lines = text.split(/[\s,]+/).filter(Boolean);
+                  const sunoLines = lines.filter((l) => extractSunoId(l));
+                  if (sunoLines.length > 0) {
+                    sunoLines.forEach((l) => addSong(l));
+                    // Keep visible briefly so the user can see what was added
+                    window.setTimeout(() => {
+                      setLinkInput("");
+                      if (inputRef.current) inputRef.current.value = "";
+                    }, 1800);
+                  }
+                }
+                // In manual mode, leave the text in the box until the user clicks Add
+              }}
+              className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
+            />
+            {linkInput && (
+              <button
+                type="button"
+                onClick={() => {
+                  setLinkInput("");
+                  if (inputRef.current) inputRef.current.value = "";
+                  inputRef.current?.focus();
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                title="Clear input"
+                aria-label="Clear input"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
+            <Plus className="w-4 h-4" /> {t("add")}
+          </button>
+        </div>
+        <div className="flex items-center justify-end gap-1 text-[11px]">
+          <span className="text-muted-foreground mr-1">On paste:</span>
+          <button
+            type="button"
+            onClick={() => setPasteMode("auto")}
+            className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "auto" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+            title="Automatically add the song to the playlist as soon as you paste"
+            aria-pressed={pasteMode === "auto"}
+          >
+            Auto-load
+          </button>
+          <button
+            type="button"
+            onClick={() => setPasteMode("manual")}
+            className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "manual" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+            title="Keep the pasted link in the box until you click Add"
+            aria-pressed={pasteMode === "manual"}
+          >
+            Manual
+          </button>
+        </div>
       </div>
 
       <div className="w-full max-w-2xl flex gap-2 mb-6">
