@@ -21,7 +21,7 @@ function Index() {
       <LanguageSelector />
       <ThemeToggle />
       <SunoPlayer />
-      <div className="w-full flex justify-center px-4 pb-6">
+      <div className="w-full flex justify-center px-4 pb-4 -mt-2">
         <SocialFooter />
       </div>
     </I18nProvider>
