@@ -686,8 +686,7 @@ export default function SunoPlayer() {
     return (
       <motion.div
         key={song.id}
-        layout
-        initial={{ opacity: 0, y: 10 }}
+        initial={hydrated ? { opacity: 0, y: 10 } : false}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
