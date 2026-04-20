@@ -1081,6 +1081,17 @@ export default function SunoPlayer() {
               </button>
             </div>
           )}
+          {/* Collapse all folders */}
+          {folders.length > 0 && expandedFolders.size > 0 && (
+            <button
+              onClick={collapseAllFolders}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              title="Collapse all folders"
+              aria-label="Collapse all folders"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
+          )}
           {/* Folder create button */}
           <button
             onClick={() => setShowFolderInput(!showFolderInput)}
