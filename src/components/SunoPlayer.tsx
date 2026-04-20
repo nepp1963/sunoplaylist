@@ -59,6 +59,7 @@ export default function SunoPlayer() {
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderParent, setNewFolderParent] = useState<string>("");
   const [showFolderInput, setShowFolderInput] = useState(false);
+  const [pasteMode, setPasteMode] = useState<"auto" | "manual">("auto");
   const [assignFolderSongId, setAssignFolderSongId] = useState<string | null>(null);
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
