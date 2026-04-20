@@ -253,10 +253,19 @@ export default function SunoPlayer() {
 
   const togglePlay = () => {
     if (currentIndex < 0 && songs.length > 0) {
+      const targetFolder = songs[0]?.folder;
+      setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
       playSong(0);
       return;
     }
-    setIsPlaying((p) => !p);
+    setIsPlaying((p) => {
+      const next = !p;
+      if (next) {
+        const targetFolder = songs[currentIndex]?.folder;
+        setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
+      }
+      return next;
+    });
   };
 
   const playNext = () => {
