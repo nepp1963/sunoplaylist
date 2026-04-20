@@ -59,6 +59,7 @@ export default function SunoPlayer() {
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderParent, setNewFolderParent] = useState<string>("");
   const [showFolderInput, setShowFolderInput] = useState(false);
+  const [pasteMode, setPasteMode] = useState<"auto" | "manual">("auto");
   const [assignFolderSongId, setAssignFolderSongId] = useState<string | null>(null);
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -282,6 +283,9 @@ export default function SunoPlayer() {
     if (songs.length > 1) {
       while (next === currentIndex) next = Math.floor(Math.random() * songs.length);
     }
+    // Collapse all folders, then expand only the one containing the song
+    const targetFolder = songs[next]?.folder;
+    setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
     playSong(next);
   };
 
@@ -842,7 +846,7 @@ export default function SunoPlayer() {
           <img
             src={nepp1963Logo}
             alt="nepp1963 logo"
-            className="w-9 h-9 rounded-xl object-cover shrink-0 ring-1 ring-border"
+            className="w-9 h-9 rounded-md object-cover shrink-0 ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
             <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
@@ -887,16 +891,34 @@ export default function SunoPlayer() {
             )}
           </div>
           {currentSong && (
-            <a
-              href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-              title={t("openOnSuno")}
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <>
+              <a
+                href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                title={t("openOnSuno")}
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <button
+                onClick={() => {
+                  setIsPlaying(false);
+                  setCurrentIndex(-1);
+                  setProgress(0);
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                  }
+                }}
+                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                title="Clear current song"
+                aria-label="Clear current song"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </>
           )}
         </div>
         <div className="cursor-pointer" onClick={seekTo}>
@@ -968,40 +990,84 @@ export default function SunoPlayer() {
         </button>
       </div>
 
-      <div className="w-full max-w-2xl flex gap-2 mb-4">
-        <input
-          ref={inputRef}
-          type="url"
-          inputMode="url"
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          placeholder={t("pasteLink")}
-          value={linkInput}
-          onChange={(e) => setLinkInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onPaste={(e) => {
-            const text = e.clipboardData.getData("text");
-            if (!text) return;
-            const lines = text.split(/[\s,]+/).filter(Boolean);
-            const sunoLines = lines.filter((l) => extractSunoId(l));
-            if (sunoLines.length === 0) return;
-            e.preventDefault();
-            // Force the pasted text to visibly appear in the input box
-            setLinkInput(text);
-            if (inputRef.current) inputRef.current.value = text;
-            sunoLines.forEach((l) => addSong(l));
-            // Clear shortly after so the user sees the paste registered
-            window.setTimeout(() => {
-              setLinkInput("");
-              if (inputRef.current) inputRef.current.value = "";
-            }, 600);
-          }}
-          className="flex-1 min-w-0 rounded-xl bg-input px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow"
-        />
-        <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
-          <Plus className="w-4 h-4" /> {t("add")}
-        </button>
+      <div className="w-full max-w-2xl flex flex-col gap-2 mb-4">
+        <div className="flex gap-2">
+          <div className="flex-1 min-w-0 relative">
+            <input
+              ref={inputRef}
+              type="url"
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={t("pasteLink")}
+              value={linkInput}
+              onChange={(e) => setLinkInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text");
+                if (!text) return;
+                e.preventDefault();
+                // Always show what was pasted in the box (longer visibility)
+                setLinkInput(text);
+                if (inputRef.current) inputRef.current.value = text;
+                if (pasteMode === "auto") {
+                  const lines = text.split(/[\s,]+/).filter(Boolean);
+                  const sunoLines = lines.filter((l) => extractSunoId(l));
+                  if (sunoLines.length > 0) {
+                    sunoLines.forEach((l) => addSong(l));
+                    // Keep visible briefly so the user can see what was added
+                    window.setTimeout(() => {
+                      setLinkInput("");
+                      if (inputRef.current) inputRef.current.value = "";
+                    }, 1800);
+                  }
+                }
+                // In manual mode, leave the text in the box until the user clicks Add
+              }}
+              className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
+            />
+            {linkInput && (
+              <button
+                type="button"
+                onClick={() => {
+                  setLinkInput("");
+                  if (inputRef.current) inputRef.current.value = "";
+                  inputRef.current?.focus();
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                title="Clear input"
+                aria-label="Clear input"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
+            <Plus className="w-4 h-4" /> {t("add")}
+          </button>
+        </div>
+        <div className="flex items-center justify-end gap-1 text-[11px]">
+          <span className="text-muted-foreground mr-1">On paste:</span>
+          <button
+            type="button"
+            onClick={() => setPasteMode("auto")}
+            className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "auto" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+            title="Automatically add the song to the playlist as soon as you paste"
+            aria-pressed={pasteMode === "auto"}
+          >
+            Auto-load
+          </button>
+          <button
+            type="button"
+            onClick={() => setPasteMode("manual")}
+            className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "manual" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+            title="Keep the pasted link in the box until you click Add"
+            aria-pressed={pasteMode === "manual"}
+          >
+            Manual
+          </button>
+        </div>
       </div>
 
       <div className="w-full max-w-2xl flex gap-2 mb-6">
@@ -1107,16 +1173,28 @@ export default function SunoPlayer() {
         {showFolderInput && (
           <div className="flex flex-col sm:flex-row gap-2 px-5 pb-2">
             <input
+              autoFocus
               type="text"
               placeholder={t("folderPlaceholder")}
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addFolder()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") addFolder();
+                if (e.key === "Escape") { setNewFolderName(""); setShowFolderInput(false); }
+              }}
               className="flex-1 rounded-lg bg-input px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring"
             />
-            <button onClick={addFolder} className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
-              {t("create")}
-            </button>
+            <div className="flex gap-2">
+              <button onClick={addFolder} className="flex-1 sm:flex-none rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
+                {t("create")}
+              </button>
+              <button
+                onClick={() => { setNewFolderName(""); setShowFolderInput(false); }}
+                className="flex-1 sm:flex-none rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 
@@ -1292,7 +1370,7 @@ export default function SunoPlayer() {
         )}
       </AnimatePresence>
 
-      <footer className="mt-6 text-sm text-muted-foreground text-center">
+      <footer className="mt-6 mb-0 text-sm text-muted-foreground text-center">
         {t("playerBy")}{" "}
         <a
           href="https://suno.com/@nepp1963"
