@@ -65,7 +65,8 @@
   --font-body: "Inter", system-ui, sans-serif;
 }
 
-.light {
+.light, html.light, html.light body {
+  color-scheme: light !important;
   --background: oklch(0.97 0.005 270);
   --foreground: oklch(0.15 0.02 270);
   --card: oklch(1 0 0);
