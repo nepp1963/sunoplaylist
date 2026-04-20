@@ -282,6 +282,9 @@ export default function SunoPlayer() {
     if (songs.length > 1) {
       while (next === currentIndex) next = Math.floor(Math.random() * songs.length);
     }
+    // Collapse all folders, then expand only the one containing the song
+    const targetFolder = songs[next]?.folder;
+    setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
     playSong(next);
   };
 
