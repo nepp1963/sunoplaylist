@@ -1155,16 +1155,28 @@ export default function SunoPlayer() {
         {showFolderInput && (
           <div className="flex flex-col sm:flex-row gap-2 px-5 pb-2">
             <input
+              autoFocus
               type="text"
               placeholder={t("folderPlaceholder")}
               value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addFolder()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") addFolder();
+                if (e.key === "Escape") { setNewFolderName(""); setShowFolderInput(false); }
+              }}
               className="flex-1 rounded-lg bg-input px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring"
             />
-            <button onClick={addFolder} className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
-              {t("create")}
-            </button>
+            <div className="flex gap-2">
+              <button onClick={addFolder} className="flex-1 sm:flex-none rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
+                {t("create")}
+              </button>
+              <button
+                onClick={() => { setNewFolderName(""); setShowFolderInput(false); }}
+                className="flex-1 sm:flex-none rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 
