@@ -891,16 +891,34 @@ export default function SunoPlayer() {
             )}
           </div>
           {currentSong && (
-            <a
-              href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-              title={t("openOnSuno")}
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <>
+              <a
+                href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                title={t("openOnSuno")}
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <button
+                onClick={() => {
+                  setIsPlaying(false);
+                  setCurrentIndex(-1);
+                  setProgress(0);
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                  }
+                }}
+                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                title="Clear current song"
+                aria-label="Clear current song"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </>
           )}
         </div>
         <div className="cursor-pointer" onClick={seekTo}>
