@@ -78,7 +78,7 @@ const LINKS: SocialLink[] = [
 export default function SocialFooter() {
   const { t } = useI18n();
   return (
-    <div className="w-full max-w-2xl mt-1 mb-2 flex flex-col items-center gap-2">
+    <div className="w-full max-w-2xl mt-0 mb-2 flex flex-col items-center gap-2">
       <p className="text-xs tracking-wider text-muted-foreground">{t("followNepp")}</p>
       <div className="flex flex-wrap items-center justify-center gap-2">
         {LINKS.map((l) => (
