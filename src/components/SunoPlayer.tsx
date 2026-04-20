@@ -1090,19 +1090,6 @@ export default function SunoPlayer() {
         {/* Folder creation input */}
         {showFolderInput && (
           <div className="flex flex-col sm:flex-row gap-2 px-5 pb-2">
-            {folders.length > 0 && (
-              <select
-                value={newFolderParent}
-                onChange={(e) => setNewFolderParent(e.target.value)}
-                className="rounded-lg bg-input px-2 py-1.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring max-w-[40%]"
-                title={t("parentFolder")}
-              >
-                <option value="">{t("noParent")}</option>
-                {folders.map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            )}
             <input
               type="text"
               placeholder={t("folderPlaceholder")}
@@ -1112,7 +1099,7 @@ export default function SunoPlayer() {
               className="flex-1 rounded-lg bg-input px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring"
             />
             <button onClick={addFolder} className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
-              {newFolderParent ? t("createSubfolder") : t("create")}
+              {t("create")}
             </button>
           </div>
         )}
