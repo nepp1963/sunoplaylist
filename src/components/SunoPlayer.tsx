@@ -318,7 +318,16 @@ export default function SunoPlayer() {
     if (lockedFolders.includes(name)) return;
     // Collect this folder + all descendants
     const affectedFolders = folders.filter((f) => f === name || f.startsWith(name + "/"));
-    const affectedSongIds = songs.filter((s) => s.folder && affectedFolders.includes(s.folder)).map((s) => s.id);
+    const affectedSongs = songs.filter((s) => s.folder && affectedFolders.includes(s.folder));
+    const songCount = affectedSongs.length;
+    const confirmMsg =
+      `⚠️ DELETE FOLDER "${folderLeaf(name)}"?\n\n` +
+      `This action is IRREVERSIBLE once the page is reloaded.\n` +
+      `${songCount > 0 ? `${songCount} song${songCount === 1 ? "" : "s"} inside will be moved out of this folder.\n` : ""}` +
+      `\nMake sure you have SAVED your playlist to a file first, or you may lose your folder structure for good.\n\n` +
+      `Continue with deletion?`;
+    if (typeof window !== "undefined" && !window.confirm(confirmMsg)) return;
+    const affectedSongIds = affectedSongs.map((s) => s.id);
     const folderIndex = folders.indexOf(name);
     const folderOrderIndex = folderOrder.indexOf(name);
     setFolders((prev) => prev.filter((f) => !affectedFolders.includes(f)));
