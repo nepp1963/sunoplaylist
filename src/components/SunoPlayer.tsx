@@ -842,7 +842,7 @@ export default function SunoPlayer() {
           <img
             src={nepp1963Logo}
             alt="nepp1963 logo"
-            className="w-9 h-9 rounded-xl object-cover shrink-0 ring-1 ring-border"
+            className="w-9 h-9 rounded-md object-cover shrink-0 ring-1 ring-border"
           />
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
             <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
