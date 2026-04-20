@@ -497,13 +497,14 @@ export default function SunoPlayer() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [songs.length]);
 
+  const currentAudioUrl = currentSong?.audioUrl ?? "";
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (currentSong) {
-      const sameSrc = audio.src.endsWith(currentSong.audioUrl) || audio.src === currentSong.audioUrl;
+    if (currentAudioUrl) {
+      const sameSrc = audio.src.endsWith(currentAudioUrl) || audio.src === currentAudioUrl;
       if (!sameSrc) {
-        audio.src = currentSong.audioUrl;
+        audio.src = currentAudioUrl;
         audio.load();
       }
       if (isPlaying) {
@@ -515,7 +516,7 @@ export default function SunoPlayer() {
       audio.pause();
       audio.src = "";
     }
-  }, [currentSong, isPlaying]);
+  }, [currentAudioUrl, isPlaying]);
 
   // Apply & persist volume / mute
   useEffect(() => {
