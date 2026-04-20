@@ -300,24 +300,19 @@ export default function SunoPlayer() {
     const leaf = newFolderName.trim();
     if (!leaf || leaf.includes("/")) {
       setNewFolderName("");
-      setNewFolderParent("");
       setShowFolderInput(false);
       return;
     }
-    const full = buildFolderName(newFolderParent, leaf);
-    if (!folders.includes(full)) {
-      setFolders((prev) => [...prev, full]);
-      setFolderOrder((prev) => [...prev, full]);
-      setExpandedFolders((prev) => {
-        const next = new Set([...prev, full]);
-        if (newFolderParent) next.add(newFolderParent);
-        return next;
-      });
+    if (!folders.includes(leaf)) {
+      setFolders((prev) => [...prev, leaf]);
+      setFolderOrder((prev) => [...prev, leaf]);
+      setExpandedFolders((prev) => new Set([...prev, leaf]));
     }
     setNewFolderName("");
-    setNewFolderParent("");
     setShowFolderInput(false);
   };
+
+  const collapseAllFolders = () => setExpandedFolders(new Set());
 
   const removeFolder = (name: string) => {
     if (lockedFolders.includes(name)) return;
