@@ -849,97 +849,97 @@ export default function SunoPlayer() {
         </p>
       </div>
 
-      <AnimatePresence mode="wait">
-        {currentSong && (
-          <motion.div
-            key={currentSong.id}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="w-full max-w-2xl mb-6 rounded-2xl bg-card p-5 border border-border"
-            style={{ boxShadow: "0 0 40px var(--glow)" }}
+      <div
+        className="w-full max-w-2xl mb-6 rounded-2xl bg-card p-5 border border-border"
+        style={{ boxShadow: "0 0 40px var(--glow)" }}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+            {currentSong?.image ? (
+              <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
+            ) : (
+              <Music className="w-6 h-6 text-primary/40" />
+            )}
+            {currentSong && (
+              <div className="absolute inset-0 flex items-end justify-center gap-[3px] pb-1 bg-black/30">
+                <span className="w-[3px] bg-white rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
+                <span className="w-[3px] bg-white rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
+                <span className="w-[3px] bg-white rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
+                <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
+            {currentSong ? (
+              <div className="marquee-mask">
+                <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
+                  {currentSong.title}
+                  {isPlaying && <span aria-hidden="true">{"   •   "}{currentSong.title}</span>}
+                </span>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground italic truncate">—</p>
+            )}
+          </div>
+          {currentSong && (
+            <a
+              href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+              title={t("openOnSuno")}
+            >
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
+        </div>
+        <div className="cursor-pointer" onClick={seekTo}>
+          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-200"
+              style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
+            />
+          </div>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
+          <span>{formatTime(progress)}</span>
+          <span>{duration ? formatTime(duration) : "--:--"}</span>
+        </div>
+        <div className="flex items-center gap-2 mt-3">
+          <button
+            onClick={() => setMuted((m) => !m)}
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+            title={muted ? t("unmute") : t("mute")}
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
-                {currentSong.image ? (
-                  <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
-                ) : (
-                  <Music className="w-6 h-6 text-primary/40" />
-                )}
-                <div className="absolute inset-0 flex items-end justify-center gap-[3px] pb-1 bg-black/30">
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
-                </div>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
-                <div className="marquee-mask">
-                  <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
-                    {currentSong.title}
-                    {isPlaying && <span aria-hidden="true">{"   •   "}{currentSong.title}</span>}
-                  </span>
-                </div>
-              </div>
-              <a
-                href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={t("openOnSuno")}
-              >
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-            <div className="cursor-pointer" onClick={seekTo}>
-              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all duration-200"
-                  style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
-                />
-              </div>
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
-              <span>{formatTime(progress)}</span>
-              <span>{duration ? formatTime(duration) : "--:--"}</span>
-            </div>
-            <div className="flex items-center gap-2 mt-3">
-              <button
-                onClick={() => setMuted((m) => !m)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={muted ? t("unmute") : t("mute")}
-              >
-                {muted || volume === 0 ? (
-                  <VolumeX className="w-4 h-4" />
-                ) : volume < 0.5 ? (
-                  <Volume1 className="w-4 h-4" />
-                ) : (
-                  <Volume2 className="w-4 h-4" />
-                )}
-              </button>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={muted ? 0 : volume}
-                onChange={(e) => {
-                  const v = parseFloat(e.target.value);
-                  setVolume(v);
-                  if (muted && v > 0) setMuted(false);
-                }}
-                className="flex-1 h-1.5 accent-primary cursor-pointer"
-                aria-label={t("volume")}
-              />
-              <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
-                {Math.round((muted ? 0 : volume) * 100)}%
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {muted || volume === 0 ? (
+              <VolumeX className="w-4 h-4" />
+            ) : volume < 0.5 ? (
+              <Volume1 className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4" />
+            )}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={muted ? 0 : volume}
+            onChange={(e) => {
+              const v = parseFloat(e.target.value);
+              setVolume(v);
+              if (muted && v > 0) setMuted(false);
+            }}
+            className="flex-1 h-1.5 accent-primary cursor-pointer"
+            aria-label={t("volume")}
+          />
+          <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
+            {Math.round((muted ? 0 : volume) * 100)}%
+          </span>
+        </div>
+      </div>
 
       <div className="w-full max-w-2xl flex items-center justify-center gap-2 sm:gap-3 mb-6 flex-wrap">
         <button onClick={shufflePlay} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("shuffle")}>
