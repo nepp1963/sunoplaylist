@@ -300,30 +300,34 @@ export default function SunoPlayer() {
     const leaf = newFolderName.trim();
     if (!leaf || leaf.includes("/")) {
       setNewFolderName("");
-      setNewFolderParent("");
       setShowFolderInput(false);
       return;
     }
-    const full = buildFolderName(newFolderParent, leaf);
-    if (!folders.includes(full)) {
-      setFolders((prev) => [...prev, full]);
-      setFolderOrder((prev) => [...prev, full]);
-      setExpandedFolders((prev) => {
-        const next = new Set([...prev, full]);
-        if (newFolderParent) next.add(newFolderParent);
-        return next;
-      });
+    if (!folders.includes(leaf)) {
+      setFolders((prev) => [...prev, leaf]);
+      setFolderOrder((prev) => [...prev, leaf]);
+      setExpandedFolders((prev) => new Set([...prev, leaf]));
     }
     setNewFolderName("");
-    setNewFolderParent("");
     setShowFolderInput(false);
   };
+
+  const collapseAllFolders = () => setExpandedFolders(new Set());
 
   const removeFolder = (name: string) => {
     if (lockedFolders.includes(name)) return;
     // Collect this folder + all descendants
     const affectedFolders = folders.filter((f) => f === name || f.startsWith(name + "/"));
-    const affectedSongIds = songs.filter((s) => s.folder && affectedFolders.includes(s.folder)).map((s) => s.id);
+    const affectedSongs = songs.filter((s) => s.folder && affectedFolders.includes(s.folder));
+    const songCount = affectedSongs.length;
+    const confirmMsg =
+      `⚠️ DELETE FOLDER "${folderLeaf(name)}"?\n\n` +
+      `This action is IRREVERSIBLE once the page is reloaded.\n` +
+      `${songCount > 0 ? `${songCount} song${songCount === 1 ? "" : "s"} inside will be moved out of this folder.\n` : ""}` +
+      `\nMake sure you have SAVED your playlist to a file first, or you may lose your folder structure for good.\n\n` +
+      `Continue with deletion?`;
+    if (typeof window !== "undefined" && !window.confirm(confirmMsg)) return;
+    const affectedSongIds = affectedSongs.map((s) => s.id);
     const folderIndex = folders.indexOf(name);
     const folderOrderIndex = folderOrder.indexOf(name);
     setFolders((prev) => prev.filter((f) => !affectedFolders.includes(f)));
@@ -493,13 +497,14 @@ export default function SunoPlayer() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [songs.length]);
 
+  const currentAudioUrl = currentSong?.audioUrl ?? "";
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (currentSong) {
-      const sameSrc = audio.src.endsWith(currentSong.audioUrl) || audio.src === currentSong.audioUrl;
+    if (currentAudioUrl) {
+      const sameSrc = audio.src.endsWith(currentAudioUrl) || audio.src === currentAudioUrl;
       if (!sameSrc) {
-        audio.src = currentSong.audioUrl;
+        audio.src = currentAudioUrl;
         audio.load();
       }
       if (isPlaying) {
@@ -511,7 +516,7 @@ export default function SunoPlayer() {
       audio.pause();
       audio.src = "";
     }
-  }, [currentSong, isPlaying]);
+  }, [currentAudioUrl, isPlaying]);
 
   // Apply & persist volume / mute
   useEffect(() => {
@@ -686,8 +691,7 @@ export default function SunoPlayer() {
     return (
       <motion.div
         key={song.id}
-        layout
-        initial={{ opacity: 0, y: 10 }}
+        initial={hydrated ? { opacity: 0, y: 10 } : false}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
@@ -849,97 +853,97 @@ export default function SunoPlayer() {
         </p>
       </div>
 
-      <AnimatePresence mode="wait">
-        {currentSong && (
-          <motion.div
-            key={currentSong.id}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="w-full max-w-2xl mb-6 rounded-2xl bg-card p-5 border border-border"
-            style={{ boxShadow: "0 0 40px var(--glow)" }}
+      <div
+        className="w-full max-w-2xl mb-6 rounded-2xl bg-card p-5 border border-border"
+        style={{ boxShadow: "0 0 40px var(--glow)" }}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+            {currentSong?.image ? (
+              <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
+            ) : (
+              <Music className="w-6 h-6 text-primary/40" />
+            )}
+            {currentSong && (
+              <div className="absolute inset-0 flex items-end justify-center gap-[3px] pb-1 bg-black/30">
+                <span className="w-[3px] bg-white rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
+                <span className="w-[3px] bg-white rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
+                <span className="w-[3px] bg-white rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
+                <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
+            {currentSong ? (
+              <div className="marquee-mask">
+                <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
+                  {currentSong.title}
+                  {isPlaying && <span aria-hidden="true">{"   •   "}{currentSong.title}</span>}
+                </span>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground italic truncate">—</p>
+            )}
+          </div>
+          {currentSong && (
+            <a
+              href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+              title={t("openOnSuno")}
+            >
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
+        </div>
+        <div className="cursor-pointer" onClick={seekTo}>
+          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-200"
+              style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
+            />
+          </div>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
+          <span>{formatTime(progress)}</span>
+          <span>{duration ? formatTime(duration) : "--:--"}</span>
+        </div>
+        <div className="flex items-center gap-2 mt-3">
+          <button
+            onClick={() => setMuted((m) => !m)}
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+            title={muted ? t("unmute") : t("mute")}
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
-                {currentSong.image ? (
-                  <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
-                ) : (
-                  <Music className="w-6 h-6 text-primary/40" />
-                )}
-                <div className="absolute inset-0 flex items-end justify-center gap-[3px] pb-1 bg-black/30">
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar1_0.8s_ease-in-out_infinite]" />
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar2_0.8s_ease-in-out_infinite_0.2s]" />
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar3_0.8s_ease-in-out_infinite_0.4s]" />
-                  <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
-                </div>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
-                <div className="marquee-mask">
-                  <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
-                    {currentSong.title}
-                    {isPlaying && <span aria-hidden="true">{"   •   "}{currentSong.title}</span>}
-                  </span>
-                </div>
-              </div>
-              <a
-                href={currentSong.url.startsWith("http") ? currentSong.url : `https://suno.com/song/${extractSunoId(currentSong.url)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={t("openOnSuno")}
-              >
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-            <div className="cursor-pointer" onClick={seekTo}>
-              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all duration-200"
-                  style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
-                />
-              </div>
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
-              <span>{formatTime(progress)}</span>
-              <span>{duration ? formatTime(duration) : "--:--"}</span>
-            </div>
-            <div className="flex items-center gap-2 mt-3">
-              <button
-                onClick={() => setMuted((m) => !m)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={muted ? t("unmute") : t("mute")}
-              >
-                {muted || volume === 0 ? (
-                  <VolumeX className="w-4 h-4" />
-                ) : volume < 0.5 ? (
-                  <Volume1 className="w-4 h-4" />
-                ) : (
-                  <Volume2 className="w-4 h-4" />
-                )}
-              </button>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={muted ? 0 : volume}
-                onChange={(e) => {
-                  const v = parseFloat(e.target.value);
-                  setVolume(v);
-                  if (muted && v > 0) setMuted(false);
-                }}
-                className="flex-1 h-1.5 accent-primary cursor-pointer"
-                aria-label={t("volume")}
-              />
-              <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
-                {Math.round((muted ? 0 : volume) * 100)}%
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {muted || volume === 0 ? (
+              <VolumeX className="w-4 h-4" />
+            ) : volume < 0.5 ? (
+              <Volume1 className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4" />
+            )}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={muted ? 0 : volume}
+            onChange={(e) => {
+              const v = parseFloat(e.target.value);
+              setVolume(v);
+              if (muted && v > 0) setMuted(false);
+            }}
+            className="flex-1 h-1.5 accent-primary cursor-pointer"
+            aria-label={t("volume")}
+          />
+          <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">
+            {Math.round((muted ? 0 : volume) * 100)}%
+          </span>
+        </div>
+      </div>
 
       <div className="w-full max-w-2xl flex items-center justify-center gap-2 sm:gap-3 mb-6 flex-wrap">
         <button onClick={shufflePlay} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("shuffle")}>
@@ -1078,6 +1082,17 @@ export default function SunoPlayer() {
               </button>
             </div>
           )}
+          {/* Collapse all folders */}
+          {folders.length > 0 && expandedFolders.size > 0 && (
+            <button
+              onClick={collapseAllFolders}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              title="Collapse all folders"
+              aria-label="Collapse all folders"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
+          )}
           {/* Folder create button */}
           <button
             onClick={() => setShowFolderInput(!showFolderInput)}
@@ -1091,19 +1106,6 @@ export default function SunoPlayer() {
         {/* Folder creation input */}
         {showFolderInput && (
           <div className="flex flex-col sm:flex-row gap-2 px-5 pb-2">
-            {folders.length > 0 && (
-              <select
-                value={newFolderParent}
-                onChange={(e) => setNewFolderParent(e.target.value)}
-                className="rounded-lg bg-input px-2 py-1.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring max-w-[40%]"
-                title={t("parentFolder")}
-              >
-                <option value="">{t("noParent")}</option>
-                {folders.map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            )}
             <input
               type="text"
               placeholder={t("folderPlaceholder")}
@@ -1113,7 +1115,7 @@ export default function SunoPlayer() {
               className="flex-1 rounded-lg bg-input px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring"
             />
             <button onClick={addFolder} className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium hover:opacity-90">
-              {newFolderParent ? t("createSubfolder") : t("create")}
+              {t("create")}
             </button>
           </div>
         )}

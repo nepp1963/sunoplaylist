@@ -2,15 +2,39 @@ import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 import { useI18n } from "../lib/i18n";
 
+const THEME_KEY = "suno-theme";
+
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
   const [light, setLight] = useState(false);
   const { t } = useI18n();
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === "light") setLight(true);
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("light", light);
+    const root = document.documentElement;
+    root.classList.toggle("light", light);
+    // Force the browser UI / native form rendering to follow our theme,
+    // overriding the OS-level dark preference on mobile browsers.
+    root.style.colorScheme = light ? "light" : "dark";
+    document.body.style.backgroundColor = light
+      ? "oklch(0.97 0.005 270)"
+      : "oklch(0.13 0.02 270)";
+    // Update <meta name="theme-color"> so mobile browser chrome matches.
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = light ? "#f5f5f7" : "#1a1a24";
+    try { localStorage.setItem(THEME_KEY, light ? "light" : "dark"); } catch { /* ignore */ }
   }, [light]);
 
   if (!mounted) return null;

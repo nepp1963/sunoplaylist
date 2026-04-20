@@ -37,6 +37,7 @@
 }
 
 :root {
+  color-scheme: dark;
   --radius: 0.75rem;
   --background: oklch(0.13 0.02 270);
   --foreground: oklch(0.95 0.01 270);
@@ -64,7 +65,8 @@
   --font-body: "Inter", system-ui, sans-serif;
 }
 
-.light {
+.light, html.light, html.light body {
+  color-scheme: light !important;
   --background: oklch(0.97 0.005 270);
   --foreground: oklch(0.15 0.02 270);
   --card: oklch(1 0 0);
@@ -87,6 +89,12 @@
   --surface: oklch(0.95 0.005 270);
   --surface-foreground: oklch(0.2 0.02 270);
   --glow: oklch(0.55 0.22 150 / 45%);
+}
+
+html.light,
+html.light body {
+  background-color: oklch(0.97 0.005 270) !important;
+  color: oklch(0.15 0.02 270) !important;
 }
 
 @layer base {
