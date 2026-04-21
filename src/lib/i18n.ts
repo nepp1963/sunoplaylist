@@ -2,21 +2,31 @@ import { createContext, useContext } from "react";
 
 export const LANGUAGES = [
   { code: "en", english: "English", native: "English" },
+  { code: "fil", english: "Filipino", native: "Filipino" },
+  { code: "ja", english: "Japanese", native: "日本語" },
+  { code: "zh", english: "Chinese", native: "中文" },
+  { code: "yue", english: "Cantonese", native: "粵語" },
+  { code: "ko", english: "Korean", native: "한국어" },
   { code: "es", english: "Spanish", native: "Español" },
   { code: "pt", english: "Portuguese", native: "Português" },
   { code: "it", english: "Italian", native: "Italiano" },
   { code: "de", english: "German", native: "Deutsch" },
   { code: "fr", english: "French", native: "Français" },
   { code: "hi", english: "Hindi", native: "हिन्दी" },
+  { code: "bn", english: "Bengali", native: "বাংলা" },
+  { code: "sw", english: "Swahili", native: "Kiswahili" },
   { code: "ar", english: "Arabic", native: "العربية" },
   { code: "ms", english: "Malaysian", native: "Bahasa Melayu" },
   { code: "id", english: "Indonesian", native: "Bahasa Indonesia" },
   { code: "vi", english: "Vietnamese", native: "Tiếng Việt" },
   { code: "th", english: "Thai", native: "ไทย" },
-  { code: "ja", english: "Japanese", native: "日本語" },
-  { code: "zh", english: "Chinese", native: "中文" },
-  { code: "yue", english: "Cantonese", native: "粵語" },
-  { code: "ko", english: "Korean", native: "한국어" },
+  { code: "my", english: "Burmese", native: "မြန်မာ" },
+  { code: "km", english: "Khmer", native: "ខ្មែរ" },
+  { code: "lo", english: "Lao", native: "ລາວ" },
+  { code: "jv", english: "Javanese", native: "Basa Jawa" },
+  { code: "su", english: "Sundanese", native: "Basa Sunda" },
+  { code: "hmn", english: "Hmong", native: "Hmoob" },
+  { code: "kar", english: "Karen", native: "ကညီကျိာ်" },
 ] as const;
 
 export type LangCode = typeof LANGUAGES[number]["code"];
@@ -86,7 +96,21 @@ export type TranslationKey =
   | "originalFolderOrder"
   | "parentFolder"
   | "noParent"
-  | "createSubfolder";
+  | "createSubfolder"
+  | "onPaste"
+  | "autoLoad"
+  | "manualMode"
+  | "cancel"
+  | "clearInput"
+  | "clearCurrentSong"
+  | "collapseAll"
+  | "aboutLink"
+  | "disclaimerLink"
+  | "close"
+  | "aboutTitle"
+  | "aboutBody"
+  | "disclaimerTitle"
+  | "disclaimerBody";
 
 type Dict = Record<TranslationKey, string>;
 type PartialDict = Partial<Dict>;
@@ -157,6 +181,36 @@ const en: Dict = {
   parentFolder: "Parent folder",
   noParent: "(top level)",
   createSubfolder: "Create subfolder",
+  onPaste: "On paste:",
+  autoLoad: "Auto-load",
+  manualMode: "Manual",
+  cancel: "Cancel",
+  clearInput: "Clear input",
+  clearCurrentSong: "Clear current song",
+  collapseAll: "Collapse all folders",
+  aboutLink: "About SUNO Playlist",
+  disclaimerLink: "Software Disclaimer",
+  close: "Close",
+  aboutTitle: "About SUNO Playlist",
+  aboutBody: `SUNO Playlist is a free web app designed to help you organize and enjoy your favorite SUNO songs with ease. It allows you to:
+
+• Create and arrange playlists of your chosen SUNO tracks
+• Organize songs into folders for better management
+• Save a copy of your playlist so you can stream it later across different browsers and platforms
+
+The primary goal of this app is convenience—to give users a simple, reliable way to maintain a playable list of SUNO songs without hassle.
+
+🔒 Privacy First
+User data privacy was a key concern in building the SUNO Playlist. That's why the app does not collect or store any user data online. Instead, your playlists remain entirely under your control. In exchange for this privacy privilege, it is your responsibility to store and back up your own playlist files.
+
+⚠️ Important Note
+Because the app does not host playlists online, sharing with other users requires manually giving them your saved playlist files. This ensures privacy but means playlists cannot be directly shared through the app itself.`,
+  disclaimerTitle: "Software Disclaimer",
+  disclaimerBody: `This application is provided free of charge. The author assumes no responsibility for any data loss, damage, or other issues that may arise from the use of this program.
+
+However, please note that such occurrences are highly improbable, as the app does not collect, store, or retain any user data. All usage remains entirely local to the user's device.
+
+By using this software, you acknowledge and accept that it is provided "as is," without warranties of any kind, express or implied.`,
 };
 
 const es: PartialDict = {
@@ -1025,8 +1079,79 @@ const yue: PartialDict = {
   createSubfolder: "新建子資料夾",
 };
 
+const fil: PartialDict = {
+  onPaste: "Sa pag-paste:", autoLoad: "Auto-load", manualMode: "Manwal", cancel: "Kanselahin",
+  clearInput: "I-clear ang input", clearCurrentSong: "I-clear ang kasalukuyang kanta",
+  collapseAll: "I-collapse ang lahat ng folder",
+  aboutLink: "Tungkol sa SUNO Playlist", disclaimerLink: "Disclaimer ng Software", close: "Isara",
+};
+const bn: PartialDict = {
+  onPaste: "পেস্টে:", autoLoad: "স্বয়ংক্রিয়", manualMode: "ম্যানুয়াল", cancel: "বাতিল",
+  clearInput: "ইনপুট মুছুন", clearCurrentSong: "বর্তমান গান মুছুন", collapseAll: "সব ফোল্ডার সঙ্কুচিত করুন",
+  aboutLink: "SUNO Playlist সম্পর্কে", disclaimerLink: "সফ্টওয়্যার দাবিত্যাগ", close: "বন্ধ",
+};
+const sw: PartialDict = {
+  onPaste: "Unapobandika:", autoLoad: "Pakia kiotomatiki", manualMode: "Mwongozo", cancel: "Ghairi",
+  clearInput: "Futa ingizo", clearCurrentSong: "Futa wimbo wa sasa", collapseAll: "Kunja folda zote",
+  aboutLink: "Kuhusu SUNO Playlist", disclaimerLink: "Kanusho la Programu", close: "Funga",
+};
+const my: PartialDict = {
+  onPaste: "Paste လုပ်သည့်အခါ:", autoLoad: "အလိုအလျောက်", manualMode: "ကိုယ်တိုင်", cancel: "ပယ်ဖျက်",
+  clearInput: "ထည့်သွင်းမှု ရှင်းရန်", clearCurrentSong: "လက်ရှိသီချင်း ရှင်းရန်",
+  collapseAll: "ဖိုင်တွဲအားလုံး ခေါက်သိမ်း",
+  aboutLink: "SUNO Playlist အကြောင်း", disclaimerLink: "ဆော့ဖ်ဝဲ ကြေငြာချက်", close: "ပိတ်",
+};
+const km: PartialDict = {
+  onPaste: "ពេលបិទភ្ជាប់៖", autoLoad: "ស្វ័យប្រវត្តិ", manualMode: "ដោយដៃ", cancel: "បោះបង់",
+  clearInput: "សម្អាតការបញ្ចូល", clearCurrentSong: "សម្អាតបទបច្ចុប្បន្ន", collapseAll: "បង្រួមថតទាំងអស់",
+  aboutLink: "អំពី SUNO Playlist", disclaimerLink: "ការបដិសេធកម្មវិធី", close: "បិទ",
+};
+const lo: PartialDict = {
+  onPaste: "ເມື່ອວາງ:", autoLoad: "ອັດຕະໂນມັດ", manualMode: "ດ້ວຍຕົນເອງ", cancel: "ຍົກເລີກ",
+  clearInput: "ລ້າງການປ້ອນ", clearCurrentSong: "ລ້າງເພງປະຈຸບັນ", collapseAll: "ຫຍໍ້ໂຟນເດີທັງໝົດ",
+  aboutLink: "ກ່ຽວກັບ SUNO Playlist", disclaimerLink: "ຄຳປະຕິເສດຊອບແວ", close: "ປິດ",
+};
+const jv: PartialDict = {
+  onPaste: "Nalika nempel:", autoLoad: "Otomatis", manualMode: "Manual", cancel: "Batal",
+  clearInput: "Resiki input", clearCurrentSong: "Resiki lagu saiki", collapseAll: "Tutup kabeh folder",
+  aboutLink: "Babagan SUNO Playlist", disclaimerLink: "Penolakan Piranti Lunak", close: "Tutup",
+};
+const su: PartialDict = {
+  onPaste: "Nalika nempelkeun:", autoLoad: "Otomatis", manualMode: "Manual", cancel: "Bolaykeun",
+  clearInput: "Beresihan input", clearCurrentSong: "Beresihan lagu ayeuna", collapseAll: "Tutup sadaya folder",
+  aboutLink: "Ngeunaan SUNO Playlist", disclaimerLink: "Panolakan Parangkat Lunak", close: "Tutup",
+};
+const hmn: PartialDict = {
+  onPaste: "Thaum muab tso:", autoLoad: "Cia li", manualMode: "Tes", cancel: "Tso tseg",
+  clearInput: "Tshem cov ntawv", clearCurrentSong: "Tshem zaj nkauj tam sim no",
+  collapseAll: "Kaw txhua nplaub ntawv",
+  aboutLink: "Hais txog SUNO Playlist", disclaimerLink: "Software Disclaimer", close: "Kaw",
+};
+const kar: PartialDict = {
+  onPaste: "ဖဲဘျးဘှ်အခါ:", autoLoad: "သဂ့ၤထီၣ်", manualMode: "Manual", cancel: "ဟးထီၣ်",
+  clearInput: "ဆှၢကွံာ်", clearCurrentSong: "ဆှၢကွံာ်တၢ်သးဝံၣ်", collapseAll: "ကးတံာ်ဖၢအိၣ်ခဲလၢာ်",
+  aboutLink: "ဘၣ်ဃးဒီး SUNO Playlist", disclaimerLink: "Software Disclaimer", close: "ကးတံာ်",
+};
+
+// Add onPaste/autoLoad/manualMode/cancel to existing langs
+Object.assign(es, { onPaste: "Al pegar:", autoLoad: "Auto", manualMode: "Manual", cancel: "Cancelar", clearInput: "Borrar campo", clearCurrentSong: "Quitar canción actual", collapseAll: "Cerrar todas las carpetas", aboutLink: "Acerca de SUNO Playlist", disclaimerLink: "Aviso del software", close: "Cerrar" });
+Object.assign(pt, { onPaste: "Ao colar:", autoLoad: "Auto", manualMode: "Manual", cancel: "Cancelar", clearInput: "Limpar campo", clearCurrentSong: "Limpar música atual", collapseAll: "Recolher todas as pastas", aboutLink: "Sobre o SUNO Playlist", disclaimerLink: "Aviso do Software", close: "Fechar" });
+Object.assign(it, { onPaste: "All'incolla:", autoLoad: "Auto", manualMode: "Manuale", cancel: "Annulla", clearInput: "Pulisci campo", clearCurrentSong: "Rimuovi brano corrente", collapseAll: "Comprimi tutte le cartelle", aboutLink: "Informazioni su SUNO Playlist", disclaimerLink: "Disclaimer Software", close: "Chiudi" });
+Object.assign(de, { onPaste: "Beim Einfügen:", autoLoad: "Auto", manualMode: "Manuell", cancel: "Abbrechen", clearInput: "Feld leeren", clearCurrentSong: "Aktuellen Song entfernen", collapseAll: "Alle Ordner einklappen", aboutLink: "Über SUNO Playlist", disclaimerLink: "Software-Haftungsausschluss", close: "Schließen" });
+Object.assign(fr, { onPaste: "Au collage :", autoLoad: "Auto", manualMode: "Manuel", cancel: "Annuler", clearInput: "Effacer le champ", clearCurrentSong: "Effacer la chanson actuelle", collapseAll: "Réduire tous les dossiers", aboutLink: "À propos de SUNO Playlist", disclaimerLink: "Avis du logiciel", close: "Fermer" });
+Object.assign(hi, { onPaste: "पेस्ट पर:", autoLoad: "स्वतः", manualMode: "मैनुअल", cancel: "रद्द करें", clearInput: "इनपुट साफ़ करें", clearCurrentSong: "वर्तमान गाना साफ़ करें", collapseAll: "सभी फ़ोल्डर बंद करें", aboutLink: "SUNO Playlist के बारे में", disclaimerLink: "सॉफ़्टवेयर अस्वीकरण", close: "बंद" });
+Object.assign(ar, { onPaste: "عند اللصق:", autoLoad: "تلقائي", manualMode: "يدوي", cancel: "إلغاء", clearInput: "مسح الإدخال", clearCurrentSong: "مسح الأغنية الحالية", collapseAll: "طي جميع المجلدات", aboutLink: "حول SUNO Playlist", disclaimerLink: "إخلاء مسؤولية البرنامج", close: "إغلاق" });
+Object.assign(ms, { onPaste: "Semasa tampal:", autoLoad: "Auto", manualMode: "Manual", cancel: "Batal", clearInput: "Kosongkan input", clearCurrentSong: "Kosongkan lagu semasa", collapseAll: "Lipat semua folder", aboutLink: "Tentang SUNO Playlist", disclaimerLink: "Penafian Perisian", close: "Tutup" });
+Object.assign(id, { onPaste: "Saat menempel:", autoLoad: "Auto", manualMode: "Manual", cancel: "Batal", clearInput: "Bersihkan input", clearCurrentSong: "Bersihkan lagu saat ini", collapseAll: "Tutup semua folder", aboutLink: "Tentang SUNO Playlist", disclaimerLink: "Penafian Perangkat Lunak", close: "Tutup" });
+Object.assign(vi, { onPaste: "Khi dán:", autoLoad: "Tự động", manualMode: "Thủ công", cancel: "Hủy", clearInput: "Xóa ô nhập", clearCurrentSong: "Xóa bài hiện tại", collapseAll: "Thu gọn tất cả thư mục", aboutLink: "Giới thiệu SUNO Playlist", disclaimerLink: "Tuyên bố từ chối", close: "Đóng" });
+Object.assign(th, { onPaste: "เมื่อวาง:", autoLoad: "อัตโนมัติ", manualMode: "ด้วยตนเอง", cancel: "ยกเลิก", clearInput: "ล้างช่องกรอก", clearCurrentSong: "ล้างเพลงปัจจุบัน", collapseAll: "ยุบทุกโฟลเดอร์", aboutLink: "เกี่ยวกับ SUNO Playlist", disclaimerLink: "ข้อปฏิเสธความรับผิด", close: "ปิด" });
+Object.assign(ja, { onPaste: "貼り付け時:", autoLoad: "自動", manualMode: "手動", cancel: "キャンセル", clearInput: "入力をクリア", clearCurrentSong: "現在の曲をクリア", collapseAll: "すべてのフォルダを折りたたむ", aboutLink: "SUNO Playlist について", disclaimerLink: "ソフトウェア免責事項", close: "閉じる" });
+Object.assign(zh, { onPaste: "粘贴时:", autoLoad: "自动", manualMode: "手动", cancel: "取消", clearInput: "清空输入", clearCurrentSong: "清除当前歌曲", collapseAll: "折叠所有文件夹", aboutLink: "关于 SUNO Playlist", disclaimerLink: "软件免责声明", close: "关闭" });
+Object.assign(yue, { onPaste: "貼上時:", autoLoad: "自動", manualMode: "手動", cancel: "取消", clearInput: "清除輸入", clearCurrentSong: "清除當前歌曲", collapseAll: "摺埋所有資料夾", aboutLink: "關於 SUNO Playlist", disclaimerLink: "軟件免責聲明", close: "閂" });
+Object.assign(ko, { onPaste: "붙여넣을 때:", autoLoad: "자동", manualMode: "수동", cancel: "취소", clearInput: "입력 지우기", clearCurrentSong: "현재 곡 지우기", collapseAll: "모든 폴더 접기", aboutLink: "SUNO Playlist 정보", disclaimerLink: "소프트웨어 면책 조항", close: "닫기" });
+
 export const TRANSLATIONS: Record<LangCode, PartialDict> & { en: Dict } = {
-  en, es, pt, it, de, fr, hi, ar, ms, id, vi, th, ja, zh, yue, ko,
+  en, fil, ja, zh, yue, ko, es, pt, it, de, fr, hi, bn, sw, ar, ms, id, vi, th, my, km, lo, jv, su, hmn, kar,
 };
 
 export const RTL_LANGS: LangCode[] = ["ar"];

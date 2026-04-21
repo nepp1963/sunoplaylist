@@ -68,6 +68,7 @@ export default function SunoPlayer() {
   const [repeat, setRepeat] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
+  const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [volume, setVolume] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
@@ -249,6 +250,10 @@ export default function SunoPlayer() {
   const playSong = (index: number) => {
     setCurrentIndex(index);
     setIsPlaying(true);
+    const targetFolder = songs[index]?.folder;
+    if (targetFolder) {
+      setExpandedFolders((prev) => (prev.has(targetFolder) ? prev : new Set([...prev, targetFolder])));
+    }
   };
 
   const togglePlay = () => {
@@ -266,6 +271,12 @@ export default function SunoPlayer() {
       }
       return next;
     });
+  };
+
+  // Focus the now-playing song's folder (collapse others) — used when tapping the player
+  const focusCurrentFolder = () => {
+    const targetFolder = songs[currentIndex]?.folder;
+    setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
   };
 
   const playNext = () => {
@@ -567,6 +578,15 @@ export default function SunoPlayer() {
     };
   }, [songs.length, currentIndex, repeat]);
 
+  // Keep the folder of the currently playing song open at all times
+  useEffect(() => {
+    if (!isPlaying || currentIndex < 0) return;
+    const targetFolder = songs[currentIndex]?.folder;
+    if (!targetFolder) return;
+    setExpandedFolders((prev) => (prev.has(targetFolder) ? prev : new Set([...prev, targetFolder])));
+  }, [isPlaying, currentIndex, songs]);
+
+
   const seekTo = (e: React.MouseEvent<HTMLDivElement>) => {
     const audio = audioRef.current;
     if (!audio || !duration) return;
@@ -704,9 +724,11 @@ export default function SunoPlayer() {
     return (
       <motion.div
         key={song.id}
+        layout
         initial={hydrated ? { opacity: 0, y: 10 } : false}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
+        transition={{ layout: { type: "spring", stiffness: 500, damping: 40 } }}
         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
           globalIndex === currentIndex
             ? "bg-primary/10 border border-primary/20"
@@ -852,11 +874,20 @@ export default function SunoPlayer() {
 
       <div className="w-full max-w-2xl mb-8 mt-12 sm:mt-8">
         <div className="flex items-center gap-3 mb-2">
-          <img
-            src={nepp1963Logo}
-            alt="nepp1963 logo"
-            className="w-9 h-9 rounded-md object-cover shrink-0 ring-1 ring-border"
-          />
+          <a
+            href="https://suno.com/@nepp1963"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:opacity-90 transition-opacity"
+            title="Open nepp1963 on SUNO"
+            aria-label="Open nepp1963 on SUNO in a new tab"
+          >
+            <img
+              src={nepp1963Logo}
+              alt="nepp1963 logo"
+              className="w-9 h-9 rounded-md object-cover ring-1 ring-border"
+            />
+          </a>
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
             <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
           </h1>
@@ -871,7 +902,13 @@ export default function SunoPlayer() {
         style={{ boxShadow: "0 0 40px var(--glow)" }}
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+          <button
+            type="button"
+            onClick={() => currentSong && focusCurrentFolder()}
+            className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            title={currentSong ? "Show this song's folder" : undefined}
+            aria-label={currentSong ? "Show this song's folder" : "Now playing"}
+          >
             {currentSong?.image ? (
               <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
             ) : (
@@ -885,8 +922,13 @@ export default function SunoPlayer() {
                 <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
               </div>
             )}
-          </div>
-          <div className="min-w-0 flex-1">
+          </button>
+          <button
+            type="button"
+            onClick={() => currentSong && focusCurrentFolder()}
+            className="min-w-0 flex-1 text-left focus:outline-none"
+            aria-label={currentSong ? "Show this song's folder" : "Now playing"}
+          >
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
             {currentSong ? (
               <div className="marquee-mask">
@@ -898,7 +940,7 @@ export default function SunoPlayer() {
             ) : (
               <p className="text-sm text-muted-foreground italic truncate">—</p>
             )}
-          </div>
+          </button>
           {currentSong && (
             <>
               <a
@@ -916,14 +958,15 @@ export default function SunoPlayer() {
                   setIsPlaying(false);
                   setCurrentIndex(-1);
                   setProgress(0);
+                  setExpandedFolders(new Set());
                   if (audioRef.current) {
                     audioRef.current.pause();
                     audioRef.current.currentTime = 0;
                   }
                 }}
                 className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                title="Clear current song"
-                aria-label="Clear current song"
+                title={t("clearCurrentSong")}
+                aria-label={t("clearCurrentSong")}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1045,8 +1088,8 @@ export default function SunoPlayer() {
                   inputRef.current?.focus();
                 }}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                title="Clear input"
-                aria-label="Clear input"
+                title={t("clearInput")}
+                aria-label={t("clearInput")}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1057,24 +1100,24 @@ export default function SunoPlayer() {
           </button>
         </div>
         <div className="flex items-center justify-end gap-1 text-[11px]">
-          <span className="text-muted-foreground mr-1">On paste:</span>
+          <span className="text-muted-foreground mr-1">{t("onPaste")}</span>
           <button
             type="button"
             onClick={() => setPasteMode("auto")}
             className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "auto" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-            title="Automatically add the song to the playlist as soon as you paste"
+            title={t("autoLoad")}
             aria-pressed={pasteMode === "auto"}
           >
-            Auto-load
+            {t("autoLoad")}
           </button>
           <button
             type="button"
             onClick={() => setPasteMode("manual")}
             className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "manual" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-            title="Keep the pasted link in the box until you click Add"
+            title={t("manualMode")}
             aria-pressed={pasteMode === "manual"}
           >
-            Manual
+            {t("manualMode")}
           </button>
         </div>
       </div>
@@ -1162,8 +1205,8 @@ export default function SunoPlayer() {
             <button
               onClick={collapseAllFolders}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              title="Collapse all folders"
-              aria-label="Collapse all folders"
+              title={t("collapseAll")}
+              aria-label={t("collapseAll")}
             >
               <ChevronUp className="w-4 h-4" />
             </button>
@@ -1201,7 +1244,7 @@ export default function SunoPlayer() {
                 onClick={() => { setNewFolderName(""); setShowFolderInput(false); }}
                 className="flex-1 sm:flex-none rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -1222,7 +1265,13 @@ export default function SunoPlayer() {
               const isLocked = lockedFolders.includes(name);
               const leaf = folderLeaf(name);
               return (
-                <div key={name} className="px-3 mb-1" style={{ paddingLeft: `${12 + depth * 16}px` }}>
+                <motion.div
+                  key={name}
+                  layout
+                  transition={{ layout: { type: "spring", stiffness: 500, damping: 40 } }}
+                  className="px-3 mb-1"
+                  style={{ paddingLeft: `${12 + depth * 16}px` }}
+                >
                   <div
                     className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
                     onClick={() => editingFolder !== name && toggleFolder(name)}
@@ -1317,7 +1366,7 @@ export default function SunoPlayer() {
                       </AnimatePresence>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
 
@@ -1344,6 +1393,69 @@ export default function SunoPlayer() {
           </span>
         ))}
       </p>
+
+      {/* About + Disclaimer links */}
+      <div className="w-full max-w-2xl mt-2 flex justify-center gap-2 flex-wrap">
+        <button
+          type="button"
+          onClick={() => setInfoModal("about")}
+          className="rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          {t("aboutLink")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setInfoModal("disclaimer")}
+          className="rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          {t("disclaimerLink")}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {infoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setInfoModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-card border border-border rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h2 className="text-base font-semibold text-foreground">
+                  {infoModal === "about" ? t("aboutTitle") : t("disclaimerTitle")}
+                </h2>
+                <button
+                  onClick={() => setInfoModal(null)}
+                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  aria-label={t("close")}
+                  title={t("close")}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="px-5 py-4 overflow-y-auto text-sm text-foreground whitespace-pre-line leading-relaxed">
+                {infoModal === "about" ? t("aboutBody") : t("disclaimerBody")}
+              </div>
+              <div className="px-5 py-3 border-t border-border flex justify-end">
+                <button
+                  onClick={() => setInfoModal(null)}
+                  className="rounded-lg bg-primary text-primary-foreground px-4 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+                >
+                  {t("close")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {dragOver && (
         <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
