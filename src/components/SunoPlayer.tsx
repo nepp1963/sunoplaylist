@@ -1265,7 +1265,13 @@ export default function SunoPlayer() {
               const isLocked = lockedFolders.includes(name);
               const leaf = folderLeaf(name);
               return (
-                <div key={name} className="px-3 mb-1" style={{ paddingLeft: `${12 + depth * 16}px` }}>
+                <motion.div
+                  key={name}
+                  layout
+                  transition={{ layout: { type: "spring", stiffness: 500, damping: 40 } }}
+                  className="px-3 mb-1"
+                  style={{ paddingLeft: `${12 + depth * 16}px` }}
+                >
                   <div
                     className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
                     onClick={() => editingFolder !== name && toggleFolder(name)}
