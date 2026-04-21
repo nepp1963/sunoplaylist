@@ -1366,7 +1366,7 @@ export default function SunoPlayer() {
                       </AnimatePresence>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
 
@@ -1393,6 +1393,69 @@ export default function SunoPlayer() {
           </span>
         ))}
       </p>
+
+      {/* About + Disclaimer links */}
+      <div className="w-full max-w-2xl mt-2 flex justify-center gap-2 flex-wrap">
+        <button
+          type="button"
+          onClick={() => setInfoModal("about")}
+          className="rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          {t("aboutLink")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setInfoModal("disclaimer")}
+          className="rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          {t("disclaimerLink")}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {infoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setInfoModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-card border border-border rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h2 className="text-base font-semibold text-foreground">
+                  {infoModal === "about" ? t("aboutTitle") : t("disclaimerTitle")}
+                </h2>
+                <button
+                  onClick={() => setInfoModal(null)}
+                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  aria-label={t("close")}
+                  title={t("close")}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="px-5 py-4 overflow-y-auto text-sm text-foreground whitespace-pre-line leading-relaxed">
+                {infoModal === "about" ? t("aboutBody") : t("disclaimerBody")}
+              </div>
+              <div className="px-5 py-3 border-t border-border flex justify-end">
+                <button
+                  onClick={() => setInfoModal(null)}
+                  className="rounded-lg bg-primary text-primary-foreground px-4 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity"
+                >
+                  {t("close")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {dragOver && (
         <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-50">
