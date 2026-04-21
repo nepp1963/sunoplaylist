@@ -1203,8 +1203,8 @@ export default function SunoPlayer() {
             <button
               onClick={collapseAllFolders}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              title="Collapse all folders"
-              aria-label="Collapse all folders"
+              title={t("collapseAll")}
+              aria-label={t("collapseAll")}
             >
               <ChevronUp className="w-4 h-4" />
             </button>
@@ -1242,7 +1242,7 @@ export default function SunoPlayer() {
                 onClick={() => { setNewFolderName(""); setShowFolderInput(false); }}
                 className="flex-1 sm:flex-none rounded-lg bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>
