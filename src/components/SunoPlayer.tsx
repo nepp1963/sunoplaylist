@@ -578,6 +578,15 @@ export default function SunoPlayer() {
     };
   }, [songs.length, currentIndex, repeat]);
 
+  // Keep the folder of the currently playing song open at all times
+  useEffect(() => {
+    if (!isPlaying || currentIndex < 0) return;
+    const targetFolder = songs[currentIndex]?.folder;
+    if (!targetFolder) return;
+    setExpandedFolders((prev) => (prev.has(targetFolder) ? prev : new Set([...prev, targetFolder])));
+  }, [isPlaying, currentIndex, songs]);
+
+
   const seekTo = (e: React.MouseEvent<HTMLDivElement>) => {
     const audio = audioRef.current;
     if (!audio || !duration) return;
