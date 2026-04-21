@@ -872,11 +872,20 @@ export default function SunoPlayer() {
 
       <div className="w-full max-w-2xl mb-8 mt-12 sm:mt-8">
         <div className="flex items-center gap-3 mb-2">
-          <img
-            src={nepp1963Logo}
-            alt="nepp1963 logo"
-            className="w-9 h-9 rounded-md object-cover shrink-0 ring-1 ring-border"
-          />
+          <a
+            href="https://suno.com/@nepp1963"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:opacity-90 transition-opacity"
+            title="Open nepp1963 on SUNO"
+            aria-label="Open nepp1963 on SUNO in a new tab"
+          >
+            <img
+              src={nepp1963Logo}
+              alt="nepp1963 logo"
+              className="w-9 h-9 rounded-md object-cover ring-1 ring-border"
+            />
+          </a>
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
             <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
           </h1>
@@ -891,7 +900,13 @@ export default function SunoPlayer() {
         style={{ boxShadow: "0 0 40px var(--glow)" }}
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative">
+          <button
+            type="button"
+            onClick={() => currentSong && focusCurrentFolder()}
+            className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden relative focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            title={currentSong ? "Show this song's folder" : undefined}
+            aria-label={currentSong ? "Show this song's folder" : "Now playing"}
+          >
             {currentSong?.image ? (
               <img src={currentSong.image} alt={currentSong.title} className="w-full h-full object-cover" />
             ) : (
@@ -905,8 +920,13 @@ export default function SunoPlayer() {
                 <span className="w-[3px] bg-white rounded-full animate-[playbar4_0.8s_ease-in-out_infinite_0.1s]" />
               </div>
             )}
-          </div>
-          <div className="min-w-0 flex-1">
+          </button>
+          <button
+            type="button"
+            onClick={() => currentSong && focusCurrentFolder()}
+            className="min-w-0 flex-1 text-left focus:outline-none"
+            aria-label={currentSong ? "Show this song's folder" : "Now playing"}
+          >
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
             {currentSong ? (
               <div className="marquee-mask">
@@ -918,7 +938,7 @@ export default function SunoPlayer() {
             ) : (
               <p className="text-sm text-muted-foreground italic truncate">—</p>
             )}
-          </div>
+          </button>
           {currentSong && (
             <>
               <a
