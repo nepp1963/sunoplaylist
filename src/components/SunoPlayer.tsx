@@ -1086,8 +1086,8 @@ export default function SunoPlayer() {
                   inputRef.current?.focus();
                 }}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                title="Clear input"
-                aria-label="Clear input"
+                title={t("clearInput")}
+                aria-label={t("clearInput")}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1098,21 +1098,21 @@ export default function SunoPlayer() {
           </button>
         </div>
         <div className="flex items-center justify-end gap-1 text-[11px]">
-          <span className="text-muted-foreground mr-1">On paste:</span>
+          <span className="text-muted-foreground mr-1">{t("onPaste")}</span>
           <button
             type="button"
             onClick={() => setPasteMode("auto")}
             className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "auto" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-            title="Automatically add the song to the playlist as soon as you paste"
+            title={t("autoLoad")}
             aria-pressed={pasteMode === "auto"}
           >
-            Auto-load
+            {t("autoLoad")}
           </button>
           <button
             type="button"
             onClick={() => setPasteMode("manual")}
             className={`px-2 py-0.5 rounded-md transition-colors ${pasteMode === "manual" ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-            title="Keep the pasted link in the box until you click Add"
+            title={t("manualMode")}
             aria-pressed={pasteMode === "manual"}
           >
             Manual
