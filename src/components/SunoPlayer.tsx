@@ -68,6 +68,7 @@ export default function SunoPlayer() {
   const [repeat, setRepeat] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
+  const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [volume, setVolume] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
