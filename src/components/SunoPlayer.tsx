@@ -250,6 +250,10 @@ export default function SunoPlayer() {
   const playSong = (index: number) => {
     setCurrentIndex(index);
     setIsPlaying(true);
+    const targetFolder = songs[index]?.folder;
+    if (targetFolder) {
+      setExpandedFolders((prev) => (prev.has(targetFolder) ? prev : new Set([...prev, targetFolder])));
+    }
   };
 
   const togglePlay = () => {
@@ -267,6 +271,12 @@ export default function SunoPlayer() {
       }
       return next;
     });
+  };
+
+  // Focus the now-playing song's folder (collapse others) — used when tapping the player
+  const focusCurrentFolder = () => {
+    const targetFolder = songs[currentIndex]?.folder;
+    setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
   };
 
   const playNext = () => {
