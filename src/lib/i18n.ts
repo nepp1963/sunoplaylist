@@ -2,21 +2,31 @@ import { createContext, useContext } from "react";
 
 export const LANGUAGES = [
   { code: "en", english: "English", native: "English" },
+  { code: "fil", english: "Filipino", native: "Filipino" },
+  { code: "ja", english: "Japanese", native: "日本語" },
+  { code: "zh", english: "Chinese", native: "中文" },
+  { code: "yue", english: "Cantonese", native: "粵語" },
+  { code: "ko", english: "Korean", native: "한국어" },
   { code: "es", english: "Spanish", native: "Español" },
   { code: "pt", english: "Portuguese", native: "Português" },
   { code: "it", english: "Italian", native: "Italiano" },
   { code: "de", english: "German", native: "Deutsch" },
   { code: "fr", english: "French", native: "Français" },
   { code: "hi", english: "Hindi", native: "हिन्दी" },
+  { code: "bn", english: "Bengali", native: "বাংলা" },
+  { code: "sw", english: "Swahili", native: "Kiswahili" },
   { code: "ar", english: "Arabic", native: "العربية" },
   { code: "ms", english: "Malaysian", native: "Bahasa Melayu" },
   { code: "id", english: "Indonesian", native: "Bahasa Indonesia" },
   { code: "vi", english: "Vietnamese", native: "Tiếng Việt" },
   { code: "th", english: "Thai", native: "ไทย" },
-  { code: "ja", english: "Japanese", native: "日本語" },
-  { code: "zh", english: "Chinese", native: "中文" },
-  { code: "yue", english: "Cantonese", native: "粵語" },
-  { code: "ko", english: "Korean", native: "한국어" },
+  { code: "my", english: "Burmese", native: "မြန်မာ" },
+  { code: "km", english: "Khmer", native: "ខ្មែរ" },
+  { code: "lo", english: "Lao", native: "ລາວ" },
+  { code: "jv", english: "Javanese", native: "Basa Jawa" },
+  { code: "su", english: "Sundanese", native: "Basa Sunda" },
+  { code: "hmn", english: "Hmong", native: "Hmoob" },
+  { code: "kar", english: "Karen", native: "ကညီကျိာ်" },
 ] as const;
 
 export type LangCode = typeof LANGUAGES[number]["code"];
@@ -86,7 +96,21 @@ export type TranslationKey =
   | "originalFolderOrder"
   | "parentFolder"
   | "noParent"
-  | "createSubfolder";
+  | "createSubfolder"
+  | "onPaste"
+  | "autoLoad"
+  | "manualMode"
+  | "cancel"
+  | "clearInput"
+  | "clearCurrentSong"
+  | "collapseAll"
+  | "aboutLink"
+  | "disclaimerLink"
+  | "close"
+  | "aboutTitle"
+  | "aboutBody"
+  | "disclaimerTitle"
+  | "disclaimerBody";
 
 type Dict = Record<TranslationKey, string>;
 type PartialDict = Partial<Dict>;
