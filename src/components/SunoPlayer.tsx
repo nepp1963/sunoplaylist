@@ -1115,7 +1115,7 @@ export default function SunoPlayer() {
             title={t("manualMode")}
             aria-pressed={pasteMode === "manual"}
           >
-            Manual
+            {t("manualMode")}
           </button>
         </div>
       </div>
