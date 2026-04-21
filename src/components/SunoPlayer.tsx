@@ -956,14 +956,15 @@ export default function SunoPlayer() {
                   setIsPlaying(false);
                   setCurrentIndex(-1);
                   setProgress(0);
+                  setExpandedFolders(new Set());
                   if (audioRef.current) {
                     audioRef.current.pause();
                     audioRef.current.currentTime = 0;
                   }
                 }}
                 className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                title="Clear current song"
-                aria-label="Clear current song"
+                title={t("clearCurrentSong")}
+                aria-label={t("clearCurrentSong")}
               >
                 <X className="w-4 h-4" />
               </button>
