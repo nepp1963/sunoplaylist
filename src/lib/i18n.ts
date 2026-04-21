@@ -181,6 +181,36 @@ const en: Dict = {
   parentFolder: "Parent folder",
   noParent: "(top level)",
   createSubfolder: "Create subfolder",
+  onPaste: "On paste:",
+  autoLoad: "Auto-load",
+  manualMode: "Manual",
+  cancel: "Cancel",
+  clearInput: "Clear input",
+  clearCurrentSong: "Clear current song",
+  collapseAll: "Collapse all folders",
+  aboutLink: "About SUNO Playlist",
+  disclaimerLink: "Software Disclaimer",
+  close: "Close",
+  aboutTitle: "About SUNO Playlist",
+  aboutBody: `SUNO Playlist is a free web app designed to help you organize and enjoy your favorite SUNO songs with ease. It allows you to:
+
+• Create and arrange playlists of your chosen SUNO tracks
+• Organize songs into folders for better management
+• Save a copy of your playlist so you can stream it later across different browsers and platforms
+
+The primary goal of this app is convenience—to give users a simple, reliable way to maintain a playable list of SUNO songs without hassle.
+
+🔒 Privacy First
+User data privacy was a key concern in building the SUNO Playlist. That's why the app does not collect or store any user data online. Instead, your playlists remain entirely under your control. In exchange for this privacy privilege, it is your responsibility to store and back up your own playlist files.
+
+⚠️ Important Note
+Because the app does not host playlists online, sharing with other users requires manually giving them your saved playlist files. This ensures privacy but means playlists cannot be directly shared through the app itself.`,
+  disclaimerTitle: "Software Disclaimer",
+  disclaimerBody: `This application is provided free of charge. The author assumes no responsibility for any data loss, damage, or other issues that may arise from the use of this program.
+
+However, please note that such occurrences are highly improbable, as the app does not collect, store, or retain any user data. All usage remains entirely local to the user's device.
+
+By using this software, you acknowledge and accept that it is provided "as is," without warranties of any kind, express or implied.`,
 };
 
 const es: PartialDict = {
