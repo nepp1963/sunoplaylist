@@ -955,7 +955,16 @@ export default function SunoPlayer() {
             />
           </a>
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
-            <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
+            <a
+              href="https://suno.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+              title="Open SUNO home"
+            >
+              SUNO
+            </a>{" "}
+            {t("title").replace(/^SUNO\s*/i, "")}
           </h1>
         </div>
         <p className="text-muted-foreground text-sm ml-[52px]">
