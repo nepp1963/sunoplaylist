@@ -15,6 +15,7 @@ type PendingUndo =
   | { kind: "folder"; name: string; affectedSongIds: string[]; folderIndex: number; folderOrderIndex: number; label: string };
 
 const STORAGE_KEY = "suno-playlist-v1";
+const RESUME_KEY = "suno-resume-v1";
 
 interface Song {
   id: string;
