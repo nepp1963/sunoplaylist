@@ -1145,13 +1145,28 @@ export default function SunoPlayer() {
               spellCheck={false}
               placeholder={t("pasteLink")}
               value={linkInput}
-              onChange={(e) => setLinkInput(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setLinkInput(val);
+                // Mobile fallback: onPaste sometimes lacks clipboardData on phones.
+                // If auto-mode and value already contains a valid SUNO link, add it.
+                if (pasteMode === "auto") {
+                  const lines = val.split(/[\s,]+/).filter(Boolean);
+                  const sunoLines = lines.filter((l) => extractSunoId(l));
+                  if (sunoLines.length > 0 && sunoLines.length === lines.length) {
+                    sunoLines.forEach((l) => addSong(l));
+                    window.setTimeout(() => {
+                      setLinkInput("");
+                      if (inputRef.current) inputRef.current.value = "";
+                    }, 1200);
+                  }
+                }
+              }}
               onKeyDown={handleKeyDown}
               onPaste={(e) => {
-                const text = e.clipboardData.getData("text");
-                if (!text) return;
+                const text = e.clipboardData?.getData("text") || "";
+                if (!text) return; // let default paste happen (mobile fallback handled by onChange)
                 e.preventDefault();
-                // Always show what was pasted in the box (longer visibility)
                 setLinkInput(text);
                 if (inputRef.current) inputRef.current.value = text;
                 if (pasteMode === "auto") {
@@ -1159,14 +1174,12 @@ export default function SunoPlayer() {
                   const sunoLines = lines.filter((l) => extractSunoId(l));
                   if (sunoLines.length > 0) {
                     sunoLines.forEach((l) => addSong(l));
-                    // Keep visible briefly so the user can see what was added
                     window.setTimeout(() => {
                       setLinkInput("");
                       if (inputRef.current) inputRef.current.value = "";
                     }, 1800);
                   }
                 }
-                // In manual mode, leave the text in the box until the user clicks Add
               }}
               className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
             />
