@@ -512,15 +512,31 @@ export default function SunoPlayer() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
+      let loadedSongs: Song[] = [];
       if (raw) {
         const data = JSON.parse(raw);
         if (data && Array.isArray(data.songs)) {
+          loadedSongs = data.songs;
           setSongs(data.songs);
           setOriginalOrder(data.originalOrder || data.songs.map((s: Song) => s.id));
           if (Array.isArray(data.folders)) setFolders(data.folders);
           if (Array.isArray(data.folderOrder)) setFolderOrder(data.folderOrder);
           else if (Array.isArray(data.folders)) setFolderOrder(data.folders);
           if (Array.isArray(data.lockedFolders)) setLockedFolders(data.lockedFolders);
+        }
+      }
+      // Restore last played song + position
+      const resumeRaw = localStorage.getItem(RESUME_KEY);
+      if (resumeRaw && loadedSongs.length > 0) {
+        const resume = JSON.parse(resumeRaw);
+        if (resume?.songId) {
+          const idx = loadedSongs.findIndex((s) => s.id === resume.songId);
+          if (idx >= 0) {
+            setCurrentIndex(idx);
+            resumeTimeRef.current = typeof resume.time === "number" ? resume.time : 0;
+            const f = loadedSongs[idx]?.folder;
+            if (f) setExpandedFolders(new Set([f]));
+          }
         }
       }
     } catch { /* ignore */ }
@@ -537,6 +553,18 @@ export default function SunoPlayer() {
       );
     } catch { /* ignore */ }
   }, [songs, folders, folderOrder, lockedFolders, originalOrder, hydrated]);
+
+  // Persist current playback position (throttled by timeupdate firing rate)
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!currentSong) {
+      try { localStorage.removeItem(RESUME_KEY); } catch { /* ignore */ }
+      return;
+    }
+    try {
+      localStorage.setItem(RESUME_KEY, JSON.stringify({ songId: currentSong.id, time: progress }));
+    } catch { /* ignore */ }
+  }, [currentSong, progress, hydrated]);
 
   // Warn before exit
   useEffect(() => {
