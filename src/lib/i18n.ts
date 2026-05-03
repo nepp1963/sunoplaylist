@@ -1141,7 +1141,7 @@ Object.assign(yue, { onPaste: "貼上時:", autoLoad: "自動", manualMode: "手
 Object.assign(ko, { onPaste: "붙여넣을 때:", autoLoad: "자동", manualMode: "수동", cancel: "취소", clearInput: "입력 지우기", clearCurrentSong: "현재 곡 지우기", collapseAll: "모든 폴더 접기", aboutLink: "SUNO Playlist 정보", disclaimerLink: "소프트웨어 면책 조항", close: "닫기" });
 
 export const TRANSLATIONS: Record<LangCode, PartialDict> & { en: Dict } = {
-  en, fil, ja, zh, yue, ko, es, pt, it, de, fr, hi, bn, sw, ar, ms, id, vi, th, my, km, lo, jv, su, hmn, kar,
+  en, es, pt, it, de, fr, zh, yue, ja, ko, hi, ar, ms, id, vi, th,
 };
 
 export const RTL_LANGS: LangCode[] = ["ar"];
