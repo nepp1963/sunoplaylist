@@ -82,6 +82,7 @@ export default function SunoPlayer() {
   });
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resumeTimeRef = useRef<number | null>(null);
 
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
 
