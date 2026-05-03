@@ -176,6 +176,7 @@ const en: Dict = {
   autoLoad: "Auto-load",
   manualMode: "Manual",
   cancel: "Cancel",
+  nextFolder: "Next folder",
   clearInput: "Clear input",
   clearCurrentSong: "Clear current song",
   collapseAll: "Collapse all folders",
