@@ -91,6 +91,7 @@ export type TranslationKey =
   | "autoLoad"
   | "manualMode"
   | "cancel"
+  | "nextFolder"
   | "clearInput"
   | "clearCurrentSong"
   | "collapseAll"
