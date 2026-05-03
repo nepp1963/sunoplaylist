@@ -15,6 +15,7 @@ type PendingUndo =
   | { kind: "folder"; name: string; affectedSongIds: string[]; folderIndex: number; folderOrderIndex: number; label: string };
 
 const STORAGE_KEY = "suno-playlist-v1";
+const RESUME_KEY = "suno-resume-v1";
 
 interface Song {
   id: string;
@@ -81,6 +82,7 @@ export default function SunoPlayer() {
   });
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resumeTimeRef = useRef<number | null>(null);
 
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
 
@@ -279,9 +281,21 @@ export default function SunoPlayer() {
     setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
   };
 
+  // Display order: folders (in folder order) then unfoldered
+  const displayOrder = (() => {
+    const list: number[] = [];
+    folders.forEach((f) => {
+      songs.forEach((s, i) => { if (s.folder === f) list.push(i); });
+    });
+    songs.forEach((s, i) => { if (!s.folder) list.push(i); });
+    return list;
+  })();
+
   const playNext = () => {
     if (songs.length === 0) return;
-    const next = (currentIndex + 1) % songs.length;
+    const order = displayOrder;
+    const pos = order.indexOf(currentIndex);
+    const next = pos < 0 ? order[0] : order[(pos + 1) % order.length];
     playSong(next);
   };
 
@@ -293,8 +307,23 @@ export default function SunoPlayer() {
       return;
     }
     if (songs.length === 0) return;
-    const prev = currentIndex <= 0 ? songs.length - 1 : currentIndex - 1;
+    const order = displayOrder;
+    const pos = order.indexOf(currentIndex);
+    const prev = pos <= 0 ? order[order.length - 1] : order[pos - 1];
     playSong(prev);
+  };
+
+  const playNextFolder = () => {
+    if (songs.length === 0) return;
+    const currentFolder = songs[currentIndex]?.folder ?? null;
+    // Build ordered folder list including null (unfoldered) at end
+    const ordered: (string | null)[] = [...folders, null];
+    const idx = ordered.indexOf(currentFolder);
+    for (let i = 1; i <= ordered.length; i++) {
+      const f = ordered[(idx + i) % ordered.length];
+      const firstSongIdx = songs.findIndex((s) => (s.folder ?? null) === f);
+      if (firstSongIdx >= 0) { playSong(firstSongIdx); return; }
+    }
   };
 
   const shufflePlay = () => {
@@ -483,15 +512,31 @@ export default function SunoPlayer() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
+      let loadedSongs: Song[] = [];
       if (raw) {
         const data = JSON.parse(raw);
         if (data && Array.isArray(data.songs)) {
+          loadedSongs = data.songs;
           setSongs(data.songs);
           setOriginalOrder(data.originalOrder || data.songs.map((s: Song) => s.id));
           if (Array.isArray(data.folders)) setFolders(data.folders);
           if (Array.isArray(data.folderOrder)) setFolderOrder(data.folderOrder);
           else if (Array.isArray(data.folders)) setFolderOrder(data.folders);
           if (Array.isArray(data.lockedFolders)) setLockedFolders(data.lockedFolders);
+        }
+      }
+      // Restore last played song + position
+      const resumeRaw = localStorage.getItem(RESUME_KEY);
+      if (resumeRaw && loadedSongs.length > 0) {
+        const resume = JSON.parse(resumeRaw);
+        if (resume?.songId) {
+          const idx = loadedSongs.findIndex((s) => s.id === resume.songId);
+          if (idx >= 0) {
+            setCurrentIndex(idx);
+            resumeTimeRef.current = typeof resume.time === "number" ? resume.time : 0;
+            const f = loadedSongs[idx]?.folder;
+            if (f) setExpandedFolders(new Set([f]));
+          }
         }
       }
     } catch { /* ignore */ }
@@ -508,6 +553,18 @@ export default function SunoPlayer() {
       );
     } catch { /* ignore */ }
   }, [songs, folders, folderOrder, lockedFolders, originalOrder, hydrated]);
+
+  // Persist current playback position (throttled by timeupdate firing rate)
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!currentSong) {
+      try { localStorage.removeItem(RESUME_KEY); } catch { /* ignore */ }
+      return;
+    }
+    try {
+      localStorage.setItem(RESUME_KEY, JSON.stringify({ songId: currentSong.id, time: progress }));
+    } catch { /* ignore */ }
+  }, [currentSong, progress, hydrated]);
 
   // Warn before exit
   useEffect(() => {
@@ -530,6 +587,15 @@ export default function SunoPlayer() {
       if (!sameSrc) {
         audio.src = currentAudioUrl;
         audio.load();
+        if (resumeTimeRef.current && resumeTimeRef.current > 0) {
+          const target = resumeTimeRef.current;
+          resumeTimeRef.current = null;
+          const onLoaded = () => {
+            try { audio.currentTime = target; setProgress(target); } catch { /* ignore */ }
+            audio.removeEventListener("loadedmetadata", onLoaded);
+          };
+          audio.addEventListener("loadedmetadata", onLoaded);
+        }
       }
       if (isPlaying) {
         if (audio.paused) audio.play().catch(() => {});
@@ -889,7 +955,16 @@ export default function SunoPlayer() {
             />
           </a>
           <h1 className="text-2xl font-bold text-foreground tracking-tight font-[var(--font-display)]">
-            <span className="text-primary">SUNO</span> {t("title").replace(/^SUNO\s*/i, "")}
+            <a
+              href="https://suno.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+              title="Open SUNO home"
+            >
+              SUNO
+            </a>{" "}
+            {t("title").replace(/^SUNO\s*/i, "")}
           </h1>
         </div>
         <p className="text-muted-foreground text-sm ml-[52px]">
@@ -929,7 +1004,12 @@ export default function SunoPlayer() {
             className="min-w-0 flex-1 text-left focus:outline-none"
             aria-label={currentSong ? "Show this song's folder" : "Now playing"}
           >
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">
+              {t("nowPlaying")}
+              {currentSong?.folder && (
+                <span className="ml-2 normal-case tracking-normal text-primary/80">📁 {currentSong.folder}</span>
+              )}
+            </p>
             {currentSong ? (
               <div className="marquee-mask">
                 <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
@@ -1032,6 +1112,17 @@ export default function SunoPlayer() {
         <button onClick={playNext} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("next")}>
           <SkipForward className="w-5 h-5" />
         </button>
+        {folders.length > 0 && (
+          <button
+            onClick={playNextFolder}
+            className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-1"
+            title={t("nextFolder")}
+            aria-label={t("nextFolder")}
+          >
+            <FolderOpen className="w-4 h-4" />
+            <SkipForward className="w-4 h-4" />
+          </button>
+        )}
         <button
           onClick={() => setRepeat((r) => !r)}
           className={`p-3 rounded-xl transition-colors ${repeat ? "bg-primary/20 text-primary ring-2 ring-primary/40" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"}`}
@@ -1054,13 +1145,28 @@ export default function SunoPlayer() {
               spellCheck={false}
               placeholder={t("pasteLink")}
               value={linkInput}
-              onChange={(e) => setLinkInput(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setLinkInput(val);
+                // Mobile fallback: onPaste sometimes lacks clipboardData on phones.
+                // If auto-mode and value already contains a valid SUNO link, add it.
+                if (pasteMode === "auto") {
+                  const lines = val.split(/[\s,]+/).filter(Boolean);
+                  const sunoLines = lines.filter((l) => extractSunoId(l));
+                  if (sunoLines.length > 0 && sunoLines.length === lines.length) {
+                    sunoLines.forEach((l) => addSong(l));
+                    window.setTimeout(() => {
+                      setLinkInput("");
+                      if (inputRef.current) inputRef.current.value = "";
+                    }, 1200);
+                  }
+                }
+              }}
               onKeyDown={handleKeyDown}
               onPaste={(e) => {
-                const text = e.clipboardData.getData("text");
-                if (!text) return;
+                const text = e.clipboardData?.getData("text") || "";
+                if (!text) return; // let default paste happen (mobile fallback handled by onChange)
                 e.preventDefault();
-                // Always show what was pasted in the box (longer visibility)
                 setLinkInput(text);
                 if (inputRef.current) inputRef.current.value = text;
                 if (pasteMode === "auto") {
@@ -1068,14 +1174,12 @@ export default function SunoPlayer() {
                   const sunoLines = lines.filter((l) => extractSunoId(l));
                   if (sunoLines.length > 0) {
                     sunoLines.forEach((l) => addSong(l));
-                    // Keep visible briefly so the user can see what was added
                     window.setTimeout(() => {
                       setLinkInput("");
                       if (inputRef.current) inputRef.current.value = "";
                     }, 1800);
                   }
                 }
-                // In manual mode, leave the text in the box until the user clicks Add
               }}
               className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
             />
