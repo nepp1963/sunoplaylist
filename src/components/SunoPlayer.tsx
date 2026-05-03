@@ -587,6 +587,15 @@ export default function SunoPlayer() {
       if (!sameSrc) {
         audio.src = currentAudioUrl;
         audio.load();
+        if (resumeTimeRef.current && resumeTimeRef.current > 0) {
+          const target = resumeTimeRef.current;
+          resumeTimeRef.current = null;
+          const onLoaded = () => {
+            try { audio.currentTime = target; setProgress(target); } catch { /* ignore */ }
+            audio.removeEventListener("loadedmetadata", onLoaded);
+          };
+          audio.addEventListener("loadedmetadata", onLoaded);
+        }
       }
       if (isPlaying) {
         if (audio.paused) audio.play().catch(() => {});
