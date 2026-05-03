@@ -1112,6 +1112,17 @@ export default function SunoPlayer() {
         <button onClick={playNext} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("next")}>
           <SkipForward className="w-5 h-5" />
         </button>
+        {folders.length > 0 && (
+          <button
+            onClick={playNextFolder}
+            className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-1"
+            title={t("nextFolder")}
+            aria-label={t("nextFolder")}
+          >
+            <FolderOpen className="w-4 h-4" />
+            <SkipForward className="w-4 h-4" />
+          </button>
+        )}
         <button
           onClick={() => setRepeat((r) => !r)}
           className={`p-3 rounded-xl transition-colors ${repeat ? "bg-primary/20 text-primary ring-2 ring-primary/40" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"}`}
