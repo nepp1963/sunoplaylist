@@ -1004,7 +1004,12 @@ export default function SunoPlayer() {
             className="min-w-0 flex-1 text-left focus:outline-none"
             aria-label={currentSong ? "Show this song's folder" : "Now playing"}
           >
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("nowPlaying")}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">
+              {t("nowPlaying")}
+              {currentSong?.folder && (
+                <span className="ml-2 normal-case tracking-normal text-primary/80">📁 {currentSong.folder}</span>
+              )}
+            </p>
             {currentSong ? (
               <div className="marquee-mask">
                 <span className={isPlaying ? "marquee-track text-foreground font-semibold" : "inline-block text-foreground font-semibold whitespace-nowrap"}>
