@@ -279,9 +279,21 @@ export default function SunoPlayer() {
     setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
   };
 
+  // Display order: folders (in folder order) then unfoldered
+  const displayOrder = (() => {
+    const list: number[] = [];
+    folders.forEach((f) => {
+      songs.forEach((s, i) => { if (s.folder === f) list.push(i); });
+    });
+    songs.forEach((s, i) => { if (!s.folder) list.push(i); });
+    return list;
+  })();
+
   const playNext = () => {
     if (songs.length === 0) return;
-    const next = (currentIndex + 1) % songs.length;
+    const order = displayOrder;
+    const pos = order.indexOf(currentIndex);
+    const next = pos < 0 ? order[0] : order[(pos + 1) % order.length];
     playSong(next);
   };
 
@@ -293,8 +305,23 @@ export default function SunoPlayer() {
       return;
     }
     if (songs.length === 0) return;
-    const prev = currentIndex <= 0 ? songs.length - 1 : currentIndex - 1;
+    const order = displayOrder;
+    const pos = order.indexOf(currentIndex);
+    const prev = pos <= 0 ? order[order.length - 1] : order[pos - 1];
     playSong(prev);
+  };
+
+  const playNextFolder = () => {
+    if (songs.length === 0) return;
+    const currentFolder = songs[currentIndex]?.folder ?? null;
+    // Build ordered folder list including null (unfoldered) at end
+    const ordered: (string | null)[] = [...folders, null];
+    const idx = ordered.indexOf(currentFolder);
+    for (let i = 1; i <= ordered.length; i++) {
+      const f = ordered[(idx + i) % ordered.length];
+      const firstSongIdx = songs.findIndex((s) => (s.folder ?? null) === f);
+      if (firstSongIdx >= 0) { playSong(firstSongIdx); return; }
+    }
   };
 
   const shufflePlay = () => {
