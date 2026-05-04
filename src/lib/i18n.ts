@@ -92,6 +92,7 @@ export type TranslationKey =
   | "manualMode"
   | "cancel"
   | "nextFolder"
+  | "previousFolder"
   | "clearInput"
   | "clearCurrentSong"
   | "collapseAll"
@@ -177,6 +178,7 @@ const en: Dict = {
   manualMode: "Manual",
   cancel: "Cancel",
   nextFolder: "Next folder",
+  previousFolder: "Previous folder",
   clearInput: "Clear input",
   clearCurrentSong: "Clear current song",
   collapseAll: "Collapse all folders",
