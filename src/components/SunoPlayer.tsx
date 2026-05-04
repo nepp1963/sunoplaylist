@@ -1139,6 +1139,17 @@ export default function SunoPlayer() {
         <button onClick={playPrev} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("back")}>
           <SkipBack className="w-5 h-5" />
         </button>
+        {folders.length > 0 && (
+          <button
+            onClick={playPrevFolder}
+            className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-1"
+            title={t("previousFolder")}
+            aria-label={t("previousFolder")}
+          >
+            <SkipBack className="w-4 h-4" />
+            <FolderOpen className="w-4 h-4" />
+          </button>
+        )}
         <button onClick={togglePlay} className="p-4 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg" style={{ boxShadow: "0 0 24px var(--glow)" }} title={isPlaying ? t("pause") : t("play")}>
           {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
         </button>
