@@ -1192,19 +1192,7 @@ export default function SunoPlayer() {
               onChange={(e) => {
                 const val = e.target.value;
                 setLinkInput(val);
-                // Mobile fallback: onPaste sometimes lacks clipboardData on phones.
-                // If auto-mode and value already contains a valid SUNO link, add it.
-                if (pasteMode === "auto") {
-                  const lines = val.split(/[\s,]+/).filter(Boolean);
-                  const sunoLines = lines.filter((l) => extractSunoId(l));
-                  if (sunoLines.length > 0 && sunoLines.length === lines.length) {
-                    sunoLines.forEach((l) => addSong(l));
-                    window.setTimeout(() => {
-                      setLinkInput("");
-                      if (inputRef.current) inputRef.current.value = "";
-                    }, 1200);
-                  }
-                }
+                if (pasteMode === "auto" && addSongsFromText(val)) clearLinkInput();
               }}
               onKeyDown={handleKeyDown}
               onPaste={(e) => {
@@ -1213,17 +1201,7 @@ export default function SunoPlayer() {
                 e.preventDefault();
                 setLinkInput(text);
                 if (inputRef.current) inputRef.current.value = text;
-                if (pasteMode === "auto") {
-                  const lines = text.split(/[\s,]+/).filter(Boolean);
-                  const sunoLines = lines.filter((l) => extractSunoId(l));
-                  if (sunoLines.length > 0) {
-                    sunoLines.forEach((l) => addSong(l));
-                    window.setTimeout(() => {
-                      setLinkInput("");
-                      if (inputRef.current) inputRef.current.value = "";
-                    }, 1800);
-                  }
-                }
+                if (pasteMode === "auto" && addSongsFromText(text)) clearLinkInput();
               }}
               className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
             />
@@ -1243,7 +1221,7 @@ export default function SunoPlayer() {
               </button>
             )}
           </div>
-          <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
+          <button type="button" onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
             <Plus className="w-4 h-4" /> {t("add")}
           </button>
         </div>
