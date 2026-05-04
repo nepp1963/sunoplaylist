@@ -346,6 +346,19 @@ export default function SunoPlayer() {
     }
   };
 
+  const playPrevFolder = () => {
+    if (songs.length === 0) return;
+    const currentFolder = songs[currentIndex]?.folder ?? null;
+    const ordered: (string | null)[] = [...folders, null];
+    const idx = ordered.indexOf(currentFolder);
+    const start = idx < 0 ? 0 : idx;
+    for (let i = 1; i <= ordered.length; i++) {
+      const f = ordered[(start - i + ordered.length) % ordered.length];
+      const firstSongIdx = songs.findIndex((s) => (s.folder ?? null) === f);
+      if (firstSongIdx >= 0) { playSong(firstSongIdx); return; }
+    }
+  };
+
   const shufflePlay = () => {
     if (songs.length === 0) return;
     let next = Math.floor(Math.random() * songs.length);
