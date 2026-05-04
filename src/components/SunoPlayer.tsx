@@ -36,6 +36,17 @@ function extractSunoId(url: string): string | null {
   return uuidMatch ? uuidMatch[0] : null;
 }
 
+function extractSunoLinks(text: string): string[] {
+  const links = new Set<string>();
+  const urlPattern = /https?:\/\/suno\.(?:com|ai)\/(?:song|s)\/[a-f0-9-]+(?:[^\s,]*)?/gi;
+  const idPattern = /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi;
+  for (const match of text.matchAll(urlPattern)) links.add(match[0]);
+  if (links.size === 0) {
+    for (const match of text.matchAll(idPattern)) links.add(match[0]);
+  }
+  return [...links];
+}
+
 function extractSunoTitle(url: string): string {
   const id = extractSunoId(url);
   return id ? `SUNO Track — ${id.slice(0, 8)}` : "Unknown Track";
@@ -90,7 +101,7 @@ export default function SunoPlayer() {
     const trimmed = url.trim();
     const sunoId = extractSunoId(trimmed);
     if (!sunoId) return false;
-    const songId = crypto.randomUUID();
+    const songId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const song: Song = {
       id: songId,
       url: trimmed,
@@ -115,12 +126,21 @@ export default function SunoPlayer() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const addSongsFromText = useCallback((text: string) => {
+    const links = extractSunoLinks(text);
+    if (links.length === 0) return false;
+    links.forEach((link) => addSong(link));
+    return true;
+  }, [addSong]);
+
+  const clearLinkInput = useCallback(() => {
+    setLinkInput("");
+    if (inputRef.current) inputRef.current.value = "";
+  }, []);
+
   const handleAddLink = () => {
     const value = linkInput || inputRef.current?.value || "";
-    if (addSong(value)) {
-      setLinkInput("");
-      if (inputRef.current) inputRef.current.value = "";
-    }
+    if (addSongsFromText(value)) clearLinkInput();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -321,6 +341,19 @@ export default function SunoPlayer() {
     const idx = ordered.indexOf(currentFolder);
     for (let i = 1; i <= ordered.length; i++) {
       const f = ordered[(idx + i) % ordered.length];
+      const firstSongIdx = songs.findIndex((s) => (s.folder ?? null) === f);
+      if (firstSongIdx >= 0) { playSong(firstSongIdx); return; }
+    }
+  };
+
+  const playPrevFolder = () => {
+    if (songs.length === 0) return;
+    const currentFolder = songs[currentIndex]?.folder ?? null;
+    const ordered: (string | null)[] = [...folders, null];
+    const idx = ordered.indexOf(currentFolder);
+    const start = idx < 0 ? 0 : idx;
+    for (let i = 1; i <= ordered.length; i++) {
+      const f = ordered[(start - i + ordered.length) % ordered.length];
       const firstSongIdx = songs.findIndex((s) => (s.folder ?? null) === f);
       if (firstSongIdx >= 0) { playSong(firstSongIdx); return; }
     }
@@ -1106,6 +1139,17 @@ export default function SunoPlayer() {
         <button onClick={playPrev} className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors" title={t("back")}>
           <SkipBack className="w-5 h-5" />
         </button>
+        {folders.length > 0 && (
+          <button
+            onClick={playPrevFolder}
+            className="p-3 rounded-xl bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-1"
+            title={t("previousFolder")}
+            aria-label={t("previousFolder")}
+          >
+            <SkipBack className="w-4 h-4" />
+            <FolderOpen className="w-4 h-4" />
+          </button>
+        )}
         <button onClick={togglePlay} className="p-4 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg" style={{ boxShadow: "0 0 24px var(--glow)" }} title={isPlaying ? t("pause") : t("play")}>
           {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
         </button>
@@ -1148,19 +1192,7 @@ export default function SunoPlayer() {
               onChange={(e) => {
                 const val = e.target.value;
                 setLinkInput(val);
-                // Mobile fallback: onPaste sometimes lacks clipboardData on phones.
-                // If auto-mode and value already contains a valid SUNO link, add it.
-                if (pasteMode === "auto") {
-                  const lines = val.split(/[\s,]+/).filter(Boolean);
-                  const sunoLines = lines.filter((l) => extractSunoId(l));
-                  if (sunoLines.length > 0 && sunoLines.length === lines.length) {
-                    sunoLines.forEach((l) => addSong(l));
-                    window.setTimeout(() => {
-                      setLinkInput("");
-                      if (inputRef.current) inputRef.current.value = "";
-                    }, 1200);
-                  }
-                }
+                if (pasteMode === "auto" && addSongsFromText(val)) clearLinkInput();
               }}
               onKeyDown={handleKeyDown}
               onPaste={(e) => {
@@ -1169,17 +1201,7 @@ export default function SunoPlayer() {
                 e.preventDefault();
                 setLinkInput(text);
                 if (inputRef.current) inputRef.current.value = text;
-                if (pasteMode === "auto") {
-                  const lines = text.split(/[\s,]+/).filter(Boolean);
-                  const sunoLines = lines.filter((l) => extractSunoId(l));
-                  if (sunoLines.length > 0) {
-                    sunoLines.forEach((l) => addSong(l));
-                    window.setTimeout(() => {
-                      setLinkInput("");
-                      if (inputRef.current) inputRef.current.value = "";
-                    }, 1800);
-                  }
-                }
+                if (pasteMode === "auto" && addSongsFromText(text)) clearLinkInput();
               }}
               className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
             />
@@ -1199,7 +1221,7 @@ export default function SunoPlayer() {
               </button>
             )}
           </div>
-          <button onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
+          <button type="button" onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
             <Plus className="w-4 h-4" /> {t("add")}
           </button>
         </div>
