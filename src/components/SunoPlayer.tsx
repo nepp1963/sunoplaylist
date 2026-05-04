@@ -115,12 +115,14 @@ export default function SunoPlayer() {
     const trimmed = url.trim();
     const sunoId = extractSunoId(trimmed);
     if (!sunoId) return false;
+    const normalizedUrl = trimmed.startsWith("http") ? stripLinkPunctuation(trimmed) : `https://suno.com/song/${sunoId}`;
+    if (songs.some((song) => extractSunoId(song.url) === sunoId)) return true;
     const songId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const song: Song = {
       id: songId,
-      url: trimmed,
+      url: normalizedUrl,
       audioUrl: `https://cdn1.suno.ai/${sunoId}.mp3`,
-      title: extractSunoTitle(trimmed),
+      title: extractSunoTitle(normalizedUrl),
     };
     setSongs((prev) => [...prev, song]);
     setOriginalOrder((prev) => [...prev, songId]);
@@ -136,7 +138,7 @@ export default function SunoPlayer() {
       }
     });
     return true;
-  }, []);
+  }, [songs]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
