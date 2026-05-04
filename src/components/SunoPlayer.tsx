@@ -29,22 +29,36 @@ interface Song {
 type SortMode = "original" | "az" | "za";
 type FolderSortMode = "original" | "az" | "za";
 
-function extractSunoId(url: string): string | null {
-  const match = url.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-f0-9-]+)/i);
-  if (match) return match[1];
-  const uuidMatch = url.match(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i);
-  return uuidMatch ? uuidMatch[0] : null;
+function stripLinkPunctuation(value: string): string {
+  return value.trim().replace(/[\])}>,.;!?]+$/g, "");
+}
+
+function extractSunoId(value: string): string | null {
+  const clean = stripLinkPunctuation(decodeURIComponent(value.trim()));
+  const uuidMatch = clean.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
+  if (uuidMatch) return uuidMatch[0].toLowerCase();
+  const legacyMatch = clean.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-z0-9-]+)/i);
+  return legacyMatch ? legacyMatch[1] : null;
 }
 
 function extractSunoLinks(text: string): string[] {
-  const links = new Set<string>();
-  const urlPattern = /https?:\/\/suno\.(?:com|ai)\/(?:song|s)\/[a-f0-9-]+(?:[^\s,]*)?/gi;
-  const idPattern = /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi;
-  for (const match of text.matchAll(urlPattern)) links.add(match[0]);
-  if (links.size === 0) {
-    for (const match of text.matchAll(idPattern)) links.add(match[0]);
+  const linksById = new Map<string, string>();
+  const urlPattern = /(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\/[^\s<>"'，,]+/gi;
+  let urlMatch: RegExpExecArray | null;
+  while ((urlMatch = urlPattern.exec(text)) !== null) {
+    const cleanUrl = stripLinkPunctuation(urlMatch[0]);
+    const id = extractSunoId(cleanUrl);
+    if (id) linksById.set(id, cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
   }
-  return [...links];
+
+  const idPattern = /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi;
+  let idMatch: RegExpExecArray | null;
+  while ((idMatch = idPattern.exec(text)) !== null) {
+    const id = idMatch[0].toLowerCase();
+    if (!linksById.has(id)) linksById.set(id, id);
+  }
+
+  return [...linksById.values()];
 }
 
 function extractSunoTitle(url: string): string {
