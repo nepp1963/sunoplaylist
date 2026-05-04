@@ -36,6 +36,17 @@ function extractSunoId(url: string): string | null {
   return uuidMatch ? uuidMatch[0] : null;
 }
 
+function extractSunoLinks(text: string): string[] {
+  const links = new Set<string>();
+  const urlPattern = /https?:\/\/suno\.(?:com|ai)\/(?:song|s)\/[a-f0-9-]+(?:[^\s,]*)?/gi;
+  const idPattern = /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi;
+  for (const match of text.matchAll(urlPattern)) links.add(match[0]);
+  if (links.size === 0) {
+    for (const match of text.matchAll(idPattern)) links.add(match[0]);
+  }
+  return [...links];
+}
+
 function extractSunoTitle(url: string): string {
   const id = extractSunoId(url);
   return id ? `SUNO Track — ${id.slice(0, 8)}` : "Unknown Track";
@@ -90,7 +101,7 @@ export default function SunoPlayer() {
     const trimmed = url.trim();
     const sunoId = extractSunoId(trimmed);
     if (!sunoId) return false;
-    const songId = crypto.randomUUID();
+    const songId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const song: Song = {
       id: songId,
       url: trimmed,
@@ -115,12 +126,21 @@ export default function SunoPlayer() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const addSongsFromText = useCallback((text: string) => {
+    const links = extractSunoLinks(text);
+    if (links.length === 0) return false;
+    links.forEach((link) => addSong(link));
+    return true;
+  }, [addSong]);
+
+  const clearLinkInput = useCallback(() => {
+    setLinkInput("");
+    if (inputRef.current) inputRef.current.value = "";
+  }, []);
+
   const handleAddLink = () => {
     const value = linkInput || inputRef.current?.value || "";
-    if (addSong(value)) {
-      setLinkInput("");
-      if (inputRef.current) inputRef.current.value = "";
-    }
+    if (addSongsFromText(value)) clearLinkInput();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
