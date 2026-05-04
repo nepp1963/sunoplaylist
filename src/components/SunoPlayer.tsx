@@ -33,8 +33,16 @@ function stripLinkPunctuation(value: string): string {
   return value.trim().replace(/[\])}>,.;!?]+$/g, "");
 }
 
+function safeDecodeURIComponent(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function extractSunoId(value: string): string | null {
-  const clean = stripLinkPunctuation(decodeURIComponent(value.trim()));
+  const clean = stripLinkPunctuation(safeDecodeURIComponent(value.trim()));
   const uuidMatch = clean.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
   if (uuidMatch) return uuidMatch[0].toLowerCase();
   const legacyMatch = clean.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-z0-9-]+)/i);
