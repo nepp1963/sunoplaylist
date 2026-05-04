@@ -1221,11 +1221,12 @@ export default function SunoPlayer() {
               onKeyDown={handleKeyDown}
               onPaste={(e) => {
                 const text = e.clipboardData?.getData("text") || "";
-                if (!text) return; // let default paste happen (mobile fallback handled by onChange)
-                e.preventDefault();
-                setLinkInput(text);
-                if (inputRef.current) inputRef.current.value = text;
-                if (pasteMode === "auto" && addSongsFromText(text)) clearLinkInput();
+                if (text) setLinkInput(text);
+                window.setTimeout(() => {
+                  const pastedValue = inputRef.current?.value || text;
+                  setLinkInput(pastedValue);
+                  if (pasteMode === "auto" && addSongsFromText(pastedValue)) clearLinkInput();
+                }, 0);
               }}
               className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
             />
@@ -1245,7 +1246,17 @@ export default function SunoPlayer() {
               </button>
             )}
           </div>
-          <button type="button" onClick={handleAddLink} className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium">
+          <button
+            type="button"
+            onPointerDown={(e) => {
+              if (e.pointerType !== "mouse") {
+                e.preventDefault();
+                handleAddLink();
+              }
+            }}
+            onClick={handleAddLink}
+            className="rounded-xl bg-primary text-primary-foreground px-4 py-3 hover:opacity-90 transition-opacity flex items-center gap-2 text-sm font-medium"
+          >
             <Plus className="w-4 h-4" /> {t("add")}
           </button>
         </div>
