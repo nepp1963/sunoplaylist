@@ -690,8 +690,6 @@ export default function SunoPlayer() {
           if (idx >= 0) {
             setCurrentIndex(idx);
             resumeTimeRef.current = typeof resume.time === "number" ? resume.time : 0;
-            const f = loadedSongs[idx]?.folder;
-            if (f) setExpandedFolders(new Set([f]));
           }
         }
       }
