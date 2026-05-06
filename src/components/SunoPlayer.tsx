@@ -78,28 +78,28 @@ function extractSunoId(value: string): string | null {
   const clean = stripLinkPunctuation(safeDecodeURIComponent(value.trim()));
   const uuidMatch = clean.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
   if (uuidMatch) return uuidMatch[0].toLowerCase();
-  const legacyMatch = clean.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-z0-9-]+)/i);
-  return legacyMatch ? legacyMatch[1] : null;
+  return null;
 }
 
 function extractSunoLinks(text: string): string[] {
-  const linksById = new Map<string, string>();
+  const linksByKey = new Map<string, string>();
   const urlPattern = /(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\/[^\s<>"'，,]+/gi;
   let urlMatch: RegExpExecArray | null;
   while ((urlMatch = urlPattern.exec(text)) !== null) {
     const cleanUrl = stripLinkPunctuation(urlMatch[0]);
     const id = extractSunoId(cleanUrl);
-    if (id) linksById.set(id, cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
+    const key = id ?? cleanUrl.toLowerCase();
+    linksByKey.set(key, cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
   }
 
   const idPattern = /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi;
   let idMatch: RegExpExecArray | null;
   while ((idMatch = idPattern.exec(text)) !== null) {
     const id = idMatch[0].toLowerCase();
-    if (!linksById.has(id)) linksById.set(id, id);
+    if (!linksByKey.has(id)) linksByKey.set(id, id);
   }
 
-  return [...linksById.values()];
+  return [...linksByKey.values()];
 }
 
 function extractSunoTitle(url: string): string {
@@ -149,35 +149,52 @@ export default function SunoPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeTimeRef = useRef<number | null>(null);
+  const songKeysRef = useRef<Set<string>>(new Set());
 
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
+
+  useEffect(() => {
+    songKeysRef.current = new Set(
+      songs.flatMap((song) => {
+        const id = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
+        return [id ? `id:${id}` : "", `url:${song.url.toLowerCase()}`].filter(Boolean);
+      }),
+    );
+  }, [songs]);
 
   const addSong = useCallback(
     (url: string) => {
       const trimmed = url.trim();
       const sunoId = extractSunoId(trimmed);
-      if (!sunoId) return false;
+      if (!sunoId && !/(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\//i.test(trimmed)) return false;
       const normalizedUrl = trimmed.startsWith("http")
         ? stripLinkPunctuation(trimmed)
-        : `https://suno.com/song/${sunoId}`;
-      if (songs.some((song) => extractSunoId(song.url) === sunoId)) return true;
+        : sunoId
+          ? `https://suno.com/song/${sunoId}`
+          : `https://${stripLinkPunctuation(trimmed)}`;
+      const provisionalKey = sunoId ? `id:${sunoId}` : `url:${normalizedUrl.toLowerCase()}`;
+      if (songKeysRef.current.has(provisionalKey)) return true;
+      songKeysRef.current.add(provisionalKey);
       const songId =
         globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const song: Song = {
         id: songId,
         url: normalizedUrl,
-        audioUrl: `https://cdn1.suno.ai/${sunoId}.mp3`,
+        audioUrl: sunoId ? `https://cdn1.suno.ai/${sunoId}.mp3` : "",
         title: extractSunoTitle(normalizedUrl),
       };
       setSongs((prev) => [...prev, song]);
       setOriginalOrder((prev) => [...prev, songId]);
-      fetchSunoMeta({ data: sunoId }).then((meta) => {
+      fetchSunoMeta({ data: normalizedUrl }).then((meta) => {
         if (meta) {
+          if (meta.id) songKeysRef.current.add(`id:${meta.id}`);
           setSongs((prev) =>
             prev.map((s) =>
               s.id === songId
                 ? {
                     ...s,
+                    ...(meta.url ? { url: meta.url } : {}),
+                    ...(meta.audioUrl ? { audioUrl: meta.audioUrl } : {}),
                     ...(meta.title ? { title: meta.title } : {}),
                     ...(meta.image ? { image: meta.image } : {}),
                   }
@@ -188,7 +205,7 @@ export default function SunoPlayer() {
       });
       return true;
     },
-    [songs],
+    [],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -673,8 +690,6 @@ export default function SunoPlayer() {
           if (idx >= 0) {
             setCurrentIndex(idx);
             resumeTimeRef.current = typeof resume.time === "number" ? resume.time : 0;
-            const f = loadedSongs[idx]?.folder;
-            if (f) setExpandedFolders(new Set([f]));
           }
         }
       }
