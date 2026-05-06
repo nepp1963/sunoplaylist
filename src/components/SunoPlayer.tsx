@@ -78,28 +78,28 @@ function extractSunoId(value: string): string | null {
   const clean = stripLinkPunctuation(safeDecodeURIComponent(value.trim()));
   const uuidMatch = clean.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
   if (uuidMatch) return uuidMatch[0].toLowerCase();
-  const legacyMatch = clean.match(/suno\.(?:com|ai)\/(?:song|s)\/([a-z0-9-]+)/i);
-  return legacyMatch ? legacyMatch[1] : null;
+  return null;
 }
 
 function extractSunoLinks(text: string): string[] {
-  const linksById = new Map<string, string>();
+  const linksByKey = new Map<string, string>();
   const urlPattern = /(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\/[^\s<>"'，,]+/gi;
   let urlMatch: RegExpExecArray | null;
   while ((urlMatch = urlPattern.exec(text)) !== null) {
     const cleanUrl = stripLinkPunctuation(urlMatch[0]);
     const id = extractSunoId(cleanUrl);
-    if (id) linksById.set(id, cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
+    const key = id ?? cleanUrl.toLowerCase();
+    linksByKey.set(key, cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
   }
 
   const idPattern = /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi;
   let idMatch: RegExpExecArray | null;
   while ((idMatch = idPattern.exec(text)) !== null) {
     const id = idMatch[0].toLowerCase();
-    if (!linksById.has(id)) linksById.set(id, id);
+    if (!linksByKey.has(id)) linksByKey.set(id, id);
   }
 
-  return [...linksById.values()];
+  return [...linksByKey.values()];
 }
 
 function extractSunoTitle(url: string): string {
