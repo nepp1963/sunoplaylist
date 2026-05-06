@@ -149,8 +149,18 @@ export default function SunoPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resumeTimeRef = useRef<number | null>(null);
+  const songKeysRef = useRef<Set<string>>(new Set());
 
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
+
+  useEffect(() => {
+    songKeysRef.current = new Set(
+      songs.flatMap((song) => {
+        const id = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
+        return [id ? `id:${id}` : "", `url:${song.url.toLowerCase()}`].filter(Boolean);
+      }),
+    );
+  }, [songs]);
 
   const addSong = useCallback(
     (url: string) => {
@@ -162,8 +172,9 @@ export default function SunoPlayer() {
         : sunoId
           ? `https://suno.com/song/${sunoId}`
           : `https://${stripLinkPunctuation(trimmed)}`;
-      if (sunoId && songs.some((song) => extractSunoId(song.url) === sunoId)) return true;
-      if (!sunoId && songs.some((song) => song.url === normalizedUrl)) return true;
+      const provisionalKey = sunoId ? `id:${sunoId}` : `url:${normalizedUrl.toLowerCase()}`;
+      if (songKeysRef.current.has(provisionalKey)) return true;
+      songKeysRef.current.add(provisionalKey);
       const songId =
         globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const song: Song = {
@@ -176,6 +187,7 @@ export default function SunoPlayer() {
       setOriginalOrder((prev) => [...prev, songId]);
       fetchSunoMeta({ data: normalizedUrl }).then((meta) => {
         if (meta) {
+          if (meta.id) songKeysRef.current.add(`id:${meta.id}`);
           setSongs((prev) =>
             prev.map((s) =>
               s.id === songId
@@ -193,7 +205,7 @@ export default function SunoPlayer() {
       });
       return true;
     },
-    [songs],
+    [],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
