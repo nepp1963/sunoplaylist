@@ -156,28 +156,33 @@ export default function SunoPlayer() {
     (url: string) => {
       const trimmed = url.trim();
       const sunoId = extractSunoId(trimmed);
-      if (!sunoId) return false;
+      if (!sunoId && !/(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\//i.test(trimmed)) return false;
       const normalizedUrl = trimmed.startsWith("http")
         ? stripLinkPunctuation(trimmed)
-        : `https://suno.com/song/${sunoId}`;
-      if (songs.some((song) => extractSunoId(song.url) === sunoId)) return true;
+        : sunoId
+          ? `https://suno.com/song/${sunoId}`
+          : `https://${stripLinkPunctuation(trimmed)}`;
+      if (sunoId && songs.some((song) => extractSunoId(song.url) === sunoId)) return true;
+      if (!sunoId && songs.some((song) => song.url === normalizedUrl)) return true;
       const songId =
         globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const song: Song = {
         id: songId,
         url: normalizedUrl,
-        audioUrl: `https://cdn1.suno.ai/${sunoId}.mp3`,
+        audioUrl: sunoId ? `https://cdn1.suno.ai/${sunoId}.mp3` : "",
         title: extractSunoTitle(normalizedUrl),
       };
       setSongs((prev) => [...prev, song]);
       setOriginalOrder((prev) => [...prev, songId]);
-      fetchSunoMeta({ data: sunoId }).then((meta) => {
+      fetchSunoMeta({ data: normalizedUrl }).then((meta) => {
         if (meta) {
           setSongs((prev) =>
             prev.map((s) =>
               s.id === songId
                 ? {
                     ...s,
+                    ...(meta.url ? { url: meta.url } : {}),
+                    ...(meta.audioUrl ? { audioUrl: meta.audioUrl } : {}),
                     ...(meta.title ? { title: meta.title } : {}),
                     ...(meta.image ? { image: meta.image } : {}),
                   }
