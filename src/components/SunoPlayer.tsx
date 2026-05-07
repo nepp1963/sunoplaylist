@@ -868,19 +868,29 @@ export default function SunoPlayer() {
 
   const savePlaylist = () => {
     const payload = {
-      version: 2,
-      songs: songs.map((s) => ({ url: s.url, title: s.title, folder: s.folder })),
+      version: 3,
+      songs: songs.map((s) => ({
+        id: s.id,
+        url: s.url,
+        audioUrl: s.audioUrl,
+        title: s.title,
+        image: s.image,
+        folder: s.folder,
+      })),
       folders,
       folderOrder,
       lockedFolders,
+      originalOrder,
     };
     const data = JSON.stringify(payload, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "Lovable's_Suno_Playlist.json";
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(a.href);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
 
   const loadPlaylist = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -901,36 +911,85 @@ export default function SunoPlayer() {
           !Array.isArray(raw) && Array.isArray(raw?.folderOrder) ? raw.folderOrder : null;
         const explicitLocked: string[] | null =
           !Array.isArray(raw) && Array.isArray(raw?.lockedFolders) ? raw.lockedFolders : null;
+        const explicitOriginalOrder: string[] | null =
+          !Array.isArray(raw) && Array.isArray(raw?.originalOrder) ? raw.originalOrder : null;
 
-        setSongs([]);
+        // Build full Song objects directly so we don't lose titles/folders
+        // and don't get blocked by the dedup ref.
+        const rebuilt: Song[] = songList
+          .filter((s: any) => s && (s.url || s.id))
+          .map((s: any) => {
+            const sunoId = extractSunoId(String(s.url ?? "")) ?? extractSunoId(String(s.id ?? ""));
+            const url: string = s.url
+              ? String(s.url)
+              : sunoId
+                ? `https://suno.com/song/${sunoId}`
+                : "";
+            const audioUrl: string =
+              s.audioUrl || (sunoId ? `https://cdn1.suno.ai/${sunoId}.mp3` : "");
+            const id: string =
+              s.id ||
+              globalThis.crypto?.randomUUID?.() ||
+              `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            return {
+              id,
+              url,
+              audioUrl,
+              title: s.title || extractSunoTitle(url),
+              image: s.image,
+              folder: s.folder,
+            };
+          });
+
+        // Reset dedup ref so reloading the same file works
+        songKeysRef.current = new Set(
+          rebuilt.flatMap((song) => {
+            const id = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
+            return [id ? `id:${id}` : "", `url:${song.url.toLowerCase()}`].filter(Boolean);
+          }),
+        );
+
         setCurrentIndex(-1);
         setIsPlaying(false);
-        setOriginalOrder([]);
+        setSongs(rebuilt);
+        setOriginalOrder(explicitOriginalOrder ?? rebuilt.map((s) => s.id));
+
         const loadedFolders = new Set<string>();
-        songList.forEach((s: any) => {
-          if (s?.folder) loadedFolders.add(s.folder);
-          if (s?.url) addSong(s.url);
+        rebuilt.forEach((s) => {
+          if (s.folder) loadedFolders.add(s.folder);
         });
-        // Merge song-derived folders with explicitly saved (possibly empty) folders
         const allFolders = new Set<string>([...loadedFolders, ...(explicitFolders ?? [])]);
         if (allFolders.size > 0) {
-          setFolders((prev) => [...new Set([...prev, ...allFolders])]);
-          const orderSeed = explicitFolderOrder ?? [...allFolders];
-          setFolderOrder((prev) => [...new Set([...prev, ...orderSeed, ...allFolders])]);
+          setFolders([...allFolders]);
+          setFolderOrder(explicitFolderOrder ?? [...allFolders]);
+        } else {
+          setFolders([]);
+          setFolderOrder([]);
         }
-        if (explicitLocked && explicitLocked.length > 0) {
-          setLockedFolders((prev) => [...new Set([...prev, ...explicitLocked])]);
-        }
-        // Assign folders after songs are added
-        setTimeout(() => {
-          setSongs((prev) =>
-            prev.map((song, i) => {
-              const matchingData = songList[i];
-              if (matchingData?.folder) return { ...song, folder: matchingData.folder };
-              return song;
-            }),
-          );
-        }, 100);
+        setLockedFolders(explicitLocked ?? []);
+
+        // Backfill missing audioUrl/title/image from network
+        rebuilt.forEach((song) => {
+          if (song.audioUrl && song.title && !song.title.startsWith("SUNO Track —")) return;
+          fetchSunoMeta({ data: song.url }).then((meta) => {
+            if (!meta) return;
+            setSongs((prev) =>
+              prev.map((s) =>
+                s.id === song.id
+                  ? {
+                      ...s,
+                      ...(meta.url && !s.url ? { url: meta.url } : {}),
+                      ...(meta.audioUrl && !s.audioUrl ? { audioUrl: meta.audioUrl } : {}),
+                      ...(meta.title && s.title.startsWith("SUNO Track —")
+                        ? { title: meta.title }
+                        : {}),
+                      ...(meta.image && !s.image ? { image: meta.image } : {}),
+                    }
+                  : s,
+              ),
+            );
+          });
+        });
       } catch {
         /* ignore */
       }
