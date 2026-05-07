@@ -699,6 +699,35 @@ export default function SunoPlayer() {
     setHydrated(true);
   }, []);
 
+  // Backfill missing image/audioUrl/title for hydrated songs (e.g., older localStorage state)
+  const backfilledRef = useRef(false);
+  useEffect(() => {
+    if (!hydrated || backfilledRef.current) return;
+    if (songs.length === 0) return;
+    backfilledRef.current = true;
+    songs.forEach((song) => {
+      const needsTitle = !song.title || song.title.startsWith("SUNO Track —");
+      if (song.image && song.audioUrl && !needsTitle) return;
+      fetchSunoMeta({ data: song.url }).then((meta) => {
+        if (!meta) return;
+        setSongs((prev) =>
+          prev.map((s) =>
+            s.id === song.id
+              ? {
+                  ...s,
+                  ...(meta.audioUrl && !s.audioUrl ? { audioUrl: meta.audioUrl } : {}),
+                  ...(meta.title && (!s.title || s.title.startsWith("SUNO Track —"))
+                    ? { title: meta.title }
+                    : {}),
+                  ...(meta.image && !s.image ? { image: meta.image } : {}),
+                }
+              : s,
+          ),
+        );
+      });
+    });
+  }, [hydrated, songs]);
+
   // Persist to localStorage whenever playlist or folders change
   useEffect(() => {
     if (!hydrated) return;
