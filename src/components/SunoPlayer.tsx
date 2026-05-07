@@ -970,7 +970,7 @@ export default function SunoPlayer() {
 
         // Backfill missing audioUrl/title/image from network
         rebuilt.forEach((song) => {
-          if (song.audioUrl && song.title && !song.title.startsWith("SUNO Track —")) return;
+          if (song.audioUrl && song.title && !song.title.startsWith("SUNO Track —") && song.image) return;
           fetchSunoMeta({ data: song.url }).then((meta) => {
             if (!meta) return;
             setSongs((prev) =>
