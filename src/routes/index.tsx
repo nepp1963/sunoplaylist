@@ -22,7 +22,13 @@ function Index() {
       <LanguageSelector />
       <ThemeToggle />
       <SunoPlayer />
-      <div className="w-full flex justify-center px-4 pb-4 -mt-2">
+      <div className="w-full flex flex-col items-center gap-2 px-4 pb-4 -mt-2">
+        <Link
+          to="/manual"
+          className="text-sm text-primary hover:underline"
+        >
+          📖 Open User Manual
+        </Link>
         <SocialFooter />
       </div>
     </I18nProvider>
