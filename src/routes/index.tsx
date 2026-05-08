@@ -4,6 +4,7 @@ import ThemeToggle from "../components/ThemeToggle";
 import LanguageSelector from "../components/LanguageSelector";
 import SocialFooter from "../components/SocialFooter";
 import I18nProvider from "../components/I18nProvider";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: Index,
