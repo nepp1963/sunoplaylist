@@ -1023,3 +1023,33 @@ const MANUAL: Record<LangCode, ManualContent> = {
 export function getManual(lang: LangCode): ManualContent {
   return MANUAL[lang] ?? en;
 }
+
+export type ManualUI = {
+  openManual: string;
+  search: string;
+  downloadPdf: string;
+  noResults: string;
+};
+
+const MANUAL_UI: Record<LangCode, ManualUI> = {
+  en:  { openManual: "📖 Open User Manual",        search: "Search the manual…",      downloadPdf: "⬇ Download PDF",        noResults: "No matching sections." },
+  es:  { openManual: "📖 Abrir manual de usuario",  search: "Buscar en el manual…",    downloadPdf: "⬇ Descargar PDF",       noResults: "Sin coincidencias." },
+  pt:  { openManual: "📖 Abrir manual do utilizador", search: "Pesquisar no manual…",  downloadPdf: "⬇ Baixar PDF",          noResults: "Sem resultados." },
+  it:  { openManual: "📖 Apri il manuale utente",   search: "Cerca nel manuale…",      downloadPdf: "⬇ Scarica PDF",         noResults: "Nessun risultato." },
+  de:  { openManual: "📖 Benutzerhandbuch öffnen",  search: "Im Handbuch suchen…",     downloadPdf: "⬇ PDF herunterladen",   noResults: "Keine passenden Abschnitte." },
+  fr:  { openManual: "📖 Ouvrir le manuel",         search: "Rechercher dans le manuel…", downloadPdf: "⬇ Télécharger en PDF", noResults: "Aucun résultat." },
+  zh:  { openManual: "📖 打开用户手册",              search: "在手册中搜索…",            downloadPdf: "⬇ 下载 PDF",             noResults: "没有匹配的章节。" },
+  yue: { openManual: "📖 打開用戶手冊",              search: "喺手冊度搵…",              downloadPdf: "⬇ 下載 PDF",             noResults: "冇符合嘅章節。" },
+  ja:  { openManual: "📖 ユーザーマニュアルを開く",   search: "マニュアル内を検索…",       downloadPdf: "⬇ PDFをダウンロード",     noResults: "該当するセクションがありません。" },
+  ko:  { openManual: "📖 사용자 매뉴얼 열기",         search: "매뉴얼 검색…",             downloadPdf: "⬇ PDF 다운로드",         noResults: "일치하는 섹션이 없습니다." },
+  hi:  { openManual: "📖 उपयोगकर्ता मैनुअल खोलें",     search: "मैनुअल में खोजें…",          downloadPdf: "⬇ PDF डाउनलोड करें",     noResults: "कोई मेल नहीं मिला।" },
+  ar:  { openManual: "📖 فتح دليل المستخدم",         search: "ابحث في الدليل…",          downloadPdf: "⬇ تنزيل PDF",            noResults: "لا توجد نتائج مطابقة." },
+  ms:  { openManual: "📖 Buka Manual Pengguna",     search: "Cari dalam manual…",       downloadPdf: "⬇ Muat turun PDF",       noResults: "Tiada hasil yang sepadan." },
+  id:  { openManual: "📖 Buka Manual Pengguna",     search: "Cari di manual…",          downloadPdf: "⬇ Unduh PDF",            noResults: "Tidak ada hasil." },
+  vi:  { openManual: "📖 Mở hướng dẫn sử dụng",     search: "Tìm trong hướng dẫn…",     downloadPdf: "⬇ Tải PDF",              noResults: "Không tìm thấy mục phù hợp." },
+  th:  { openManual: "📖 เปิดคู่มือผู้ใช้",            search: "ค้นหาในคู่มือ…",            downloadPdf: "⬇ ดาวน์โหลด PDF",        noResults: "ไม่พบส่วนที่ตรงกัน" },
+};
+
+export function getManualUI(lang: LangCode): ManualUI {
+  return MANUAL_UI[lang] ?? MANUAL_UI.en;
+}
