@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import SunoPlayer from "../components/SunoPlayer";
 import ThemeToggle from "../components/ThemeToggle";
 import LanguageSelector from "../components/LanguageSelector";
 import SocialFooter from "../components/SocialFooter";
 import I18nProvider from "../components/I18nProvider";
-import { Link } from "@tanstack/react-router";
+import { useI18n } from "../lib/i18n";
+import { getManualUI } from "../lib/manualI18n";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -16,6 +17,16 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+function ManualLink() {
+  const { lang } = useI18n();
+  const ui = getManualUI(lang);
+  return (
+    <Link to="/manual" className="text-sm text-primary hover:underline">
+      {ui.openManual}
+    </Link>
+  );
+}
+
 function Index() {
   return (
     <I18nProvider>
@@ -23,12 +34,7 @@ function Index() {
       <ThemeToggle />
       <SunoPlayer />
       <div className="w-full flex flex-col items-center gap-2 px-4 pb-4 -mt-2">
-        <Link
-          to="/manual"
-          className="text-sm text-primary hover:underline"
-        >
-          📖 Open User Manual
-        </Link>
+        <ManualLink />
         <SocialFooter />
       </div>
     </I18nProvider>
