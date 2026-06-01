@@ -4,6 +4,8 @@ import ThemeToggle from "../components/ThemeToggle";
 import LanguageSelector from "../components/LanguageSelector";
 import SocialFooter from "../components/SocialFooter";
 import I18nProvider from "../components/I18nProvider";
+import ColorSchemeProvider from "../components/ColorSchemeProvider";
+import ColorSchemeSelector from "../components/ColorSchemeSelector";
 import { useI18n } from "../lib/i18n";
 import { getManualUI } from "../lib/manualI18n";
 
@@ -29,14 +31,17 @@ function ManualLink() {
 
 function Index() {
   return (
-    <I18nProvider>
-      <LanguageSelector />
-      <ThemeToggle />
-      <SunoPlayer />
-      <div className="w-full flex flex-col items-center gap-2 px-4 pb-4 -mt-2">
-        <ManualLink />
-        <SocialFooter />
-      </div>
-    </I18nProvider>
+    <ColorSchemeProvider>
+      <I18nProvider>
+        <LanguageSelector />
+        <ColorSchemeSelector />
+        <ThemeToggle />
+        <SunoPlayer />
+        <div className="w-full flex flex-col items-center gap-2 px-4 pb-4 -mt-2">
+          <ManualLink />
+          <SocialFooter />
+        </div>
+      </I18nProvider>
+    </ColorSchemeProvider>
   );
 }
