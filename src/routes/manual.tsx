@@ -3,6 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import I18nProvider from "../components/I18nProvider";
 import LanguageSelector from "../components/LanguageSelector";
 import ThemeToggle from "../components/ThemeToggle";
+import ColorSchemeProvider from "../components/ColorSchemeProvider";
+import ColorSchemeSelector from "../components/ColorSchemeSelector";
 import { useI18n } from "../lib/i18n";
 import { getManual, getManualUI, type ManualBlock, type ManualSection } from "../lib/manualI18n";
 
@@ -131,12 +133,15 @@ function ManualBody() {
 
 function ManualPage() {
   return (
-    <I18nProvider>
-      <div className="no-print">
-        <LanguageSelector />
-        <ThemeToggle />
-      </div>
-      <ManualBody />
-    </I18nProvider>
+    <ColorSchemeProvider>
+      <I18nProvider>
+        <div className="no-print">
+          <LanguageSelector />
+          <ColorSchemeSelector />
+          <ThemeToggle />
+        </div>
+        <ManualBody />
+      </I18nProvider>
+    </ColorSchemeProvider>
   );
 }
