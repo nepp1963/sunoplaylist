@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { fetchSunoMeta } from "../lib/fetchSunoTitle";
 import { useI18n } from "../lib/i18n";
+import { useColorScheme } from "./ColorSchemeProvider";
+import { COLOR_SCHEMES } from "../lib/themes";
 import nepp1963Logo from "../assets/nepp1963-logo.webp";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -109,6 +111,7 @@ function extractSunoTitle(url: string): string {
 
 export default function SunoPlayer() {
   const { t } = useI18n();
+  const { schemeId, setSchemeId } = useColorScheme();
   const [songs, setSongs] = useState<Song[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState(false);
