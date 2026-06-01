@@ -900,7 +900,8 @@ export default function SunoPlayer() {
 
   const savePlaylist = () => {
     const payload = {
-      version: 3,
+      version: 4,
+      colorScheme: schemeId,
       songs: songs.map((s) => ({
         id: s.id,
         url: s.url,
@@ -945,6 +946,11 @@ export default function SunoPlayer() {
           !Array.isArray(raw) && Array.isArray(raw?.lockedFolders) ? raw.lockedFolders : null;
         const explicitOriginalOrder: string[] | null =
           !Array.isArray(raw) && Array.isArray(raw?.originalOrder) ? raw.originalOrder : null;
+        const explicitScheme: string | null =
+          !Array.isArray(raw) && typeof raw?.colorScheme === "string" ? raw.colorScheme : null;
+        if (explicitScheme && COLOR_SCHEMES.some((s) => s.id === explicitScheme)) {
+          setSchemeId(explicitScheme);
+        }
 
         // Build full Song objects directly so we don't lose titles/folders
         // and don't get blocked by the dedup ref.
