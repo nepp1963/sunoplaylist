@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { fetchSunoMeta } from "../lib/fetchSunoTitle";
 import { useI18n } from "../lib/i18n";
+import { useColorScheme } from "./ColorSchemeProvider";
+import { COLOR_SCHEMES } from "../lib/themes";
 import nepp1963Logo from "../assets/nepp1963-logo.webp";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -109,6 +111,7 @@ function extractSunoTitle(url: string): string {
 
 export default function SunoPlayer() {
   const { t } = useI18n();
+  const { schemeId, setSchemeId } = useColorScheme();
   const [songs, setSongs] = useState<Song[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -897,7 +900,8 @@ export default function SunoPlayer() {
 
   const savePlaylist = () => {
     const payload = {
-      version: 3,
+      version: 4,
+      colorScheme: schemeId,
       songs: songs.map((s) => ({
         id: s.id,
         url: s.url,
@@ -942,6 +946,11 @@ export default function SunoPlayer() {
           !Array.isArray(raw) && Array.isArray(raw?.lockedFolders) ? raw.lockedFolders : null;
         const explicitOriginalOrder: string[] | null =
           !Array.isArray(raw) && Array.isArray(raw?.originalOrder) ? raw.originalOrder : null;
+        const explicitScheme: string | null =
+          !Array.isArray(raw) && typeof raw?.colorScheme === "string" ? raw.colorScheme : null;
+        if (explicitScheme && COLOR_SCHEMES.some((s) => s.id === explicitScheme)) {
+          setSchemeId(explicitScheme);
+        }
 
         // Build full Song objects directly so we don't lose titles/folders
         // and don't get blocked by the dedup ref.
