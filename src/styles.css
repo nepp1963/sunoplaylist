@@ -67,28 +67,6 @@
 
 .light, html.light, html.light body {
   color-scheme: light;
-  --background: oklch(0.97 0.005 270);
-  --foreground: oklch(0.15 0.02 270);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 270);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 270);
-  --primary: oklch(0.55 0.22 150);
-  --primary-foreground: oklch(0.98 0.005 270);
-  --secondary: oklch(0.93 0.005 270);
-  --secondary-foreground: oklch(0.3 0.02 270);
-  --muted: oklch(0.92 0.005 270);
-  --muted-foreground: oklch(0.45 0.02 270);
-  --accent: oklch(0.55 0.25 330);
-  --accent-foreground: oklch(0.98 0.005 270);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0.005 270);
-  --border: oklch(0.88 0.01 270);
-  --input: oklch(0.92 0.005 270);
-  --ring: oklch(0.55 0.22 150);
-  --surface: oklch(0.95 0.005 270);
-  --surface-foreground: oklch(0.2 0.02 270);
-  --glow: oklch(0.55 0.22 150 / 45%);
 }
 
 html.light,
