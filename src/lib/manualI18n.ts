@@ -896,6 +896,7 @@ const id: ManualContent = {
       { ul: [
         "<strong>Pengalih tema</strong> — mode terang/gelap.",
         "<strong>Pemilih bahasa</strong> — UI multibahasa dengan dukungan RTL.",
+        "<strong>Pemilih skema warna</strong> — pilih dari enam palet (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) yang mewarnai antarmuka dalam mode gelap dan terang. Pilihan Anda disimpan di browser dan ekspor daftar putar.",
       ]},
     ]},
     { heading: "9. Aplikasi Web Mobile", blocks: [
