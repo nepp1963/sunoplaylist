@@ -834,6 +834,7 @@ const ms: ManualContent = {
       { ul: [
         "<strong>Togol tema</strong> — mod cerah/gelap.",
         "<strong>Pemilih bahasa</strong> — UI berbilang bahasa, sokongan RTL.",
+        "<strong>Pemilih skema warna</strong> — pilih daripada enam palet (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) yang mewarnai antara muka dalam mod gelap dan cerah. Pilihan anda disimpan dalam pelayar dan eksport senarai main.",
       ]},
     ]},
     { heading: "9. Apl Web Mudah Alih", blocks: [
