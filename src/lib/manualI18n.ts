@@ -338,6 +338,7 @@ const de: ManualContent = {
       { ul: [
         "<strong>Theme-Umschalter</strong> — heller oder dunkler Modus.",
         "<strong>Sprachauswahl</strong> — mehrsprachige UI mit RTL-Unterstützung.",
+        "<strong>Farbschema-Auswahl</strong> — wähle aus sechs Paletten (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose), die die Oberfläche im dunklen und hellen Modus einfärben. Die Wahl wird im Browser und in Playlist-Exporten gespeichert.",
       ]},
     ]},
     { heading: "9. Mobile Web-App", blocks: [
