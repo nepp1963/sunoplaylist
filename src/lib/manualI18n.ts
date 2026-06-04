@@ -83,6 +83,7 @@ const en: ManualContent = {
         { ul: [
           "<strong>Theme toggle</strong> — switch between light and dark modes.",
           "<strong>Language selector</strong> — multilingual UI with RTL support for applicable languages.",
+          "<strong>Color scheme selector</strong> — choose from six palettes (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) that tint the interface in both dark and light modes. Your choice is saved in the browser and inside playlist exports.",
         ] },
       ],
     },
@@ -151,6 +152,7 @@ const es: ManualContent = {
       { ul: [
         "<strong>Cambio de tema</strong> — alterna entre modo claro y oscuro.",
         "<strong>Selector de idioma</strong> — interfaz multilingüe con soporte RTL.",
+        "<strong>Selector de esquema de color</strong> — elige entre seis paletas (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) que teñen la interfaz en modo oscuro y claro. Tu elección se guarda en el navegador y en las exportaciones de playlists.",
       ]},
     ]},
     { heading: "9. App web móvil", blocks: [
@@ -212,6 +214,7 @@ const pt: ManualContent = {
       { ul: [
         "<strong>Alternar tema</strong> — modo claro ou escuro.",
         "<strong>Seletor de idioma</strong> — interface multilingue com suporte RTL.",
+        "<strong>Seletor de esquema de cor</strong> — escolhe entre seis paletas (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) que colorizam a interface em modo escuro e claro. A escolha é guardada no navegador e nas exportações de playlists.",
       ]},
     ]},
     { heading: "9. App web mobile", blocks: [
@@ -273,6 +276,7 @@ const it: ManualContent = {
       { ul: [
         "<strong>Tema</strong> — alterna tra chiaro e scuro.",
         "<strong>Selettore lingua</strong> — interfaccia multilingue con supporto RTL.",
+        "<strong>Selettore schema colore</strong> — scegli tra sei palette (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) che tingono l'interfaccia in modalità scura e chiara. La scelta viene salvata nel browser e nelle esportazioni delle playlist.",
       ]},
     ]},
     { heading: "9. App web mobile", blocks: [
@@ -395,6 +399,7 @@ const fr: ManualContent = {
       { ul: [
         "<strong>Thème</strong> — clair ou sombre.",
         "<strong>Sélecteur de langue</strong> — interface multilingue avec support RTL.",
+        "<strong>Sélecteur de schéma de couleurs</strong> — choisissez parmi six palettes (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) qui teintent l'interface en mode sombre et clair. Votre choix est enregistré dans le navigateur et dans les exports de playlists.",
       ]},
     ]},
     { heading: "9. Application web mobile", blocks: [
@@ -456,6 +461,7 @@ const zh: ManualContent = {
       { ul: [
         "<strong>主题切换</strong> — 在浅色和深色模式之间切换。",
         "<strong>语言选择器</strong> — 多语言界面，支持 RTL。",
+        "<strong>配色方案选择器</strong> — 从六种调色板中选择（Emerald、Ocean、Sunset、Lavender、Noir Gold、Rose），为深色和浅色模式下的界面着色。你的选择会保存在浏览器和播放列表导出文件中。",
       ]},
     ]},
     { heading: "9. 移动 Web 应用", blocks: [
@@ -517,6 +523,7 @@ const yue: ManualContent = {
       { ul: [
         "<strong>主題切換</strong> — 淺色或深色模式。",
         "<strong>語言選擇</strong> — 多語言介面，支援 RTL。",
+        "<strong>配色方案選擇器</strong> — 喺六款調色板度揀（Emerald、Ocean、Sunset、Lavender、Noir Gold、Rose），為深色同淺色模式下嘅界面着色。你嘅選擇會儲存喺瀏覽器同播放清單匯出檔案度。",
       ]},
     ]},
     { heading: "9. 手機 Web App", blocks: [
@@ -578,6 +585,7 @@ const ja: ManualContent = {
       { ul: [
         "<strong>テーマ切替</strong> — ライト/ダーク。",
         "<strong>言語セレクター</strong> — 多言語UI、RTL対応。",
+        "<strong>カラースキーム選択</strong> — 6つのパレット（Emerald、Ocean、Sunset、Lavender、Noir Gold、Rose）から選んで、ダーク/ライト両モードのインターフェースに色付けします。選択はブラウザとプレイリストのエクスポートに保存されます。",
       ]},
     ]},
     { heading: "9. モバイル Web アプリ", blocks: [
@@ -639,6 +647,7 @@ const ko: ManualContent = {
       { ul: [
         "<strong>테마 전환</strong> — 라이트/다크 모드.",
         "<strong>언어 선택기</strong> — 다국어 UI, RTL 지원.",
+        "<strong>컬러 스킴 선택기</strong> — 6가지 팔레트(Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) 중 선택하여 다크/라이트 모드 모두에 색상을 입힙니다. 선택은 브라우저와 플레이리스트 내보내기에 저장됩니다.",
       ]},
     ]},
     { heading: "9. 모바일 웹 앱", blocks: [
@@ -700,6 +709,7 @@ const hi: ManualContent = {
       { ul: [
         "<strong>थीम टॉगल</strong> — हल्की/गहरी मोड।",
         "<strong>भाषा चयनकर्ता</strong> — बहुभाषी UI, RTL समर्थन।",
+        "<strong>कलर स्कीम चयनकर्ता</strong> — छह पैलेट (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) में से चुनें जो डार्क और लाइट दोनों मोड में इंटरफ़ेस को रंगते हैं। आपकी पसंद ब्राउज़र और प्लेलिस्ट निर्यात में सेव होती है।",
       ]},
     ]},
     { heading: "9. मोबाइल वेब ऐप", blocks: [
@@ -761,6 +771,7 @@ const ar: ManualContent = {
       { ul: [
         "<strong>تبديل النمط</strong> — فاتح/داكن.",
         "<strong>منتقي اللغة</strong> — واجهة متعددة اللغات بدعم RTL.",
+        "<strong>منتقي مخطط الألوان</strong> — اختر من بين ستة لوحات (Emerald، Ocean، Sunset، Lavender، Noir Gold، Rose) لصبغ الواجهة في الوضعين الداكن والفاتح. يتم حفظ اختيارك في المتصفح وفي صادر قوائم التشغيل.",
       ]},
     ]},
     { heading: "9. تطبيق الويب على الجوال", blocks: [
@@ -944,6 +955,7 @@ const vi: ManualContent = {
       { ul: [
         "<strong>Chuyển chủ đề</strong> — sáng/tối.",
         "<strong>Chọn ngôn ngữ</strong> — UI đa ngôn ngữ, hỗ trợ RTL.",
+        "<strong>Bộ chọn bảng màu</strong> — chọn từ sáu bảng màu (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) để tô màu giao diện ở cả chế độ tối và sáng. Lựa chọn của bạn được lưu trong trình duyệt và xuất danh sách phát.",
       ]},
     ]},
     { heading: "9. Ứng dụng web di động", blocks: [
@@ -1005,6 +1017,7 @@ const th: ManualContent = {
       { ul: [
         "<strong>สลับธีม</strong> — โหมดสว่าง/มืด",
         "<strong>เลือกภาษา</strong> — UI หลายภาษา รองรับ RTL",
+        "<strong>ตัวเลือกธีมสี</strong> — เลือกจากหกพาเลต (Emerald, Ocean, Sunset, Lavender, Noir Gold, Rose) เพื่อระบายสีอินเตอร์เฟซในโหมดมืดและสว่าง การเลือกจะถูกบันทึกในเบราว์เซอร์และการส่งออกเพลย์ลิสต์",
       ]},
     ]},
     { heading: "9. เว็บแอปบนมือถือ", blocks: [
