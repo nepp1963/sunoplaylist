@@ -135,7 +135,7 @@ export default function SunoPlayer() {
   const [editingTitle, setEditingTitle] = useState("");
   const [editingFolder, setEditingFolder] = useState<string | null>(null);
   const [editingFolderName, setEditingFolderName] = useState("");
-  const [repeat, setRepeat] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<"off" | "repeat" | "once">("off");
   const [hydrated, setHydrated] = useState(false);
   const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
   const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
@@ -830,9 +830,15 @@ export default function SunoPlayer() {
     const onTime = () => setProgress(audio.currentTime);
     const onDur = () => setDuration(audio.duration || 0);
     const onEnd = () => {
-      if (repeat && audio) {
+      if (repeatMode === "repeat" && audio) {
         audio.currentTime = 0;
         audio.play().catch(() => {});
+        return;
+      }
+      if (repeatMode === "once") {
+        audio.pause();
+        audio.currentTime = 0;
+        setIsPlaying(false);
         return;
       }
       playNext();
@@ -845,7 +851,7 @@ export default function SunoPlayer() {
       audio.removeEventListener("durationchange", onDur);
       audio.removeEventListener("ended", onEnd);
     };
-  }, [songs.length, currentIndex, repeat]);
+  }, [songs.length, currentIndex, repeatMode]);
 
   // Keep the folder of the currently playing song open at all times
   useEffect(() => {
@@ -1499,12 +1505,23 @@ export default function SunoPlayer() {
           </button>
         )}
         <button
-          onClick={() => setRepeat((r) => !r)}
-          className={`p-3 rounded-xl transition-colors ${repeat ? "bg-primary/20 text-primary ring-2 ring-primary/40" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"}`}
-          title={repeat ? t("repeatOn") : t("repeatOff")}
-          aria-pressed={repeat}
+          onClick={() =>
+            setRepeatMode((m) => (m === "off" ? "repeat" : m === "repeat" ? "once" : "off"))
+          }
+          className={`relative p-3 rounded-xl transition-colors ${repeatMode !== "off" ? "bg-primary/20 text-primary ring-2 ring-primary/40" : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"}`}
+          title={
+            repeatMode === "repeat"
+              ? t("repeatOn")
+              : repeatMode === "once"
+                ? t("repeatOnce")
+                : t("repeatOff")
+          }
+          aria-pressed={repeatMode !== "off"}
         >
           <Repeat className="w-5 h-5" />
+          <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-primary px-1 text-[10px] font-bold leading-tight text-primary-foreground">
+            {repeatMode === "once" ? "1" : "R"}
+          </span>
         </button>
       </div>
 
