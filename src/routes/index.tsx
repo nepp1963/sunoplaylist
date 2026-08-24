@@ -23,9 +23,14 @@ function ManualLink() {
   const { lang } = useI18n();
   const ui = getManualUI(lang);
   return (
-    <Link to="/manual" className="text-sm text-primary hover:underline">
+    <a
+      href="/manual"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-sm text-primary hover:underline"
+    >
       {ui.openManual}
-    </Link>
+    </a>
   );
 }
 
