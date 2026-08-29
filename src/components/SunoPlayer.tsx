@@ -119,6 +119,8 @@ export default function SunoPlayer() {
   const [dragOver, setDragOver] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackError, setPlaybackError] = useState(false);
+
   const [sortMode, setSortMode] = useState<SortMode>("original");
   const [originalOrder, setOriginalOrder] = useState<string[]>([]);
   const [folders, setFolders] = useState<string[]>([]);
@@ -371,7 +373,23 @@ export default function SunoPlayer() {
     });
   };
 
+  // Some browsers (notably Microsoft Edge) require the very first play() call to
+  // happen synchronously inside a user gesture. Unlock the element on first tap.
+  const audioUnlockedRef = useRef(false);
+  const unlockAudio = () => {
+    const audio = audioRef.current;
+    if (!audio || audioUnlockedRef.current) return;
+    audioUnlockedRef.current = true;
+    try {
+      const p = audio.play();
+      if (p && typeof p.then === "function") p.catch(() => {});
+    } catch {
+      /* ignore */
+    }
+  };
+
   const playSong = (index: number) => {
+    unlockAudio();
     setCurrentIndex(index);
     setIsPlaying(true);
     const targetFolder = songs[index]?.folder;
@@ -382,14 +400,27 @@ export default function SunoPlayer() {
     }
   };
 
+
   const togglePlay = () => {
+    unlockAudio();
     if (currentIndex < 0 && songs.length > 0) {
       const targetFolder = songs[0]?.folder;
       setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
       playSong(0);
       return;
     }
+    const audio = audioRef.current;
+    if (audio && audio.paused && audio.src) {
+      // synchronous gesture-driven play for strict browsers
+      try {
+        const p = audio.play();
+        if (p && typeof p.then === "function") p.catch(() => {});
+      } catch {
+        /* ignore */
+      }
+    }
     setIsPlaying((p) => {
+
       const next = !p;
       if (next) {
         const targetFolder = songs[currentIndex]?.folder;
@@ -808,6 +839,37 @@ export default function SunoPlayer() {
       audio.src = "";
     }
   }, [currentAudioUrl, isPlaying]);
+
+  // Fallback source if the CDN mp3 fails to load (some browsers/CDN edges reject it)
+  const triedFallbackRef = useRef<string | null>(null);
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onError = () => {
+      const id = extractSunoId(currentSong?.url ?? "") ?? extractSunoId(currentAudioUrl);
+      if (!id) {
+        setPlaybackError(true);
+        return;
+      }
+      const alt = `https://audiopipe.suno.ai/?item_id=${id}`;
+      if (triedFallbackRef.current === id || audio.src === alt) {
+        setPlaybackError(true);
+        return;
+      }
+      triedFallbackRef.current = id;
+      audio.src = alt;
+      audio.load();
+      if (isPlaying) audio.play().catch(() => {});
+    };
+    const onPlaying = () => setPlaybackError(false);
+    audio.addEventListener("error", onError);
+    audio.addEventListener("playing", onPlaying);
+    return () => {
+      audio.removeEventListener("error", onError);
+      audio.removeEventListener("playing", onPlaying);
+    };
+  }, [currentAudioUrl, currentSong, isPlaying]);
+
 
   // Apply & persist volume / mute
   useEffect(() => {
@@ -1348,6 +1410,12 @@ export default function SunoPlayer() {
                 </span>
               )}
             </p>
+            {playbackError && currentSong && (
+              <p className="text-xs text-destructive mt-0.5">
+                Audio couldn't be loaded in this browser. Try tapping play again or reloading.
+              </p>
+            )}
+
             {currentSong ? (
               <div className="marquee-mask">
                 <span
