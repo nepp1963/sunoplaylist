@@ -1325,7 +1325,7 @@ export default function SunoPlayer() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start py-8 px-4">
-      <audio ref={audioRef} preload="auto" playsInline />
+      <audio ref={audioRef} preload="auto" />
       <input
         ref={fileInputRef}
         type="file"
