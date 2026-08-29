@@ -838,6 +838,37 @@ export default function SunoPlayer() {
     }
   }, [currentAudioUrl, isPlaying]);
 
+  // Fallback source if the CDN mp3 fails to load (some browsers/CDN edges reject it)
+  const triedFallbackRef = useRef<string | null>(null);
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onError = () => {
+      const id = extractSunoId(currentSong?.url ?? "") ?? extractSunoId(currentAudioUrl);
+      if (!id) {
+        setPlaybackError(true);
+        return;
+      }
+      const alt = `https://audiopipe.suno.ai/?item_id=${id}`;
+      if (triedFallbackRef.current === id || audio.src === alt) {
+        setPlaybackError(true);
+        return;
+      }
+      triedFallbackRef.current = id;
+      audio.src = alt;
+      audio.load();
+      if (isPlaying) audio.play().catch(() => {});
+    };
+    const onPlaying = () => setPlaybackError(false);
+    audio.addEventListener("error", onError);
+    audio.addEventListener("playing", onPlaying);
+    return () => {
+      audio.removeEventListener("error", onError);
+      audio.removeEventListener("playing", onPlaying);
+    };
+  }, [currentAudioUrl, currentSong, isPlaying]);
+
+
   // Apply & persist volume / mute
   useEffect(() => {
     const audio = audioRef.current;
