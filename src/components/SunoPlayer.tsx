@@ -371,7 +371,23 @@ export default function SunoPlayer() {
     });
   };
 
+  // Some browsers (notably Microsoft Edge) require the very first play() call to
+  // happen synchronously inside a user gesture. Unlock the element on first tap.
+  const audioUnlockedRef = useRef(false);
+  const unlockAudio = () => {
+    const audio = audioRef.current;
+    if (!audio || audioUnlockedRef.current) return;
+    audioUnlockedRef.current = true;
+    try {
+      const p = audio.play();
+      if (p && typeof p.then === "function") p.catch(() => {});
+    } catch {
+      /* ignore */
+    }
+  };
+
   const playSong = (index: number) => {
+    unlockAudio();
     setCurrentIndex(index);
     setIsPlaying(true);
     const targetFolder = songs[index]?.folder;
@@ -381,6 +397,7 @@ export default function SunoPlayer() {
       );
     }
   };
+
 
   const togglePlay = () => {
     if (currentIndex < 0 && songs.length > 0) {
