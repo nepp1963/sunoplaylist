@@ -1410,6 +1410,12 @@ export default function SunoPlayer() {
                 </span>
               )}
             </p>
+            {playbackError && currentSong && (
+              <p className="text-xs text-destructive mt-0.5">
+                Audio couldn't be loaded in this browser. Try tapping play again or reloading.
+              </p>
+            )}
+
             {currentSong ? (
               <div className="marquee-mask">
                 <span
