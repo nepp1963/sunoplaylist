@@ -119,6 +119,8 @@ export default function SunoPlayer() {
   const [dragOver, setDragOver] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackError, setPlaybackError] = useState(false);
+
   const [sortMode, setSortMode] = useState<SortMode>("original");
   const [originalOrder, setOriginalOrder] = useState<string[]>([]);
   const [folders, setFolders] = useState<string[]>([]);
