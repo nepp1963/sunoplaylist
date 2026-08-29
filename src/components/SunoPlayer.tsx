@@ -400,13 +400,25 @@ export default function SunoPlayer() {
 
 
   const togglePlay = () => {
+    unlockAudio();
     if (currentIndex < 0 && songs.length > 0) {
       const targetFolder = songs[0]?.folder;
       setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
       playSong(0);
       return;
     }
+    const audio = audioRef.current;
+    if (audio && audio.paused && audio.src) {
+      // synchronous gesture-driven play for strict browsers
+      try {
+        const p = audio.play();
+        if (p && typeof p.then === "function") p.catch(() => {});
+      } catch {
+        /* ignore */
+      }
+    }
     setIsPlaying((p) => {
+
       const next = !p;
       if (next) {
         const targetFolder = songs[currentIndex]?.folder;
