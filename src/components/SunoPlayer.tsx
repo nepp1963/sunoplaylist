@@ -109,6 +109,12 @@ function extractSunoTitle(url: string): string {
   return id ? `SUNO Track — ${id.slice(0, 8)}` : "Unknown Track";
 }
 
+function getPlayableAudioUrl(song: Song | null | undefined): string {
+  if (!song) return "";
+  const id = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
+  return id ? `/api/public/suno-audio?id=${encodeURIComponent(id)}` : song.audioUrl;
+}
+
 export default function SunoPlayer() {
   const { t } = useI18n();
   const { schemeId, setSchemeId } = useColorScheme();
@@ -373,23 +379,23 @@ export default function SunoPlayer() {
     });
   };
 
-  // Some browsers (notably Microsoft Edge) require the very first play() call to
-  // happen synchronously inside a user gesture. Unlock the element on first tap.
-  const audioUnlockedRef = useRef(false);
-  const unlockAudio = () => {
+  // Assign the real source and call play() inside the tap event. Edge does not
+  // reliably preserve user activation until the state-driven effect runs.
+  const startAudioFromGesture = (song: Song | null | undefined) => {
     const audio = audioRef.current;
-    if (!audio || audioUnlockedRef.current) return;
-    audioUnlockedRef.current = true;
-    try {
-      const p = audio.play();
-      if (p && typeof p.then === "function") p.catch(() => {});
-    } catch {
-      /* ignore */
+    const playableUrl = getPlayableAudioUrl(song);
+    if (!audio || !playableUrl) return;
+    const resolvedUrl = new URL(playableUrl, window.location.href).href;
+    if (audio.src !== resolvedUrl) {
+      audio.src = playableUrl;
+      audio.load();
     }
+    setPlaybackError(false);
+    audio.play().catch(() => setPlaybackError(true));
   };
 
   const playSong = (index: number) => {
-    unlockAudio();
+    startAudioFromGesture(songs[index]);
     setCurrentIndex(index);
     setIsPlaying(true);
     const targetFolder = songs[index]?.folder;
@@ -402,7 +408,6 @@ export default function SunoPlayer() {
 
 
   const togglePlay = () => {
-    unlockAudio();
     if (currentIndex < 0 && songs.length > 0) {
       const targetFolder = songs[0]?.folder;
       setExpandedFolders(targetFolder ? new Set([targetFolder]) : new Set());
@@ -410,14 +415,10 @@ export default function SunoPlayer() {
       return;
     }
     const audio = audioRef.current;
-    if (audio && audio.paused && audio.src) {
-      // synchronous gesture-driven play for strict browsers
-      try {
-        const p = audio.play();
-        if (p && typeof p.then === "function") p.catch(() => {});
-      } catch {
-        /* ignore */
-      }
+    if (!isPlaying) {
+      startAudioFromGesture(currentSong);
+    } else {
+      audio?.pause();
     }
     setIsPlaying((p) => {
 
@@ -805,7 +806,7 @@ export default function SunoPlayer() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [songs.length]);
 
-  const currentAudioUrl = currentSong?.audioUrl ?? "";
+  const currentAudioUrl = getPlayableAudioUrl(currentSong);
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -840,26 +841,12 @@ export default function SunoPlayer() {
     }
   }, [currentAudioUrl, isPlaying]);
 
-  // Fallback source if the CDN mp3 fails to load (some browsers/CDN edges reject it)
-  const triedFallbackRef = useRef<string | null>(null);
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     const onError = () => {
-      const id = extractSunoId(currentSong?.url ?? "") ?? extractSunoId(currentAudioUrl);
-      if (!id) {
-        setPlaybackError(true);
-        return;
-      }
-      const alt = `https://audiopipe.suno.ai/?item_id=${id}`;
-      if (triedFallbackRef.current === id || audio.src === alt) {
-        setPlaybackError(true);
-        return;
-      }
-      triedFallbackRef.current = id;
-      audio.src = alt;
-      audio.load();
-      if (isPlaying) audio.play().catch(() => {});
+      setPlaybackError(true);
+      setIsPlaying(false);
     };
     const onPlaying = () => setPlaybackError(false);
     audio.addEventListener("error", onError);
@@ -868,7 +855,7 @@ export default function SunoPlayer() {
       audio.removeEventListener("error", onError);
       audio.removeEventListener("playing", onPlaying);
     };
-  }, [currentAudioUrl, currentSong, isPlaying]);
+  }, [currentAudioUrl]);
 
 
   // Apply & persist volume / mute
