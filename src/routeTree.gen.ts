@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ManualRouteImport } from './routes/manual'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicSunoAudioRouteImport } from './routes/api/public/suno-audio'
 
 const ManualRoute = ManualRouteImport.update({
   id: '/manual',
@@ -22,31 +23,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSunoAudioRoute = ApiPublicSunoAudioRouteImport.update({
+  id: '/api/public/suno-audio',
+  path: '/api/public/suno-audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/manual': typeof ManualRoute
+  '/api/public/suno-audio': typeof ApiPublicSunoAudioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/manual': typeof ManualRoute
+  '/api/public/suno-audio': typeof ApiPublicSunoAudioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/manual': typeof ManualRoute
+  '/api/public/suno-audio': typeof ApiPublicSunoAudioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/manual'
+  fullPaths: '/' | '/manual' | '/api/public/suno-audio'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/manual'
-  id: '__root__' | '/' | '/manual'
+  to: '/' | '/manual' | '/api/public/suno-audio'
+  id: '__root__' | '/' | '/manual' | '/api/public/suno-audio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ManualRoute: typeof ManualRoute
+  ApiPublicSunoAudioRoute: typeof ApiPublicSunoAudioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/suno-audio': {
+      id: '/api/public/suno-audio'
+      path: '/api/public/suno-audio'
+      fullPath: '/api/public/suno-audio'
+      preLoaderRoute: typeof ApiPublicSunoAudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ManualRoute: ManualRoute,
+  ApiPublicSunoAudioRoute: ApiPublicSunoAudioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
