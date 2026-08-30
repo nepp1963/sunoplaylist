@@ -1,0 +1,51 @@
+import { createFileRoute } from "@tanstack/react-router";
+
+const SUNO_ID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+
+export const Route = createFileRoute("/api/public/suno-audio")({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        const id = new URL(request.url).searchParams.get("id") ?? "";
+        if (!SUNO_ID.test(id)) return new Response("Invalid song ID", { status: 400 });
+
+        const range = request.headers.get("range");
+        const upstream = await fetch(
+          `https://audiopipe.suno.ai/?item_id=${encodeURIComponent(id.toLowerCase())}`,
+          {
+            headers: {
+              Accept: "audio/mpeg,audio/*;q=0.9,*/*;q=0.8",
+              Referer: "https://suno.com/",
+              ...(range ? { Range: range } : {}),
+            },
+          },
+        );
+
+        if (!upstream.ok || !upstream.body) {
+          return new Response("Audio unavailable", { status: upstream.status || 502 });
+        }
+
+        const headers = new Headers();
+        for (const name of [
+          "accept-ranges",
+          "cache-control",
+          "content-length",
+          "content-range",
+          "content-type",
+          "etag",
+          "last-modified",
+        ]) {
+          const value = upstream.headers.get(name);
+          if (value) headers.set(name, value);
+        }
+        if (!headers.has("content-type")) headers.set("content-type", "audio/mpeg");
+        headers.set("content-disposition", "inline");
+
+        return new Response(upstream.body, {
+          status: upstream.status,
+          headers,
+        });
+      },
+    },
+  },
+});
