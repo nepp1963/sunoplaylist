@@ -847,7 +847,7 @@ const th: PartialDict = {
   darkMode: "โหมดมืด",
   undo: "เลิกทำ",
   dismiss: "ปิด",
-  duplicateSong: "⚠️ เพลงนี้นี้อยู่ในเพลย์ลิสต์ของคุณแล้ว",
+  duplicateSong: "⚠️ เพลงนี้อยู่ในเพลย์ลิสต์ของคุณแล้ว",
   deletedSong: "ลบแล้ว",
   deletedFolder: "ลบโฟลเดอร์แล้ว",
   autosaveNote: "💾 เพลย์ลิสต์ถูกบันทึกในเบราว์เซอร์อัตโนมัติ หากล้างแคชต้องโหลดใหม่",
