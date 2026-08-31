@@ -147,7 +147,15 @@ export default function SunoPlayer() {
   const [hydrated, setHydrated] = useState(false);
   const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
   const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
+  const [duplicateWarning, setDuplicateWarning] = useState(false);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showDuplicateWarning = useCallback(() => {
+    if (dupTimerRef.current) clearTimeout(dupTimerRef.current);
+    setDuplicateWarning(true);
+    dupTimerRef.current = setTimeout(() => setDuplicateWarning(false), 5000);
+  }, []);
   const [volume, setVolume] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
     const v = parseFloat(localStorage.getItem("suno-volume") || "1");
@@ -174,17 +182,19 @@ export default function SunoPlayer() {
   }, [songs]);
 
   const addSong = useCallback(
-    (url: string) => {
+    (url: string): "added" | "duplicate" | "invalid" => {
       const trimmed = url.trim();
       const sunoId = extractSunoId(trimmed);
-      if (!sunoId && !/(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\//i.test(trimmed)) return false;
+      if (!sunoId && !/(?:https?:\/\/)?(?:[\w-]+\.)?suno\.(?:com|ai)\//i.test(trimmed)) return "invalid";
       const normalizedUrl = trimmed.startsWith("http")
         ? stripLinkPunctuation(trimmed)
         : sunoId
           ? `https://suno.com/song/${sunoId}`
           : `https://${stripLinkPunctuation(trimmed)}`;
       const provisionalKey = sunoId ? `id:${sunoId}` : `url:${normalizedUrl.toLowerCase()}`;
-      if (songKeysRef.current.has(provisionalKey)) return true;
+      const urlKey = `url:${normalizedUrl.toLowerCase()}`;
+      if (songKeysRef.current.has(provisionalKey) || songKeysRef.current.has(urlKey))
+        return "duplicate";
       songKeysRef.current.add(provisionalKey);
       const songId =
         globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -214,7 +224,7 @@ export default function SunoPlayer() {
           );
         }
       });
-      return true;
+      return "added";
     },
     [],
   );
@@ -225,10 +235,14 @@ export default function SunoPlayer() {
     (text: string) => {
       const links = extractSunoLinks(text);
       if (links.length === 0) return false;
-      links.forEach((link) => addSong(link));
+      let sawDuplicate = false;
+      links.forEach((link) => {
+        if (addSong(link) === "duplicate") sawDuplicate = true;
+      });
+      if (sawDuplicate) showDuplicateWarning();
       return true;
     },
-    [addSong],
+    [addSong, showDuplicateWarning],
   );
 
   const clearLinkInput = useCallback(() => {
@@ -931,7 +945,11 @@ export default function SunoPlayer() {
     setDragOver(false);
     const text = e.dataTransfer.getData("text/plain");
     if (text) {
-      text.split(/[\n\r]+/).forEach((line) => addSong(line));
+      let sawDuplicate = false;
+      text.split(/[\n\r]+/).forEach((line) => {
+        if (addSong(line) === "duplicate") sawDuplicate = true;
+      });
+      if (sawDuplicate) showDuplicateWarning();
       return;
     }
     const files = e.dataTransfer.files;
@@ -2059,6 +2077,27 @@ export default function SunoPlayer() {
       )}
 
       <AnimatePresence>
+        {duplicateWarning && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl bg-amber-500/95 text-amber-950 border border-amber-600 shadow-lg px-4 py-2.5 max-w-[90vw]"
+            role="alert"
+          >
+            <span className="text-sm font-medium">{t("duplicateSong")}</span>
+            <button
+              onClick={() => {
+                if (dupTimerRef.current) clearTimeout(dupTimerRef.current);
+                setDuplicateWarning(false);
+              }}
+              className="p-1 rounded-lg text-amber-900 hover:text-amber-950 transition-colors"
+              title={t("dismiss")}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
         {pendingUndo && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
