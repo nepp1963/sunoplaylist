@@ -36,7 +36,9 @@ export const Route = createFileRoute("/api/public/suno-audio")({
           const value = upstream.headers.get(name);
           if (value) headers.set(name, value);
         }
-        if (!headers.has("content-type")) headers.set("content-type", "video/mp4");
+        // The MP4 contains an AAC audio track. Advertising it as audio/mp4 lets
+        // Chromium/Edge select that track when the response feeds <audio>.
+        headers.set("content-type", "audio/mp4");
         headers.set("content-disposition", "inline");
 
         return new Response(upstream.body, {
