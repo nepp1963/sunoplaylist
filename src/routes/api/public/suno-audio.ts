@@ -9,27 +9,11 @@ export const Route = createFileRoute("/api/public/suno-audio")({
         const id = new URL(request.url).searchParams.get("id") ?? "";
         if (!SUNO_ID.test(id)) return new Response("Invalid song ID", { status: 400 });
 
-        const pageResponse = await fetch(`https://suno.com/song/${id.toLowerCase()}`, {
-          headers: {
-            Accept: "text/html,application/xhtml+xml",
-            "Accept-Language": "en-US,en;q=0.9",
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
-          },
-        });
-        const page = pageResponse.ok ? await pageResponse.text() : "";
-        const escapedId = id.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const m4aPattern = new RegExp(
-          `https://[^"\\\\]+/clip/${escapedId}\\.m4a`,
-          "i",
-        );
-        const mediaUrl = page.match(m4aPattern)?.[0]?.replace(/\\u0026/g, "&");
-        if (!mediaUrl) return new Response("Audio unavailable", { status: 404 });
-
         const range = request.headers.get("range");
+        const mediaUrl = `https://cdn1.suno.ai/${id.toLowerCase()}.mp4`;
         const upstream = await fetch(mediaUrl, {
           headers: {
-            Accept: "audio/mp4,audio/*;q=0.9,*/*;q=0.8",
+            Accept: "video/mp4,audio/*;q=0.9,*/*;q=0.8",
             Referer: "https://suno.com/",
             ...(range ? { Range: range } : {}),
           },
@@ -52,7 +36,7 @@ export const Route = createFileRoute("/api/public/suno-audio")({
           const value = upstream.headers.get(name);
           if (value) headers.set(name, value);
         }
-        if (!headers.has("content-type")) headers.set("content-type", "audio/mp4");
+        if (!headers.has("content-type")) headers.set("content-type", "video/mp4");
         headers.set("content-disposition", "inline");
 
         return new Response(upstream.body, {
