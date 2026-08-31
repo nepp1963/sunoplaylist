@@ -224,7 +224,7 @@ export default function SunoPlayer() {
           );
         }
       });
-      return true;
+      return "added";
     },
     [],
   );
