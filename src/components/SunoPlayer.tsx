@@ -859,15 +859,25 @@ export default function SunoPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     const onError = () => {
+      // Ignore transient/aborted errors (empty src after clearing, aborted
+      // loads when switching tracks). Some browsers fire these even though
+      // playback works fine, causing a false error banner.
+      const err = audio.error;
+      if (!audio.src || !err || err.code === MediaError.MEDIA_ERR_ABORTED) {
+        return;
+      }
       setPlaybackError(true);
       setIsPlaying(false);
     };
     const onPlaying = () => setPlaybackError(false);
+    const onLoadStart = () => setPlaybackError(false);
     audio.addEventListener("error", onError);
     audio.addEventListener("playing", onPlaying);
+    audio.addEventListener("loadstart", onLoadStart);
     return () => {
       audio.removeEventListener("error", onError);
       audio.removeEventListener("playing", onPlaying);
+      audio.removeEventListener("loadstart", onLoadStart);
     };
   }, [currentAudioUrl]);
 
