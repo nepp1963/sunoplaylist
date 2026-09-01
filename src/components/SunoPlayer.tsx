@@ -1602,9 +1602,11 @@ export default function SunoPlayer() {
           aria-pressed={repeatMode !== "off"}
         >
           <Repeat className="w-5 h-5" />
-          <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-primary px-1 text-[10px] font-bold leading-tight text-primary-foreground">
-            {repeatMode === "once" ? "1" : "R"}
-          </span>
+          {repeatMode !== "off" && (
+            <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-primary px-1 text-[10px] font-bold leading-tight text-primary-foreground">
+              {repeatMode === "once" ? "1" : "R"}
+            </span>
+          )}
         </button>
       </div>
 
