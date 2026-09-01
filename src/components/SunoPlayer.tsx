@@ -863,7 +863,7 @@ export default function SunoPlayer() {
       // loads when switching tracks). Some browsers fire these even though
       // playback works fine, causing a false error banner.
       const err = audio.error;
-      if (!audio.src || !err || err.code === MediaError.MEDIA_ERR_ABORTED) {
+      if (!audio.src || !err || err.code === 1 /* MEDIA_ERR_ABORTED */) {
         return;
       }
       setPlaybackError(true);
