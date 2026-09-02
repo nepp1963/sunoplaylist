@@ -28,6 +28,7 @@ const en: ManualContent = {
         { p: "<strong>Auto-load mode:</strong> Paste one or more SUNO URLs (one per line). The app automatically fetches each track's metadata (title, cover image, audio) and adds it to your current folder." },
         { p: "<strong>Manual mode:</strong> Paste a SUNO URL and provide a custom title. Useful when you want to override SUNO's default name." },
         { p: "Both modes work identically on desktop and on mobile devices." },
+        { p: "<strong>Duplicate protection:</strong> If a pasted or dropped SUNO song link is already in the playlist in any folder, the app will not add it again and will show an amber warning banner: \"⚠️ This song is already in your playlist.\"" },
       ],
     },
     {
@@ -118,6 +119,7 @@ const es: ManualContent = {
       { p: "<strong>Modo auto-carga:</strong> Pega una o varias URLs de SUNO (una por línea). La app obtiene los metadatos de cada pista (título, portada, audio) y la añade a la carpeta actual." },
       { p: "<strong>Modo manual:</strong> Pega una URL de SUNO y proporciona un título personalizado. Útil para sustituir el nombre por defecto de SUNO." },
       { p: "Ambos modos funcionan igual en escritorio y móvil." },
+      { p: "<strong>Protección contra duplicados:</strong> Si un enlace de canción SUNO pegado o arrastrado ya está en la playlist en cualquier carpeta, la app no lo añadirá de nuevo y mostrará una advertencia ámbar: \"⚠️ Esta canción ya está en tu playlist.\"" },
     ]},
     { heading: "3. Carpetas", blocks: [
       { ul: [
@@ -183,6 +185,7 @@ const pt: ManualContent = {
       { p: "<strong>Modo auto-carregar:</strong> Cole uma ou mais URLs do SUNO (uma por linha). A app obtém os metadados de cada faixa (título, capa, áudio) e adiciona à pasta atual." },
       { p: "<strong>Modo manual:</strong> Cole uma URL do SUNO e forneça um título personalizado. Útil para substituir o nome padrão do SUNO." },
       { p: "Ambos os modos funcionam de forma idêntica em desktop e mobile." },
+      { p: "<strong>Proteção contra duplicados:</strong> Se um link de música SUNO colado ou arrastado já estiver na playlist em qualquer pasta, a app não o adicionará novamente e mostrará um aviso âmbar: \"⚠️ Esta música já está na tua playlist.\"" },
     ]},
     { heading: "3. Pastas", blocks: [
       { ul: [
@@ -248,6 +251,7 @@ const it: ManualContent = {
       { p: "<strong>Modalità auto-caricamento:</strong> Incolla uno o più URL SUNO (uno per riga). L'app recupera automaticamente i metadati di ogni brano e lo aggiunge alla cartella corrente." },
       { p: "<strong>Modalità manuale:</strong> Incolla un URL SUNO e fornisci un titolo personalizzato. Utile per sovrascrivere il nome predefinito di SUNO." },
       { p: "Entrambe le modalità funzionano allo stesso modo su desktop e mobile." },
+      { p: "<strong>Protezione dai duplicati:</strong> Se un link di una canzone SUNO incollato o trascinato è già nella playlist in qualsiasi cartella, l'app non lo aggiungerà di nuovo e mostrerà un avviso ambra: \"⚠️ Questo brano è già nella tua playlist.\"" },
     ]},
     { heading: "3. Cartelle", blocks: [
       { ul: [
@@ -313,6 +317,7 @@ const de: ManualContent = {
       { p: "<strong>Auto-Lade-Modus:</strong> Füge eine oder mehrere SUNO-URLs ein (eine pro Zeile). Die App lädt automatisch die Metadaten und fügt jeden Track zur aktuellen Ordner hinzu." },
       { p: "<strong>Manueller Modus:</strong> Füge eine SUNO-URL ein und gib einen eigenen Titel an. Nützlich, um den Standardnamen zu überschreiben." },
       { p: "Beide Modi funktionieren auf Desktop und Mobil identisch." },
+      { p: "<strong>Dublettenschutz:</strong> Wenn ein eingefügter oder abgelegter SUNO-Songlink bereits in der Playlist in einem beliebigen Ordner vorhanden ist, fügt die App ihn nicht erneut hinzu und zeigt eine bernsteinfarbene Warnung an: \"⚠️ Dieser Song ist bereits in deiner Playlist.\"" },
     ]},
     { heading: "3. Ordner", blocks: [
       { ul: [
@@ -378,6 +383,7 @@ const fr: ManualContent = {
       { p: "<strong>Mode auto-chargement :</strong> Collez une ou plusieurs URLs SUNO (une par ligne). L'application récupère automatiquement les métadonnées et ajoute chaque morceau au dossier courant." },
       { p: "<strong>Mode manuel :</strong> Collez une URL SUNO et fournissez un titre personnalisé. Utile pour remplacer le nom par défaut." },
       { p: "Les deux modes fonctionnent à l'identique sur ordinateur et mobile." },
+      { p: "<strong>Protection contre les doublons :</strong> Si un lien de morceau SUNO collé ou déposé est déjà dans la playlist dans n'importe quel dossier, l'application ne l'ajoutera pas à nouveau et affichera un avertissement ambré : \"⚠️ Ce morceau est déjà dans votre playlist.\"" },
     ]},
     { heading: "3. Dossiers", blocks: [
       { ul: [
@@ -443,6 +449,7 @@ const zh: ManualContent = {
       { p: "<strong>自动加载模式：</strong> 粘贴一个或多个 SUNO 链接（每行一个）。应用会自动获取每首曲目的元数据并加入当前文件夹。" },
       { p: "<strong>手动模式：</strong> 粘贴 SUNO 链接并提供自定义标题，便于覆盖默认名称。" },
       { p: "两种模式在桌面和移动端的表现一致。" },
+      { p: "<strong>重复保护：</strong> 如果粘贴或拖入的 SUNO 歌曲链接已存在于任意文件夹的播放列表中，应用不会再次添加，并会显示琥珀色警告条：\"⚠️ 这首歌已在你的播放列表中。\"" },
     ]},
     { heading: "3. 文件夹", blocks: [
       { ul: [
@@ -508,6 +515,7 @@ const yue: ManualContent = {
       { p: "<strong>自動載入模式：</strong> 貼一個或多個 SUNO 網址（每行一個）。App 會自動攞每首歌嘅資料加入而家嘅資料夾。" },
       { p: "<strong>手動模式：</strong> 貼 SUNO 網址再自訂標題，可以覆蓋 SUNO 預設名。" },
       { p: "兩種模式喺電腦同手機嘅運作完全一樣。" },
+      { p: "<strong>重複保護：</strong> 如果貼上或者拖入嘅 SUNO 歌曲連結已經喺任何資料夾嘅播放清單度，App 唔會再新增，並會顯示琥珀色警告：\"⚠️ 呢首歌已經喺你嘅播放清單度。\"" },
     ]},
     { heading: "3. 資料夾", blocks: [
       { ul: [
@@ -573,6 +581,7 @@ const ja: ManualContent = {
       { p: "<strong>自動読み込みモード：</strong> SUNO の URL を1つ以上（1行に1つ）貼り付けます。各曲のメタデータが自動取得され、現在のフォルダーに追加されます。" },
       { p: "<strong>手動モード：</strong> SUNO の URL とカスタムタイトルを入力します。SUNO の既定名を上書きしたいときに便利です。" },
       { p: "どちらのモードもデスクトップとモバイルで同じ動作です。" },
+      { p: "<strong>重複防止：</strong> 貼り付けまたはドロップした SUNO の曲リンクが、どのフォルダーのプレイリストにも既に存在する場合、アプリは再追加せず、アンバー色の警告バーを表示します：\"⚠️ この曲は既にプレイリストに追加されています。\"" },
     ]},
     { heading: "3. フォルダー", blocks: [
       { ul: [
@@ -638,6 +647,7 @@ const ko: ManualContent = {
       { p: "<strong>자동 로드 모드:</strong> 하나 이상의 SUNO URL을 (한 줄에 하나씩) 붙여 넣으면 메타데이터가 자동으로 가져와져 현재 폴더에 추가됩니다." },
       { p: "<strong>수동 모드:</strong> SUNO URL과 사용자 지정 제목을 입력합니다. SUNO 기본 이름을 덮어쓸 때 유용합니다." },
       { p: "두 모드 모두 데스크톱과 모바일에서 동일하게 작동합니다." },
+      { p: "<strong>중복 방지:</strong> 붙여넣기 또는 드롭한 SUNO 곡 링크가 어느 폴더의 재생목록에 이미 있는 경우, 앱은 다시 추가하지 않고 황색 경고 배너를 표시합니다: \"⚠️ 이 곡은 이미 재생목록에 있습니다.\"" },
     ]},
     { heading: "3. 폴더", blocks: [
       { ul: [
@@ -703,6 +713,7 @@ const hi: ManualContent = {
       { p: "<strong>ऑटो-लोड मोड:</strong> एक या अधिक SUNO URL (प्रति पंक्ति एक) पेस्ट करें। ऐप स्वचालित रूप से प्रत्येक ट्रैक का मेटाडेटा लाकर वर्तमान फ़ोल्डर में जोड़ता है।" },
       { p: "<strong>मैनुअल मोड:</strong> SUNO URL और अपना शीर्षक दें। SUNO के डिफ़ॉल्ट नाम को बदलने के लिए उपयोगी।" },
       { p: "दोनों मोड डेस्कटॉप और मोबाइल पर समान रूप से काम करते हैं।" },
+      { p: "<strong>डुप्लिकेट सुरक्षा:</strong> यदि किसी भी फ़ोल्डर में प्लेलिस्ट में पहले से मौजूद SUNO गाने का लिंक पेस्ट या ड्रॉप किया जाता है, तो ऐप उसे दोबारा नहीं जोड़ेगा और एक एम्बर चेतावनी बैनर दिखाएगा: \"⚠️ यह गाना पहले से ही आपकी प्लेलिस्ट में है।\"" },
     ]},
     { heading: "3. फ़ोल्डर", blocks: [
       { ul: [
@@ -768,6 +779,7 @@ const ar: ManualContent = {
       { p: "<strong>وضع التحميل التلقائي:</strong> الصق رابطاً واحداً أو أكثر من SUNO (رابط لكل سطر). يجلب التطبيق بيانات كل مقطع تلقائياً ويضيفه إلى المجلد الحالي." },
       { p: "<strong>الوضع اليدوي:</strong> الصق رابط SUNO وأدخل عنواناً مخصصاً. مفيد لاستبدال الاسم الافتراضي." },
       { p: "كلا الوضعين يعملان بنفس الطريقة على الحاسوب والهاتف." },
+      { p: "<strong>الحماية من التكرار:</strong> إذا كان رابط أغنية SUNO الملصق أو المُسقَط موجودًا بالفعل في قائمة التشغيل داخل أي مجلد، فلن يعيد التطبيق إضافته وسيظهر شريط تحذيري كهرماني: \"⚠️ هذه الأغنية موجودة بالفعل في قائمة التشغيل الخاصة بك.\"" },
     ]},
     { heading: "3. المجلدات", blocks: [
       { ul: [
@@ -833,6 +845,7 @@ const ms: ManualContent = {
       { p: "<strong>Mod muat-auto:</strong> Tampal satu atau lebih URL SUNO (satu setiap baris). Apl mengambil metadata setiap lagu dan menambahkannya ke folder semasa." },
       { p: "<strong>Mod manual:</strong> Tampal URL SUNO dan beri tajuk tersuai untuk menggantikan nama lalai SUNO." },
       { p: "Kedua-dua mod berfungsi sama di desktop dan mudah alih." },
+      { p: "<strong>Perlindungan pendua:</strong> Jika pautan lagu SUNO yang ditampal atau dilepas sudah wujud dalam senarai main dalam mana-mana folder, apl tidak akan menambahnya semula dan akan memaparkan amaran amber: \"⚠️ Lagu ini sudah dalam senarai main anda.\"" },
     ]},
     { heading: "3. Folder", blocks: [
       { ul: [
@@ -898,6 +911,7 @@ const id: ManualContent = {
       { p: "<strong>Mode muat-otomatis:</strong> Tempel satu atau lebih URL SUNO (satu per baris). Aplikasi otomatis mengambil metadata setiap trek dan menambahkannya ke folder saat ini." },
       { p: "<strong>Mode manual:</strong> Tempel URL SUNO dan masukkan judul kustom untuk mengganti nama bawaan SUNO." },
       { p: "Kedua mode bekerja sama di desktop dan ponsel." },
+      { p: "<strong>Perlindungan duplikat:</strong> Jika tautan lagu SUNO yang ditempel atau dijatuhkan sudah ada di daftar putar dalam folder mana pun, aplikasi tidak akan menambahkannya lagi dan akan menampilkan peringatan warna amber: \"⚠️ Lagu ini sudah ada dalam daftar putarmu.\"" },
     ]},
     { heading: "3. Folder", blocks: [
       { ul: [
@@ -963,6 +977,7 @@ const vi: ManualContent = {
       { p: "<strong>Chế độ tự tải:</strong> Dán một hoặc nhiều URL SUNO (mỗi dòng một). Ứng dụng tự động lấy dữ liệu của từng bài và thêm vào thư mục hiện tại." },
       { p: "<strong>Chế độ thủ công:</strong> Dán URL SUNO và nhập tiêu đề tùy chỉnh, hữu ích khi muốn thay tên mặc định của SUNO." },
       { p: "Cả hai chế độ hoạt động giống nhau trên máy tính và di động." },
+      { p: "<strong>Bảo vệ trùng lặp:</strong> Nếu liên kết bài hát SUNO đã dán hoặc thả vào đã có trong danh sách phát ở bất kỳ thư mục nào, ứng dụng sẽ không thêm lại và hiển thị cảnh báo màu hổ phách: \"⚠️ Bài hát này đã có trong danh sách phát của bạn.\"" },
     ]},
     { heading: "3. Thư mục", blocks: [
       { ul: [
@@ -1028,6 +1043,7 @@ const th: ManualContent = {
       { p: "<strong>โหมดโหลดอัตโนมัติ:</strong> วาง URL SUNO หนึ่งรายการขึ้นไป (บรรทัดละหนึ่ง) แอปจะดึงข้อมูลแต่ละเพลงและเพิ่มลงในโฟลเดอร์ปัจจุบันโดยอัตโนมัติ" },
       { p: "<strong>โหมดด้วยตนเอง:</strong> วาง URL SUNO พร้อมตั้งชื่อเอง เหมาะสำหรับการแทนที่ชื่อเริ่มต้นของ SUNO" },
       { p: "ทั้งสองโหมดทำงานเหมือนกันบนเดสก์ท็อปและมือถือ" },
+      { p: "<strong>ป้องกันการซ้ำ:</strong> หากลิงก์เพลง SUNO ที่วางหรือลากมามีอยู่ในเพลย์ลิสต์แล้วในโฟลเดอร์ใดก็ตาม แอปจะไม่เพิ่มซ้ำ และจะแสดงแถบเตือนสีเหลืองอำพัน: \"⚠️ เพลงนี้อยู่ในเพลย์ลิสต์ของคุณแล้ว\"" },
     ]},
     { heading: "3. โฟลเดอร์", blocks: [
       { ul: [
