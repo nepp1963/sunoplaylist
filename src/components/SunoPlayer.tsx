@@ -214,27 +214,45 @@ export default function SunoPlayer() {
       setSongs((prev) => [...prev, song]);
       setOriginalOrder((prev) => [...prev, songId]);
       fetchSunoMeta({ data: normalizedUrl }).then((meta) => {
-        if (meta) {
-          if (meta.id) songKeysRef.current.add(`id:${meta.id}`);
-          setSongs((prev) =>
-            prev.map((s) =>
-              s.id === songId
-                ? {
-                    ...s,
-                    ...(meta.url ? { url: meta.url } : {}),
-                    ...(meta.audioUrl ? { audioUrl: meta.audioUrl } : {}),
-                    ...(meta.title ? { title: meta.title } : {}),
-                    ...(meta.image ? { image: meta.image } : {}),
-                  }
-                : s,
-            ),
+        if (!meta) return;
+        // A short link only reveals its real song after resolution: re-check for duplicates now.
+        let removedAsDuplicate = false;
+        setSongs((prev) => {
+          const clash = prev.some((s) => {
+            if (s.id === songId) return false;
+            const otherId = extractSunoId(s.url) ?? extractSunoId(s.audioUrl);
+            if (meta.id && otherId && otherId === meta.id) return true;
+            if (meta.url && s.url.toLowerCase() === meta.url.toLowerCase()) return true;
+            return false;
+          });
+          if (clash) {
+            removedAsDuplicate = true;
+            return prev.filter((s) => s.id !== songId);
+          }
+          return prev.map((s) =>
+            s.id === songId
+              ? {
+                  ...s,
+                  ...(meta.url ? { url: meta.url } : {}),
+                  ...(meta.audioUrl ? { audioUrl: meta.audioUrl } : {}),
+                  ...(meta.title ? { title: meta.title } : {}),
+                  ...(meta.image ? { image: meta.image } : {}),
+                }
+              : s,
           );
+        });
+        if (removedAsDuplicate) {
+          setOriginalOrder((prev) => prev.filter((id) => id !== songId));
+          showDuplicateWarning();
+        } else if (meta.id) {
+          songKeysRef.current.add(`id:${meta.id}`);
         }
       });
       return "added";
     },
-    [],
+    [showDuplicateWarning],
   );
+
 
   const inputRef = useRef<HTMLInputElement>(null);
 
