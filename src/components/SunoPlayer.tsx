@@ -55,6 +55,7 @@ const RESUME_KEY = "suno-resume-v1";
 interface Song {
   id: string;
   url: string;
+  sourceUrl?: string;
   audioUrl: string;
   title: string;
   image?: string;
@@ -176,7 +177,11 @@ export default function SunoPlayer() {
     songKeysRef.current = new Set(
       songs.flatMap((song) => {
         const id = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
-        return [id ? `id:${id}` : "", `url:${song.url.toLowerCase()}`].filter(Boolean);
+        return [
+          id ? `id:${id}` : "",
+          `url:${song.url.toLowerCase()}`,
+          song.sourceUrl ? `url:${song.sourceUrl.toLowerCase()}` : "",
+        ].filter(Boolean);
       }),
     );
   }, [songs]);
@@ -196,11 +201,13 @@ export default function SunoPlayer() {
       if (songKeysRef.current.has(provisionalKey) || songKeysRef.current.has(urlKey))
         return "duplicate";
       songKeysRef.current.add(provisionalKey);
+      songKeysRef.current.add(urlKey);
       const songId =
         globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const song: Song = {
         id: songId,
         url: normalizedUrl,
+        sourceUrl: normalizedUrl,
         audioUrl: sunoId ? `https://cdn1.suno.ai/${sunoId}.mp3` : "",
         title: extractSunoTitle(normalizedUrl),
       };
@@ -231,10 +238,16 @@ export default function SunoPlayer() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const lastProcessedRef = useRef<{ text: string; at: number }>({ text: "", at: 0 });
+
   const addSongsFromText = useCallback(
     (text: string) => {
       const links = extractSunoLinks(text);
       if (links.length === 0) return false;
+      const now = Date.now();
+      if (lastProcessedRef.current.text === text && now - lastProcessedRef.current.at < 2000)
+        return true;
+      lastProcessedRef.current = { text, at: now };
       let sawDuplicate = false;
       links.forEach((link) => {
         if (addSong(link) === "duplicate") sawDuplicate = true;
