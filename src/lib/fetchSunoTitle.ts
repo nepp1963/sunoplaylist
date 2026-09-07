@@ -59,7 +59,6 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
       const html = await res.text();
 
       const canonical = canonicalUrl(html) ?? metaContent(html, "og:url") ?? res.url;
-      if (!sunoId) return null;
 
       const ogTitle = metaContent(html, "og:title");
       const titleTag = html.match(/<title>([^<]+)<\/title>/i);
