@@ -300,6 +300,10 @@ export default function SunoPlayer() {
     const idx = songs.findIndex((s) => s.id === id);
     if (idx < 0) return;
     const song = songs[idx];
+    const removedSunoId = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
+    if (removedSunoId) songKeysRef.current.delete(`id:${removedSunoId}`);
+    songKeysRef.current.delete(`url:${song.url.toLowerCase()}`);
+    if (song.sourceUrl) songKeysRef.current.delete(`url:${song.sourceUrl.toLowerCase()}`);
     const orderIndex = originalOrder.indexOf(id);
     setSongs((prev) => {
       const newSongs = prev.filter((s) => s.id !== id);
@@ -1019,6 +1023,7 @@ export default function SunoPlayer() {
       songs: songs.map((s) => ({
         id: s.id,
         url: s.url,
+        sourceUrl: s.sourceUrl,
         audioUrl: s.audioUrl,
         title: s.title,
         image: s.image,
@@ -1086,6 +1091,7 @@ export default function SunoPlayer() {
             return {
               id,
               url,
+              sourceUrl: s.sourceUrl ? String(s.sourceUrl) : url,
               audioUrl,
               title: s.title || extractSunoTitle(url),
               image: s.image,
@@ -1097,7 +1103,11 @@ export default function SunoPlayer() {
         songKeysRef.current = new Set(
           rebuilt.flatMap((song) => {
             const id = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
-            return [id ? `id:${id}` : "", `url:${song.url.toLowerCase()}`].filter(Boolean);
+            return [
+              id ? `id:${id}` : "",
+              `url:${song.url.toLowerCase()}`,
+              song.sourceUrl ? `url:${song.sourceUrl.toLowerCase()}` : "",
+            ].filter(Boolean);
           }),
         );
 
@@ -1661,12 +1671,10 @@ export default function SunoPlayer() {
               onKeyDown={handleKeyDown}
               onPaste={(e) => {
                 const text = e.clipboardData?.getData("text") || "";
-                if (text) setLinkInput(text);
-                window.setTimeout(() => {
-                  const pastedValue = inputRef.current?.value || text;
-                  setLinkInput(pastedValue);
-                  if (pasteMode === "auto" && addSongsFromText(pastedValue)) clearLinkInput();
-                }, 0);
+                if (!text) return;
+                e.preventDefault();
+                setLinkInput(text);
+                if (pasteMode === "auto" && addSongsFromText(text)) clearLinkInput();
               }}
               className="w-full rounded-xl bg-input pl-4 pr-10 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow text-ellipsis"
             />

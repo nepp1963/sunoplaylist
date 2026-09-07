@@ -34,6 +34,12 @@ function metaContent(html: string, name: string): string | null {
   return decodeHtmlEntities(tag?.match(/content=["']([^"']*)["']/i)?.[1] ?? "") || null;
 }
 
+function canonicalUrl(html: string): string | null {
+  const links = html.match(/<link\s+[^>]*>/gi) ?? [];
+  const canonical = links.find((tag) => /\brel=["'][^"']*\bcanonical\b[^"']*["']/i.test(tag));
+  return canonical?.match(/\bhref=["']([^"']+)["']/i)?.[1] ?? null;
+}
+
 export const fetchSunoMeta = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => input as string)
   .handler(async ({ data: input }) => {
@@ -52,9 +58,7 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
       if (!res.ok) return null;
       const html = await res.text();
 
-      const canonical = html.match(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)/i)?.[1] ?? res.url;
-      const sunoId = extractUuid(canonical) ?? extractUuid(html) ?? initialUuid;
-      if (!sunoId) return null;
+      const canonical = canonicalUrl(html) ?? metaContent(html, "og:url") ?? res.url;
 
       const ogTitle = metaContent(html, "og:title");
       const titleTag = html.match(/<title>([^<]+)<\/title>/i);
@@ -64,7 +68,12 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
         metaContent(html, "og:audio") ??
         metaContent(html, "twitter:player:stream") ??
         html.match(/https:\/\/cdn1\.suno\.ai\/[a-f0-9-]+\.mp3/i)?.[0] ??
-        `https://cdn1.suno.ai/${sunoId}.mp3`;
+        null;
+      // Never use an arbitrary UUID found elsewhere in the page. Short-link pages can
+      // contain unrelated request/asset IDs, which previously caused false duplicates.
+      const sunoId =
+        extractUuid(canonical) ?? extractUuid(res.url) ?? extractUuid(audioUrl ?? "") ?? initialUuid;
+      if (!sunoId) return null;
 
       const title = ogTitle
         ? ogTitle
@@ -74,7 +83,13 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
 
       const image = ogImage || null;
 
-      return { id: sunoId, url: `https://suno.com/song/${sunoId}`, audioUrl, title, image };
+      return {
+        id: sunoId,
+        url: `https://suno.com/song/${sunoId}`,
+        audioUrl: audioUrl ?? `https://cdn1.suno.ai/${sunoId}.mp3`,
+        title,
+        image,
+      };
     } catch {
       return null;
     }
