@@ -104,17 +104,64 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
 
       const image = ogImage || null;
 
-      return {
+      return remember({
         id: sunoId,
         url: `https://suno.com/song/${sunoId}`,
         audioUrl: audioUrl ?? `https://cdn1.suno.ai/${sunoId}.mp3`,
         title,
         image,
-      };
+      });
     } catch {
       return null;
     }
   });
+
+// ---- Browser-side helper: memoize + de-duplicate + limit concurrency ----
+const clientCache = new Map<string, SunoMeta | null>();
+const inFlight = new Map<string, Promise<SunoMeta | null>>();
+let active = 0;
+const queue: Array<() => void> = [];
+const MAX_PARALLEL = 6;
+
+function runNext() {
+  if (active >= MAX_PARALLEL) return;
+  const job = queue.shift();
+  if (!job) return;
+  active += 1;
+  job();
+}
+
+/**
+ * Fetches song metadata with a local cache so the same link is never fetched
+ * twice, and at most a handful of requests run at once (faster overall than
+ * firing an entire playlist's worth of requests simultaneously).
+ */
+export function getSunoMeta(url: string): Promise<SunoMeta | null> {
+  const key = String(url || "").trim().toLowerCase();
+  if (clientCache.has(key)) return Promise.resolve(clientCache.get(key) ?? null);
+  const pending = inFlight.get(key);
+  if (pending) return pending;
+
+  const promise = new Promise<SunoMeta | null>((resolve) => {
+    queue.push(() => {
+      fetchSunoMeta({ data: url })
+        .then((meta) => {
+          clientCache.set(key, meta ?? null);
+          resolve(meta ?? null);
+        })
+        .catch(() => resolve(null))
+        .finally(() => {
+          active -= 1;
+          inFlight.delete(key);
+          runNext();
+        });
+    });
+    runNext();
+  });
+
+  inFlight.set(key, promise);
+  return promise;
+}
 
 // Keep backward compat alias
 export const fetchSunoTitle = createServerFn({ method: "GET" })
