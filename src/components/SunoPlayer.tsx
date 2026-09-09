@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { fetchSunoMeta } from "../lib/fetchSunoTitle";
+import { getSunoMeta } from "../lib/fetchSunoTitle";
 import { useI18n } from "../lib/i18n";
 import { useColorScheme } from "./ColorSchemeProvider";
 import { COLOR_SCHEMES } from "../lib/themes";
@@ -213,7 +213,7 @@ export default function SunoPlayer() {
       };
       setSongs((prev) => [...prev, song]);
       setOriginalOrder((prev) => [...prev, songId]);
-      fetchSunoMeta({ data: normalizedUrl }).then((meta) => {
+      getSunoMeta(normalizedUrl).then((meta) => {
         if (!meta) return;
         // A short link only reveals its real song after resolution: re-check for duplicates now.
         let removedAsDuplicate = false;
@@ -792,7 +792,7 @@ export default function SunoPlayer() {
     songs.forEach((song) => {
       const needsTitle = !song.title || song.title.startsWith("SUNO Track —");
       if (song.image && song.audioUrl && !needsTitle) return;
-      fetchSunoMeta({ data: song.url }).then((meta) => {
+      getSunoMeta(song.url).then((meta) => {
         if (!meta) return;
         setSongs((prev) =>
           prev.map((s) =>
@@ -1133,7 +1133,7 @@ export default function SunoPlayer() {
         // Backfill missing audioUrl/title/image from network
         rebuilt.forEach((song) => {
           if (song.audioUrl && song.title && !song.title.startsWith("SUNO Track —") && song.image) return;
-          fetchSunoMeta({ data: song.url }).then((meta) => {
+          getSunoMeta(song.url).then((meta) => {
             if (!meta) return;
             setSongs((prev) =>
               prev.map((s) =>
