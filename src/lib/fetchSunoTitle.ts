@@ -76,7 +76,7 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
           Accept: "text/html,application/xhtml+xml",
         },
       });
-      if (!res.ok) return null;
+      if (!res.ok) return remember(null);
       const html = await res.text();
 
       const canonical = canonicalUrl(html) ?? metaContent(html, "og:url") ?? res.url;
