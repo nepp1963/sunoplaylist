@@ -94,7 +94,7 @@ export const fetchSunoMeta = createServerFn({ method: "GET" })
       // contain unrelated request/asset IDs, which previously caused false duplicates.
       const sunoId =
         extractUuid(canonical) ?? extractUuid(res.url) ?? extractUuid(audioUrl ?? "") ?? initialUuid;
-      if (!sunoId) return null;
+      if (!sunoId) return remember(null);
 
       const title = ogTitle
         ? ogTitle
