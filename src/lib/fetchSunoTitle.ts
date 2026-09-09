@@ -40,9 +40,30 @@ function canonicalUrl(html: string): string | null {
   return canonical?.match(/\bhref=["']([^"']+)["']/i)?.[1] ?? null;
 }
 
+type SunoMeta = {
+  id: string;
+  url: string;
+  audioUrl: string;
+  title: string | null;
+  image: string | null;
+};
+
+// Server-side memo: the same song page is often requested by several visitors
+// (and repeatedly during backfill), and Suno's HTML rarely changes.
+const serverCache = new Map<string, { at: number; value: SunoMeta | null }>();
+const SERVER_TTL = 30 * 60 * 1000;
+
 export const fetchSunoMeta = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => input as string)
-  .handler(async ({ data: input }) => {
+  .handler(async ({ data: input }): Promise<SunoMeta | null> => {
+    const cacheKey = stripLinkPunctuation(String(input || "")).toLowerCase();
+    const cached = serverCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < SERVER_TTL) return cached.value;
+    const remember = (value: SunoMeta | null) => {
+      if (serverCache.size > 500) serverCache.clear();
+      serverCache.set(cacheKey, { at: Date.now(), value });
+      return value;
+    };
     try {
       const initial = stripLinkPunctuation(String(input || ""));
       const initialUuid = extractUuid(initial);
