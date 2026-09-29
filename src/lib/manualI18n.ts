@@ -1100,8 +1100,158 @@ const MANUAL: Record<LangCode, ManualContent> = {
   en, es, pt, it, de, fr, zh, yue, ja, ko, hi, ar, ms, id, vi, th,
 };
 
+// Section covering the floating quick-control tab, Collapse All, and Back to Top.
+const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
+  en: { heading: "11. Floating Quick Controls", blocks: [
+    { p: "A small floating tab stays pinned to the right edge of the screen so you never have to scroll back to the top." },
+    { ul: [
+      "<strong>Play / Pause</strong> — start or stop the current song from anywhere on the page. It is greyed out when no song is selected.",
+      "<strong>Now playing</strong> — the title of the current song is shown on the tab.",
+      "<strong>Collapse all folders</strong> — closes every open folder in one tap. It is greyed out when no folder is open. The same button is also available in the playlist area.",
+      "<strong>Back to the top</strong> — appears once you scroll down and smoothly returns you to the top of the page.",
+    ]},
+  ]},
+  es: { heading: "11. Controles rápidos flotantes", blocks: [
+    { p: "Una pequeña pestaña flotante permanece fijada en el borde derecho de la pantalla para que nunca tengas que volver arriba." },
+    { ul: [
+      "<strong>Reproducir / Pausa</strong> — inicia o detiene la canción actual desde cualquier parte de la página. Se desactiva si no hay canción seleccionada.",
+      "<strong>Reproduciendo</strong> — el título de la canción actual se muestra en la pestaña.",
+      "<strong>Contraer todas las carpetas</strong> — cierra todas las carpetas abiertas con un toque. Se desactiva si no hay ninguna abierta. El mismo botón está también en la lista.",
+      "<strong>Volver arriba</strong> — aparece al desplazarte hacia abajo y te lleva suavemente al inicio de la página.",
+    ]},
+  ]},
+  pt: { heading: "11. Controlos rápidos flutuantes", blocks: [
+    { p: "Um pequeno separador flutuante fica fixo na margem direita do ecrã para nunca teres de voltar ao topo." },
+    { ul: [
+      "<strong>Reproduzir / Pausa</strong> — inicia ou para a música atual a partir de qualquer ponto da página. Fica inativo se não houver música selecionada.",
+      "<strong>A tocar</strong> — o título da música atual aparece no separador.",
+      "<strong>Recolher todas as pastas</strong> — fecha todas as pastas abertas com um toque. Fica inativo se nenhuma estiver aberta. O mesmo botão existe na área da playlist.",
+      "<strong>Voltar ao topo</strong> — aparece quando desces a página e leva-te suavemente de volta ao início.",
+    ]},
+  ]},
+  it: { heading: "11. Controlli rapidi flottanti", blocks: [
+    { p: "Una piccola scheda flottante resta fissata sul bordo destro dello schermo, così non devi mai tornare in cima." },
+    { ul: [
+      "<strong>Riproduci / Pausa</strong> — avvia o ferma il brano corrente da qualsiasi punto della pagina. È disattivato se nessun brano è selezionato.",
+      "<strong>In riproduzione</strong> — il titolo del brano corrente è mostrato sulla scheda.",
+      "<strong>Comprimi tutte le cartelle</strong> — chiude tutte le cartelle aperte con un tocco. È disattivato se nessuna è aperta. Lo stesso pulsante è nella playlist.",
+      "<strong>Torna su</strong> — compare quando scorri verso il basso e ti riporta dolcemente all'inizio della pagina.",
+    ]},
+  ]},
+  de: { heading: "11. Schwebende Schnellsteuerung", blocks: [
+    { p: "Eine kleine schwebende Leiste bleibt am rechten Bildschirmrand, damit du nie nach oben scrollen musst." },
+    { ul: [
+      "<strong>Wiedergabe / Pause</strong> — startet oder stoppt den aktuellen Titel von überall auf der Seite. Ausgegraut, wenn kein Titel gewählt ist.",
+      "<strong>Aktueller Titel</strong> — der Name des laufenden Titels wird auf der Leiste angezeigt.",
+      "<strong>Alle Ordner einklappen</strong> — schließt alle offenen Ordner mit einem Tippen. Ausgegraut, wenn kein Ordner offen ist. Die gleiche Schaltfläche gibt es in der Playlist.",
+      "<strong>Nach oben</strong> — erscheint beim Scrollen und bringt dich sanft zum Seitenanfang zurück.",
+    ]},
+  ]},
+  fr: { heading: "11. Commandes rapides flottantes", blocks: [
+    { p: "Un petit onglet flottant reste fixé au bord droit de l'écran pour ne jamais devoir remonter en haut." },
+    { ul: [
+      "<strong>Lecture / Pause</strong> — démarre ou arrête le morceau en cours depuis n'importe où sur la page. Désactivé si aucun morceau n'est sélectionné.",
+      "<strong>En lecture</strong> — le titre du morceau en cours s'affiche sur l'onglet.",
+      "<strong>Replier tous les dossiers</strong> — ferme tous les dossiers ouverts en un geste. Désactivé si aucun n'est ouvert. Le même bouton existe dans la playlist.",
+      "<strong>Retour en haut</strong> — apparaît dès que vous faites défiler et vous ramène doucement en haut de la page.",
+    ]},
+  ]},
+  zh: { heading: "11. 悬浮快捷控件", blocks: [
+    { p: "屏幕右侧固定着一个小型悬浮标签，让你无需滚回页面顶部。" },
+    { ul: [
+      "<strong>播放 / 暂停</strong> — 在页面任何位置控制当前歌曲。未选中歌曲时按钮为灰色。",
+      "<strong>正在播放</strong> — 标签上显示当前歌曲的标题。",
+      "<strong>收起所有文件夹</strong> — 一键关闭所有已展开的文件夹。没有展开的文件夹时按钮为灰色。播放列表区域也有同样的按钮。",
+      "<strong>返回顶部</strong> — 向下滚动后出现，平滑地回到页面顶部。",
+    ]},
+  ]},
+  yue: { heading: "11. 浮動快捷控制", blocks: [
+    { p: "螢幕右邊會固定住一個細細嘅浮動標籤，唔使再碌返上頂。" },
+    { ul: [
+      "<strong>播放 / 暫停</strong> — 喺頁面任何位置控制而家首歌。冇揀歌嘅時候會變灰。",
+      "<strong>正在播放</strong> — 標籤上會顯示而家首歌嘅名。",
+      "<strong>收埋所有資料夾</strong> — 一撳就關晒所有打開咗嘅資料夾。冇資料夾打開時會變灰。播放清單嗰度都有同樣嘅掣。",
+      "<strong>返回頂部</strong> — 向下碌之後就會出現，平順咁帶你返去頁面頂。",
+    ]},
+  ]},
+  ja: { heading: "11. フローティング・クイック操作", blocks: [
+    { p: "画面の右端に小さなフローティングタブが固定され、上までスクロールし直す必要がありません。" },
+    { ul: [
+      "<strong>再生 / 一時停止</strong> — ページのどこからでも現在の曲を操作できます。曲が未選択のときは無効になります。",
+      "<strong>再生中</strong> — 現在の曲のタイトルがタブに表示されます。",
+      "<strong>すべてのフォルダを閉じる</strong> — 開いているフォルダをワンタップで全て閉じます。開いていないときは無効です。同じボタンはプレイリスト側にもあります。",
+      "<strong>トップへ戻る</strong> — 下にスクロールすると現れ、ページ先頭までなめらかに戻ります。",
+    ]},
+  ]},
+  ko: { heading: "11. 떠 있는 빠른 조작 탭", blocks: [
+    { p: "화면 오른쪽 가장자리에 작은 탭이 고정되어 있어 위로 다시 스크롤할 필요가 없습니다." },
+    { ul: [
+      "<strong>재생 / 일시정지</strong> — 페이지 어디에서든 현재 곡을 조작합니다. 선택된 곡이 없으면 비활성화됩니다.",
+      "<strong>재생 중</strong> — 현재 곡 제목이 탭에 표시됩니다.",
+      "<strong>모든 폴더 접기</strong> — 열려 있는 폴더를 한 번에 모두 닫습니다. 열린 폴더가 없으면 비활성화됩니다. 재생목록 영역에도 같은 버튼이 있습니다.",
+      "<strong>맨 위로</strong> — 아래로 스크롤하면 나타나며 페이지 맨 위로 부드럽게 이동합니다.",
+    ]},
+  ]},
+  hi: { heading: "11. फ़्लोटिंग त्वरित नियंत्रण", blocks: [
+    { p: "स्क्रीन के दाहिने किनारे पर एक छोटा फ़्लोटिंग टैब टिका रहता है, ताकि आपको ऊपर वापस स्क्रॉल न करना पड़े।" },
+    { ul: [
+      "<strong>चलाएँ / रोकें</strong> — पेज पर कहीं से भी मौजूदा गाना चलाएँ या रोकें। कोई गाना चुना न हो तो यह निष्क्रिय रहता है।",
+      "<strong>अभी चल रहा है</strong> — मौजूदा गाने का नाम टैब पर दिखता है।",
+      "<strong>सभी फ़ोल्डर बंद करें</strong> — एक टैप में सभी खुले फ़ोल्डर बंद कर देता है। कोई फ़ोल्डर खुला न हो तो निष्क्रिय रहता है। यही बटन प्लेलिस्ट में भी है।",
+      "<strong>ऊपर जाएँ</strong> — नीचे स्क्रॉल करते ही दिखता है और आपको आसानी से पेज के शीर्ष पर ले जाता है।",
+    ]},
+  ]},
+  ar: { heading: "11. أدوات التحكم السريعة العائمة", blocks: [
+    { p: "يبقى شريط عائم صغير مثبتًا على الحافة اليمنى من الشاشة حتى لا تضطر للعودة إلى الأعلى." },
+    { ul: [
+      "<strong>تشغيل / إيقاف مؤقت</strong> — تحكّم في الأغنية الحالية من أي مكان في الصفحة. يكون معطلاً إذا لم تُحدَّد أغنية.",
+      "<strong>قيد التشغيل</strong> — يظهر عنوان الأغنية الحالية على الشريط.",
+      "<strong>طيّ كل المجلدات</strong> — يغلق كل المجلدات المفتوحة بلمسة واحدة. يكون معطلاً إذا لم يكن هناك مجلد مفتوح. الزر نفسه موجود في قائمة التشغيل.",
+      "<strong>العودة إلى الأعلى</strong> — يظهر عند التمرير للأسفل ويعيدك بسلاسة إلى أعلى الصفحة.",
+    ]},
+  ]},
+  ms: { heading: "11. Kawalan Pantas Terapung", blocks: [
+    { p: "Tab terapung kecil kekal di tepi kanan skrin supaya anda tidak perlu menatal semula ke atas." },
+    { ul: [
+      "<strong>Main / Jeda</strong> — mula atau hentikan lagu semasa dari mana-mana pada halaman. Ia dimatikan jika tiada lagu dipilih.",
+      "<strong>Sedang dimainkan</strong> — tajuk lagu semasa dipaparkan pada tab.",
+      "<strong>Tutup semua folder</strong> — menutup semua folder terbuka dengan satu ketikan. Dimatikan jika tiada folder terbuka. Butang sama ada dalam senarai main.",
+      "<strong>Kembali ke atas</strong> — muncul apabila anda menatal ke bawah dan membawa anda lancar ke atas halaman.",
+    ]},
+  ]},
+  id: { heading: "11. Kontrol Cepat Mengambang", blocks: [
+    { p: "Tab kecil mengambang tetap menempel di tepi kanan layar sehingga Anda tak perlu menggulir kembali ke atas." },
+    { ul: [
+      "<strong>Putar / Jeda</strong> — mulai atau hentikan lagu saat ini dari mana saja di halaman. Nonaktif bila tidak ada lagu terpilih.",
+      "<strong>Sedang diputar</strong> — judul lagu saat ini ditampilkan pada tab.",
+      "<strong>Tutup semua folder</strong> — menutup semua folder terbuka dengan sekali ketuk. Nonaktif bila tidak ada folder terbuka. Tombol yang sama ada di daftar putar.",
+      "<strong>Kembali ke atas</strong> — muncul saat Anda menggulir ke bawah dan membawa Anda mulus ke bagian atas halaman.",
+    ]},
+  ]},
+  vi: { heading: "11. Bảng điều khiển nhanh nổi", blocks: [
+    { p: "Một thẻ nhỏ luôn nổi ở mép phải màn hình để bạn không phải cuộn ngược lên đầu trang." },
+    { ul: [
+      "<strong>Phát / Tạm dừng</strong> — điều khiển bài hát hiện tại từ bất kỳ đâu trên trang. Bị mờ khi chưa chọn bài nào.",
+      "<strong>Đang phát</strong> — tên bài hát hiện tại hiển thị trên thẻ.",
+      "<strong>Thu gọn tất cả thư mục</strong> — đóng mọi thư mục đang mở chỉ với một chạm. Bị mờ khi không có thư mục nào mở. Nút này cũng có trong danh sách phát.",
+      "<strong>Về đầu trang</strong> — xuất hiện khi bạn cuộn xuống và đưa bạn mượt mà trở lại đầu trang.",
+    ]},
+  ]},
+  th: { heading: "11. แถบควบคุมด่วนแบบลอย", blocks: [
+    { p: "แถบลอยขนาดเล็กติดอยู่ที่ขอบขวาของหน้าจอ ทำให้คุณไม่ต้องเลื่อนกลับขึ้นไปด้านบน" },
+    { ul: [
+      "<strong>เล่น / หยุดชั่วคราว</strong> — ควบคุมเพลงปัจจุบันจากตำแหน่งใดก็ได้ในหน้า จะเป็นสีจางเมื่อยังไม่ได้เลือกเพลง",
+      "<strong>กำลังเล่น</strong> — ชื่อเพลงปัจจุบันจะแสดงบนแถบ",
+      "<strong>ยุบทุกโฟลเดอร์</strong> — ปิดโฟลเดอร์ที่เปิดอยู่ทั้งหมดในครั้งเดียว จะเป็นสีจางเมื่อไม่มีโฟลเดอร์เปิดอยู่ ปุ่มเดียวกันนี้มีในส่วนเพลย์ลิสต์ด้วย",
+      "<strong>กลับขึ้นด้านบน</strong> — ปรากฏเมื่อคุณเลื่อนลง และพากลับขึ้นสู่ด้านบนของหน้าอย่างนุ่มนวล",
+    ]},
+  ]},
+};
+
 export function getManual(lang: LangCode): ManualContent {
-  return MANUAL[lang] ?? en;
+  const base = MANUAL[lang] ?? en;
+  const extra = QUICK_CONTROLS[lang] ?? QUICK_CONTROLS.en;
+  return { ...base, sections: [...base.sections, extra] };
 }
 
 export type ManualUI = {
