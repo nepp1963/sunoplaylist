@@ -36,6 +36,8 @@ import {
   Volume1,
   Lock,
   Unlock,
+  ArrowUpToLine,
+  FolderClosed,
 } from "lucide-react";
 
 type PendingUndo =
@@ -149,6 +151,7 @@ export default function SunoPlayer() {
   const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
   const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
   const [duplicateWarning, setDuplicateWarning] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -172,6 +175,13 @@ export default function SunoPlayer() {
   const songKeysRef = useRef<Set<string>>(new Set());
 
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
+
+  useEffect(() => {
+    const updateScrollState = () => setHasScrolled(window.scrollY > 240);
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrollState);
+  }, []);
 
   useEffect(() => {
     songKeysRef.current = new Set(
@@ -1390,6 +1400,65 @@ export default function SunoPlayer() {
         onChange={loadPlaylist}
       />
 
+      <div
+        className="fixed bottom-16 right-3 z-40 grid max-w-[calc(100vw-1.5rem)] grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-1 rounded-lg border border-border bg-card/95 p-1.5 text-card-foreground shadow-lg backdrop-blur-md sm:right-4"
+        aria-label="Floating player controls"
+      >
+        <button
+          type="button"
+          onClick={togglePlay}
+          disabled={!currentSong && songs.length === 0}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          title={isPlaying ? t("pause") : t("play")}
+          aria-label={isPlaying ? t("pause") : t("play")}
+        >
+          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => currentSong && focusCurrentFolder()}
+          disabled={!currentSong}
+          className="hidden min-w-0 max-w-44 px-2 text-left disabled:cursor-default sm:block"
+          title={currentSong?.title ?? t("nowPlaying")}
+        >
+          <span className="block text-[10px] uppercase text-muted-foreground">
+            {t("nowPlaying")}
+          </span>
+          <span className="block truncate text-xs font-medium">
+            {currentSong?.title ?? "—"}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={collapseAllFolders}
+          disabled={folders.length === 0 || expandedFolders.size === 0}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-35"
+          title={t("collapseAll")}
+          aria-label={t("collapseAll")}
+        >
+          <FolderClosed className="h-5 w-5" />
+        </button>
+
+        <AnimatePresence initial={false}>
+          {hasScrolled && (
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 40 }}
+              exit={{ opacity: 0, width: 0 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="grid h-10 shrink-0 place-items-center overflow-hidden rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              title="Back to the top"
+              aria-label="Back to the top"
+            >
+              <ArrowUpToLine className="h-5 w-5 shrink-0" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
+
       <div className="w-full max-w-2xl mb-8 mt-12 sm:mt-8">
         <div className="flex items-center gap-3 mb-2">
           <a
@@ -1820,14 +1889,15 @@ export default function SunoPlayer() {
             </div>
           )}
           {/* Collapse all folders */}
-          {folders.length > 0 && expandedFolders.size > 0 && (
+          {folders.length > 0 && (
             <button
               onClick={collapseAllFolders}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              disabled={expandedFolders.size === 0}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-35"
               title={t("collapseAll")}
               aria-label={t("collapseAll")}
             >
-              <ChevronUp className="w-4 h-4" />
+              <FolderClosed className="w-4 h-4" />
             </button>
           )}
           {/* Folder create button */}
