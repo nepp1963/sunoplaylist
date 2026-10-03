@@ -96,6 +96,8 @@ export type TranslationKey =
   | "previousFolder"
   | "clearInput"
   | "clearCurrentSong"
+  | "openCurrentFolder"
+  | "jumpToFolder"
   | "collapseAll"
   | "aboutLink"
   | "disclaimerLink"
@@ -185,6 +187,8 @@ const en: Dict = {
   previousFolder: "Previous folder",
   clearInput: "Clear input",
   clearCurrentSong: "Clear current song",
+  openCurrentFolder: "Open the playing song's folder",
+  jumpToFolder: "Jump to the playing song",
   collapseAll: "Collapse all folders",
   aboutLink: "About SUNO Playlist",
   disclaimerLink: "Software Disclaimer",
