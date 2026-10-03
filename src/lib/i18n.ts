@@ -1263,6 +1263,22 @@ Object.assign(ko, { nextFolder: "다음 폴더", previousFolder: "이전 폴더"
 });
 Object.assign(en, { nextFolder: "Next folder", previousFolder: "Previous folder" });
 
+Object.assign(es, { openCurrentFolder: "Abrir la carpeta de la canción", jumpToFolder: "Saltar a la canción en reproducción" });
+Object.assign(pt, { openCurrentFolder: "Abrir a pasta da música", jumpToFolder: "Ir para a música em reprodução" });
+Object.assign(it, { openCurrentFolder: "Apri la cartella del brano", jumpToFolder: "Vai al brano in riproduzione" });
+Object.assign(de, { openCurrentFolder: "Ordner des Songs öffnen", jumpToFolder: "Zum gespielten Song springen" });
+Object.assign(fr, { openCurrentFolder: "Ouvrir le dossier de la chanson", jumpToFolder: "Aller à la chanson en cours" });
+Object.assign(zh, { openCurrentFolder: "打开当前歌曲所在文件夹", jumpToFolder: "跳转到正在播放的歌曲" });
+Object.assign(yue, { openCurrentFolder: "開啟正在播放歌曲嘅資料夾", jumpToFolder: "跳去正在播放嘅歌曲" });
+Object.assign(ja, { openCurrentFolder: "再生中の曲のフォルダを開く", jumpToFolder: "再生中の曲へジャンプ" });
+Object.assign(ko, { openCurrentFolder: "재생 중인 곡의 폴더 열기", jumpToFolder: "재생 중인 곡으로 이동" });
+Object.assign(hi, { openCurrentFolder: "चल रहे गाने का फ़ोल्डर खोलें", jumpToFolder: "चल रहे गाने पर जाएं" });
+Object.assign(ar, { openCurrentFolder: "فتح مجلد الأغنية الحالية", jumpToFolder: "الانتقال إلى الأغنية المشغلة" });
+Object.assign(ms, { openCurrentFolder: "Buka folder lagu semasa", jumpToFolder: "Lompat ke lagu yang dimainkan" });
+Object.assign(id, { openCurrentFolder: "Buka folder lagu saat ini", jumpToFolder: "Lompat ke lagu yang diputar" });
+Object.assign(vi, { openCurrentFolder: "Mở thư mục của bài đang phát", jumpToFolder: "Nhảy tới bài đang phát" });
+Object.assign(th, { openCurrentFolder: "เปิดโฟลเดอร์ของเพลงที่กำลังเล่น", jumpToFolder: "ข้ามไปยังเพลงที่กำลังเล่น" });
+
 export const TRANSLATIONS: Record<LangCode, PartialDict> & { en: Dict } = {
   en, es, pt, it, de, fr, zh, yue, ja, ko, hi, ar, ms, id, vi, th,
 };
