@@ -152,13 +152,6 @@ export default function SunoPlayer() {
   const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
   const [duplicateWarning, setDuplicateWarning] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setHasScrolled(window.scrollY > 240);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -184,7 +177,7 @@ export default function SunoPlayer() {
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
 
   useEffect(() => {
-    const updateScrollState = () => setHasScrolled(window.scrollY > 240);
+    const updateScrollState = () => setHasScrolled(window.scrollY > 40);
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
     return () => window.removeEventListener("scroll", updateScrollState);
