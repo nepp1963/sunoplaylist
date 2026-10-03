@@ -38,6 +38,7 @@ import {
   Unlock,
   ArrowUpToLine,
   FolderClosed,
+  Crosshair,
 } from "lucide-react";
 
 type PendingUndo =
@@ -137,6 +138,8 @@ export default function SunoPlayer() {
   const [folderSortMode, setFolderSortMode] = useState<FolderSortMode>("original");
   const [lockedFolders, setLockedFolders] = useState<string[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const folderRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const songRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderParent, setNewFolderParent] = useState<string>("");
   const [showFolderInput, setShowFolderInput] = useState(false);
@@ -603,6 +606,25 @@ export default function SunoPlayer() {
   };
 
   const collapseAllFolders = () => setExpandedFolders(new Set());
+
+  const openCurrentFolder = () => {
+    const folder = songs[currentIndex]?.folder;
+    if (folder) setExpandedFolders(new Set([folder]));
+  };
+
+  const jumpToCurrentSong = () => {
+    if (currentIndex < 0) return;
+    const song = songs[currentIndex];
+    const folder = song?.folder;
+    if (folder) setExpandedFolders(new Set([folder]));
+    // Wait for the folder expansion to render, then scroll to the song row
+    setTimeout(() => {
+      const el =
+        songRefs.current.get(song?.id ?? "") ??
+        (folder ? folderRefs.current.get(folder) : null);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
+  };
 
   const removeFolder = (name: string) => {
     if (lockedFolders.includes(name)) return;
