@@ -1224,6 +1224,10 @@ export default function SunoPlayer() {
       <motion.div
         key={song.id}
         layout
+        ref={(el) => {
+          if (el) songRefs.current.set(song.id, el);
+          else songRefs.current.delete(song.id);
+        }}
         initial={hydrated ? { opacity: 0, y: 10 } : false}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
@@ -1601,6 +1605,29 @@ export default function SunoPlayer() {
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openCurrentFolder();
+                }}
+                disabled={!currentSong.folder}
+                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                title={t("openCurrentFolder")}
+                aria-label={t("openCurrentFolder")}
+              >
+                <FolderOpen className="w-4 h-4" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  jumpToCurrentSong();
+                }}
+                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                title={t("jumpToFolder")}
+                aria-label={t("jumpToFolder")}
+              >
+                <Crosshair className="w-4 h-4" />
+              </button>
               <button
                 onClick={() => {
                   setIsPlaying(false);
@@ -1988,6 +2015,10 @@ export default function SunoPlayer() {
                 <motion.div
                   key={name}
                   layout
+                  ref={(el) => {
+                    if (el) folderRefs.current.set(name, el);
+                    else folderRefs.current.delete(name);
+                  }}
                   transition={{ layout: { type: "spring", stiffness: 500, damping: 40 } }}
                   className="px-3 mb-1"
                   style={{ paddingLeft: `${12 + depth * 16}px` }}
