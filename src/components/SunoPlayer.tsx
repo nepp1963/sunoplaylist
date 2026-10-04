@@ -1647,64 +1647,6 @@ export default function SunoPlayer() {
               <p className="text-sm text-muted-foreground italic truncate">—</p>
             )}
           </button>
-          {currentSong && (
-            <>
-              <a
-                href={
-                  currentSong.url.startsWith("http")
-                    ? currentSong.url
-                    : `https://suno.com/song/${extractSunoId(currentSong.url)}`
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={t("openOnSuno")}
-              >
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openCurrentFolder();
-                }}
-                disabled={!currentSong.folder}
-                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-                title={t("openCurrentFolder")}
-                aria-label={t("openCurrentFolder")}
-              >
-                <FolderOpen className="w-4 h-4" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  jumpToCurrentSong();
-                }}
-                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                title={t("jumpToFolder")}
-                aria-label={t("jumpToFolder")}
-              >
-                <Crosshair className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => {
-                  setIsPlaying(false);
-                  setCurrentIndex(-1);
-                  setProgress(0);
-                  setExpandedFolders(new Set());
-                  if (audioRef.current) {
-                    audioRef.current.pause();
-                    audioRef.current.currentTime = 0;
-                  }
-                }}
-                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                title={t("clearCurrentSong")}
-                aria-label={t("clearCurrentSong")}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </>
-          )}
         </div>
         <div className="cursor-pointer" onClick={seekTo}>
           <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
