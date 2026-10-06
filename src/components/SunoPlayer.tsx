@@ -925,12 +925,30 @@ export default function SunoPlayer() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    let attempt = 0;
+    const id = currentSong ? extractSunoId(currentSong.url) ?? extractSunoId(currentSong.audioUrl) : null;
+    // Fallback chain: retry proxy (cache-busted), then direct SUNO CDN files.
+    const fallbacks = id
+      ? [
+          `/api/public/suno-audio?id=${id}&r=${Date.now()}`,
+          `https://cdn1.suno.ai/${id}.mp3`,
+          `https://cdn1.suno.ai/${id}.mp4`,
+        ]
+      : [];
     const onError = () => {
-      // Ignore transient/aborted errors (empty src after clearing, aborted
-      // loads when switching tracks). Some browsers fire these even though
-      // playback works fine, causing a false error banner.
       const err = audio.error;
       if (!audio.src || !err || err.code === 1 /* MEDIA_ERR_ABORTED */) {
+        return;
+      }
+      if (attempt < fallbacks.length) {
+        const pos = audio.currentTime || 0;
+        const wasPlaying = isPlayingRef.current;
+        audio.src = fallbacks[attempt++];
+        audio.load();
+        if (pos > 0) {
+          audio.addEventListener("loadedmetadata", () => { try { audio.currentTime = pos; } catch { /* ignore */ } }, { once: true });
+        }
+        if (wasPlaying) audio.play().catch(() => {});
         return;
       }
       setPlaybackError(true);
@@ -946,6 +964,20 @@ export default function SunoPlayer() {
       audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("loadstart", onLoadStart);
     };
+  }, [currentAudioUrl]);
+
+  // Warm the cache for the next song so it starts faster.
+  useEffect(() => {
+    if (!currentSong) return;
+    const idx = songs.findIndex((s) => s.id === currentSong.id);
+    const next = idx >= 0 ? songs[idx + 1] : undefined;
+    const url = getPlayableAudioUrl(next);
+    if (!url) return;
+    const t = setTimeout(() => {
+      fetch(url, { headers: { Range: "bytes=0-524287" } }).catch(() => {});
+    }, 3000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAudioUrl]);
 
 
