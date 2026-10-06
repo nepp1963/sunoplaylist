@@ -10,17 +10,35 @@ export const Route = createFileRoute("/api/public/suno-audio")({
         if (!SUNO_ID.test(id)) return new Response("Invalid song ID", { status: 400 });
 
         const range = request.headers.get("range");
-        const mediaUrl = `https://cdn1.suno.ai/${id.toLowerCase()}.mp4`;
-        const upstream = await fetch(mediaUrl, {
-          headers: {
-            Accept: "video/mp4,audio/*;q=0.9,*/*;q=0.8",
-            Referer: "https://suno.com/",
-            ...(range ? { Range: range } : {}),
-          },
-        });
+        const lower = id.toLowerCase();
+        const candidates = [
+          `https://cdn1.suno.ai/${lower}.mp4`,
+          `https://cdn1.suno.ai/${lower}.mp4`,
+          `https://cdn1.suno.ai/${lower}.mp3`,
+        ];
+        let upstream: Response | null = null;
+        let isMp3 = false;
+        for (const mediaUrl of candidates) {
+          try {
+            const r = await fetch(mediaUrl, {
+              headers: {
+                Accept: "video/mp4,audio/*;q=0.9,*/*;q=0.8",
+                Referer: "https://suno.com/",
+                ...(range ? { Range: range } : {}),
+              },
+            });
+            if (r.ok && r.body) {
+              upstream = r;
+              isMp3 = mediaUrl.endsWith(".mp3");
+              break;
+            }
+          } catch {
+            /* try next */
+          }
+        }
 
-        if (!upstream.ok || !upstream.body) {
-          return new Response("Audio unavailable", { status: upstream.status || 502 });
+        if (!upstream || !upstream.body) {
+          return new Response("Audio unavailable", { status: 502 });
         }
 
         const headers = new Headers();

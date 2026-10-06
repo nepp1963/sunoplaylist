@@ -125,6 +125,8 @@ export default function SunoPlayer() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(false);
+  isPlayingRef.current = isPlaying;
   const [linkInput, setLinkInput] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [progress, setProgress] = useState(0);
