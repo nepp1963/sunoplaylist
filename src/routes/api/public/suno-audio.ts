@@ -56,7 +56,7 @@ export const Route = createFileRoute("/api/public/suno-audio")({
         }
         // The MP4 contains an AAC audio track. Advertising it as audio/mp4 lets
         // Chromium/Edge select that track when the response feeds <audio>.
-        headers.set("content-type", "audio/mp4");
+        headers.set("content-type", isMp3 ? "audio/mpeg" : "audio/mp4");
         headers.set("content-disposition", "inline");
         // Song audio never changes, so let browsers and the edge reuse it.
         headers.set("cache-control", "public, max-age=86400, immutable");
