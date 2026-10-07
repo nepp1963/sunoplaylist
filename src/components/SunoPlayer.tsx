@@ -1027,6 +1027,35 @@ export default function SunoPlayer() {
     };
   }, [songs.length, currentIndex, repeatMode]);
 
+  // Mobile browsers sometimes stop firing timeupdate (or the audio element is
+  // swapped). Poll the live element while playing and resync when the page
+  // becomes visible again so the progress bar and title never freeze.
+  const [marqueeKey, setMarqueeKey] = useState(0);
+  useEffect(() => {
+    const sync = () => {
+      const a = audioRef.current;
+      if (!a) return;
+      setProgress(a.currentTime || 0);
+      if (a.duration && isFinite(a.duration)) setDuration(a.duration);
+    };
+    const id = isPlaying ? window.setInterval(sync, 250) : undefined;
+    const onVis = () => {
+      if (document.visibilityState === "visible") {
+        sync();
+        setMarqueeKey((k) => k + 1);
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("pageshow", onVis);
+    window.addEventListener("focus", onVis);
+    return () => {
+      if (id) window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("pageshow", onVis);
+      window.removeEventListener("focus", onVis);
+    };
+  }, [isPlaying, currentIndex]);
+
   // Keep the folder of the currently playing song open at all times
   useEffect(() => {
     if (!isPlaying || currentIndex < 0) return;
@@ -1662,6 +1691,7 @@ export default function SunoPlayer() {
             {currentSong ? (
               <div className="marquee-mask">
                 <span
+                  key={`${currentSong.id}-${marqueeKey}-${isPlaying ? 1 : 0}`}
                   className={
                     isPlaying
                       ? "marquee-track text-foreground font-semibold"
