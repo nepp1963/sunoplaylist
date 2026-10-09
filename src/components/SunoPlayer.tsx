@@ -37,6 +37,7 @@ import {
   Lock,
   Unlock,
   ArrowUpToLine,
+  ArrowDownToLine,
   FolderClosed,
   Crosshair,
 } from "lucide-react";
@@ -157,6 +158,7 @@ export default function SunoPlayer() {
   const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
   const [duplicateWarning, setDuplicateWarning] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -182,7 +184,12 @@ export default function SunoPlayer() {
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
 
   useEffect(() => {
-    const updateScrollState = () => setHasScrolled(window.scrollY > 40);
+    const updateScrollState = () => {
+      setHasScrolled(window.scrollY > 40);
+      setCanScrollDown(
+        window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 40,
+      );
+    };
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
     return () => window.removeEventListener("scroll", updateScrollState);
@@ -1535,6 +1542,25 @@ export default function SunoPlayer() {
         </button>
 
         <AnimatePresence initial={false}>
+          {canScrollDown && (
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 40 }}
+              exit={{ opacity: 0, width: 0 }}
+              onClick={() =>
+                window.scrollTo({
+                  top: document.documentElement.scrollHeight,
+                  behavior: "smooth",
+                })
+              }
+              className="grid h-10 shrink-0 place-items-center overflow-hidden rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              title="Jump to the bottom"
+              aria-label="Jump to the bottom"
+            >
+              <ArrowDownToLine className="h-5 w-5 shrink-0" />
+            </motion.button>
+          )}
           {hasScrolled && (
             <motion.button
               type="button"
