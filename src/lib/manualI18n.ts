@@ -1251,7 +1251,18 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
 export function getManual(lang: LangCode): ManualContent {
   const base = MANUAL[lang] ?? en;
   const extra = QUICK_CONTROLS[lang] ?? QUICK_CONTROLS.en;
-  return { ...base, sections: [...base.sections, extra] };
+  const sections = [...base.sections];
+  const aboutIdx = sections.findIndex((s) => /^10\./.test(s.heading));
+  if (aboutIdx === -1) return { ...base, sections: [...sections, extra] };
+  const [about] = sections.splice(aboutIdx, 1);
+  return {
+    ...base,
+    sections: [
+      ...sections,
+      { ...extra, heading: extra.heading.replace(/^11\./, "10.") },
+      { ...about, heading: about.heading.replace(/^10\./, "11.") },
+    ],
+  };
 }
 
 export type ManualUI = {
