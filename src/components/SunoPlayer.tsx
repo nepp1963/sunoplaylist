@@ -184,7 +184,12 @@ export default function SunoPlayer() {
   const currentSong = currentIndex >= 0 && currentIndex < songs.length ? songs[currentIndex] : null;
 
   useEffect(() => {
-    const updateScrollState = () => setHasScrolled(window.scrollY > 40);
+    const updateScrollState = () => {
+      setHasScrolled(window.scrollY > 40);
+      setCanScrollDown(
+        window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 40,
+      );
+    };
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
     return () => window.removeEventListener("scroll", updateScrollState);
