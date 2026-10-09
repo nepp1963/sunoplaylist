@@ -1542,6 +1542,25 @@ export default function SunoPlayer() {
         </button>
 
         <AnimatePresence initial={false}>
+          {canScrollDown && (
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: 40 }}
+              exit={{ opacity: 0, width: 0 }}
+              onClick={() =>
+                window.scrollTo({
+                  top: document.documentElement.scrollHeight,
+                  behavior: "smooth",
+                })
+              }
+              className="grid h-10 shrink-0 place-items-center overflow-hidden rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              title="Jump to the bottom"
+              aria-label="Jump to the bottom"
+            >
+              <ArrowDownToLine className="h-5 w-5 shrink-0" />
+            </motion.button>
+          )}
           {hasScrolled && (
             <motion.button
               type="button"
