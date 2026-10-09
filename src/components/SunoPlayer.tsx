@@ -1112,6 +1112,10 @@ export default function SunoPlayer() {
   };
 
   const savePlaylist = () => {
+    // The currently displayed folder order becomes the new "original" order.
+    const displayedFolderOrder = [...folders];
+    setFolderOrder(displayedFolderOrder);
+    setFolderSortMode("original");
     const payload = {
       version: 4,
       colorScheme: schemeId,
@@ -1124,8 +1128,8 @@ export default function SunoPlayer() {
         image: s.image,
         folder: s.folder,
       })),
-      folders,
-      folderOrder,
+      folders: displayedFolderOrder,
+      folderOrder: displayedFolderOrder,
       lockedFolders,
       originalOrder,
     };
