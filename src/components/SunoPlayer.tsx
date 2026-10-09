@@ -37,6 +37,7 @@ import {
   Lock,
   Unlock,
   ArrowUpToLine,
+  ArrowDownToLine,
   FolderClosed,
   Crosshair,
 } from "lucide-react";
@@ -157,6 +158,7 @@ export default function SunoPlayer() {
   const [infoModal, setInfoModal] = useState<null | "about" | "disclaimer">(null);
   const [duplicateWarning, setDuplicateWarning] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
