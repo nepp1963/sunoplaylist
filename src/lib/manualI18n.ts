@@ -1109,6 +1109,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>Now playing</strong> — the title of the current song is shown on the tab.",
       "<strong>Collapse all folders</strong> — closes every open folder in one tap. It is greyed out when no folder is open. The same button is also available in the playlist area.",
       "<strong>Back to the top</strong> — appears once you scroll down and smoothly returns you to the top of the page.",
+      "<strong>Jump to the bottom</strong> — appears when there is still more page below and smoothly takes you to the end of the page.",
     ]},
   ]},
   es: { heading: "11. Controles rápidos flotantes", blocks: [
@@ -1118,6 +1119,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>Reproduciendo</strong> — el título de la canción actual se muestra en la pestaña.",
       "<strong>Contraer todas las carpetas</strong> — cierra todas las carpetas abiertas con un toque. Se desactiva si no hay ninguna abierta. El mismo botón está también en la lista.",
       "<strong>Volver arriba</strong> — aparece al desplazarte hacia abajo y te lleva suavemente al inicio de la página.",
+      "<strong>Ir al final</strong> — aparece cuando queda más página por debajo y te lleva suavemente al final de la página.",
     ]},
   ]},
   pt: { heading: "11. Controlos rápidos flutuantes", blocks: [
@@ -1127,6 +1129,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>A tocar</strong> — o título da música atual aparece no separador.",
       "<strong>Recolher todas as pastas</strong> — fecha todas as pastas abertas com um toque. Fica inativo se nenhuma estiver aberta. O mesmo botão existe na área da playlist.",
       "<strong>Voltar ao topo</strong> — aparece quando desces a página e leva-te suavemente de volta ao início.",
+      "<strong>Ir para o fundo</strong> — aparece quando há mais página abaixo e leva-te suavemente ao final da página.",
     ]},
   ]},
   it: { heading: "11. Controlli rapidi flottanti", blocks: [
@@ -1136,6 +1139,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>In riproduzione</strong> — il titolo del brano corrente è mostrato sulla scheda.",
       "<strong>Comprimi tutte le cartelle</strong> — chiude tutte le cartelle aperte con un tocco. È disattivato se nessuna è aperta. Lo stesso pulsante è nella playlist.",
       "<strong>Torna su</strong> — compare quando scorri verso il basso e ti riporta dolcemente all'inizio della pagina.",
+      "<strong>Vai in fondo</strong> — compare quando resta più pagina sotto e ti porta dolcemente alla fine della pagina.",
     ]},
   ]},
   de: { heading: "11. Schwebende Schnellsteuerung", blocks: [
@@ -1145,6 +1149,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>Aktueller Titel</strong> — der Name des laufenden Titels wird auf der Leiste angezeigt.",
       "<strong>Alle Ordner einklappen</strong> — schließt alle offenen Ordner mit einem Tippen. Ausgegraut, wenn kein Ordner offen ist. Die gleiche Schaltfläche gibt es in der Playlist.",
       "<strong>Nach oben</strong> — erscheint beim Scrollen und bringt dich sanft zum Seitenanfang zurück.",
+      "<strong>Nach unten</strong> — erscheint, wenn weiter unten noch Seite übrig ist, und bringt dich sanft ans Seitenende.",
     ]},
   ]},
   fr: { heading: "11. Commandes rapides flottantes", blocks: [
@@ -1154,6 +1159,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>En lecture</strong> — le titre du morceau en cours s'affiche sur l'onglet.",
       "<strong>Replier tous les dossiers</strong> — ferme tous les dossiers ouverts en un geste. Désactivé si aucun n'est ouvert. Le même bouton existe dans la playlist.",
       "<strong>Retour en haut</strong> — apparaît dès que vous faites défiler et vous ramène doucement en haut de la page.",
+      "<strong>Aller en bas</strong> — apparaît lorsqu'il reste de la page en dessous et vous emmène doucement en bas de la page.",
     ]},
   ]},
   zh: { heading: "11. 悬浮快捷控件", blocks: [
@@ -1163,6 +1169,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>正在播放</strong> — 标签上显示当前歌曲的标题。",
       "<strong>收起所有文件夹</strong> — 一键关闭所有已展开的文件夹。没有展开的文件夹时按钮为灰色。播放列表区域也有同样的按钮。",
       "<strong>返回顶部</strong> — 向下滚动后出现，平滑地回到页面顶部。",
+      "<strong>跳到底部</strong> — 当页面下方还有内容时出现，平滑地跳到页面末尾。",
     ]},
   ]},
   yue: { heading: "11. 浮動快捷控制", blocks: [
@@ -1172,6 +1179,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>正在播放</strong> — 標籤上會顯示而家首歌嘅名。",
       "<strong>收埋所有資料夾</strong> — 一撳就關晒所有打開咗嘅資料夾。冇資料夾打開時會變灰。播放清單嗰度都有同樣嘅掣。",
       "<strong>返回頂部</strong> — 向下碌之後就會出現，平順咁帶你返去頁面頂。",
+      "<strong>跳去最底</strong> — 頁面下面仲有嘢嗰陣就會出現，平順咁帶你去到頁面最底。",
     ]},
   ]},
   ja: { heading: "11. フローティング・クイック操作", blocks: [
@@ -1181,6 +1189,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>再生中</strong> — 現在の曲のタイトルがタブに表示されます。",
       "<strong>すべてのフォルダを閉じる</strong> — 開いているフォルダをワンタップで全て閉じます。開いていないときは無効です。同じボタンはプレイリスト側にもあります。",
       "<strong>トップへ戻る</strong> — 下にスクロールすると現れ、ページ先頭までなめらかに戻ります。",
+      "<strong>一番下へ</strong> — ページの下にまだ内容があるときに現れ、ページの最後までなめらかに移動します。",
     ]},
   ]},
   ko: { heading: "11. 떠 있는 빠른 조작 탭", blocks: [
@@ -1190,6 +1199,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>재생 중</strong> — 현재 곡 제목이 탭에 표시됩니다.",
       "<strong>모든 폴더 접기</strong> — 열려 있는 폴더를 한 번에 모두 닫습니다. 열린 폴더가 없으면 비활성화됩니다. 재생목록 영역에도 같은 버튼이 있습니다.",
       "<strong>맨 위로</strong> — 아래로 스크롤하면 나타나며 페이지 맨 위로 부드럽게 이동합니다.",
+      "      <strong>맨 아래로</strong> — 아래에 페이지가 더 남아 있을 때 나타나며 페이지 끝으로 부드럽게 이동합니다.",
     ]},
   ]},
   hi: { heading: "11. फ़्लोटिंग त्वरित नियंत्रण", blocks: [
@@ -1199,6 +1209,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>अभी चल रहा है</strong> — मौजूदा गाने का नाम टैब पर दिखता है।",
       "<strong>सभी फ़ोल्डर बंद करें</strong> — एक टैप में सभी खुले फ़ोल्डर बंद कर देता है। कोई फ़ोल्डर खुला न हो तो निष्क्रिय रहता है। यही बटन प्लेलिस्ट में भी है।",
       "<strong>ऊपर जाएँ</strong> — नीचे स्क्रॉल करते ही दिखता है और आपको आसानी से पेज के शीर्ष पर ले जाता है।",
+      "<strong>नीचे जाएँ</strong> — पेज के नीचे और सामग्री होने पर दिखता है और आपको आसानी से पेज के अंत तक ले जाता है।",
     ]},
   ]},
   ar: { heading: "11. أدوات التحكم السريعة العائمة", blocks: [
@@ -1208,6 +1219,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>قيد التشغيل</strong> — يظهر عنوان الأغنية الحالية على الشريط.",
       "<strong>طيّ كل المجلدات</strong> — يغلق كل المجلدات المفتوحة بلمسة واحدة. يكون معطلاً إذا لم يكن هناك مجلد مفتوح. الزر نفسه موجود في قائمة التشغيل.",
       "<strong>العودة إلى الأعلى</strong> — يظهر عند التمرير للأسفل ويعيدك بسلاسة إلى أعلى الصفحة.",
+      "<strong>الانتقال إلى الأسفل</strong> — يظهر عند وجود المزيد من الصفحة بالأسفل وينقلك بسلاسة إلى نهاية الصفحة.",
     ]},
   ]},
   ms: { heading: "11. Kawalan Pantas Terapung", blocks: [
@@ -1217,6 +1229,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>Sedang dimainkan</strong> — tajuk lagu semasa dipaparkan pada tab.",
       "<strong>Tutup semua folder</strong> — menutup semua folder terbuka dengan satu ketikan. Dimatikan jika tiada folder terbuka. Butang sama ada dalam senarai main.",
       "<strong>Kembali ke atas</strong> — muncul apabila anda menatal ke bawah dan membawa anda lancar ke atas halaman.",
+      "<strong>Pergi ke bawah</strong> — muncul apabila masih ada halaman di bawah dan membawa anda lancar ke penghujung halaman.",
     ]},
   ]},
   id: { heading: "11. Kontrol Cepat Mengambang", blocks: [
@@ -1226,6 +1239,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>Sedang diputar</strong> — judul lagu saat ini ditampilkan pada tab.",
       "<strong>Tutup semua folder</strong> — menutup semua folder terbuka dengan sekali ketuk. Nonaktif bila tidak ada folder terbuka. Tombol yang sama ada di daftar putar.",
       "<strong>Kembali ke atas</strong> — muncul saat Anda menggulir ke bawah dan membawa Anda mulus ke bagian atas halaman.",
+      "<strong>Pergi ke bawah</strong> — muncul saat masih ada halaman di bawah dan membawa Anda mulus ke bagian bawah halaman.",
     ]},
   ]},
   vi: { heading: "11. Bảng điều khiển nhanh nổi", blocks: [
@@ -1235,6 +1249,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>Đang phát</strong> — tên bài hát hiện tại hiển thị trên thẻ.",
       "<strong>Thu gọn tất cả thư mục</strong> — đóng mọi thư mục đang mở chỉ với một chạm. Bị mờ khi không có thư mục nào mở. Nút này cũng có trong danh sách phát.",
       "<strong>Về đầu trang</strong> — xuất hiện khi bạn cuộn xuống và đưa bạn mượt mà trở lại đầu trang.",
+      "<strong>Về cuối trang</strong> — xuất hiện khi còn nội dung phía dưới và đưa bạn mượt mà đến cuối trang.",
     ]},
   ]},
   th: { heading: "11. แถบควบคุมด่วนแบบลอย", blocks: [
@@ -1244,6 +1259,7 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
       "<strong>กำลังเล่น</strong> — ชื่อเพลงปัจจุบันจะแสดงบนแถบ",
       "<strong>ยุบทุกโฟลเดอร์</strong> — ปิดโฟลเดอร์ที่เปิดอยู่ทั้งหมดในครั้งเดียว จะเป็นสีจางเมื่อไม่มีโฟลเดอร์เปิดอยู่ ปุ่มเดียวกันนี้มีในส่วนเพลย์ลิสต์ด้วย",
       "<strong>กลับขึ้นด้านบน</strong> — ปรากฏเมื่อคุณเลื่อนลง และพากลับขึ้นสู่ด้านบนของหน้าอย่างนุ่มนวล",
+      "<strong>ลงด้านล่าง</strong> — ปรากฏเมื่อมีหน้าเหลืออยู่ด้านล่าง และพาคุณไปสุดหน้าอย่างนุ่มนวล",
     ]},
   ]},
 };
