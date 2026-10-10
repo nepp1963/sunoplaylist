@@ -1228,8 +1228,16 @@ export default function SunoPlayer() {
         });
         const allFolders = new Set<string>([...loadedFolders, ...(explicitFolders ?? [])]);
         if (allFolders.size > 0) {
-          setFolders([...allFolders]);
-          setFolderOrder(explicitFolderOrder ?? [...allFolders]);
+          // Display folders in the saved folderOrder when present,
+          // appending any folders not listed there at the end.
+          const ordered = explicitFolderOrder
+            ? [
+                ...explicitFolderOrder.filter((f) => allFolders.has(f)),
+                ...[...allFolders].filter((f) => !explicitFolderOrder.includes(f)),
+              ]
+            : [...allFolders];
+          setFolders(ordered);
+          setFolderOrder(ordered);
         } else {
           setFolders([]);
           setFolderOrder([]);
