@@ -1314,7 +1314,7 @@ export default function SunoPlayer() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
         transition={{ layout: { type: "spring", stiffness: 500, damping: 40 } }}
-        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
+        className={`flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 rounded-xl mb-1 group cursor-pointer transition-colors ${
           globalIndex === currentIndex
             ? "bg-primary/10 border border-primary/20"
             : "hover:bg-secondary/60"
@@ -1322,7 +1322,7 @@ export default function SunoPlayer() {
         onClick={() => playSong(globalIndex)}
       >
         {/* Up/Down move buttons */}
-        <div className="flex flex-col gap-0.5 shrink-0">
+        <div className="hidden sm:flex flex-col gap-0.5 shrink-0">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -1407,6 +1407,35 @@ export default function SunoPlayer() {
             <p className="text-[10px] text-muted-foreground truncate">{song.folder}</p>
           )}
         </div>
+        {/* Song controls: on mobile these move to their own row above the title */}
+        <div className="order-first flex w-full items-center justify-between gap-1 shrink-0 sm:order-none sm:w-auto sm:justify-end sm:gap-0.5">
+          <div className="flex items-center gap-0.5 sm:hidden">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                moveSong(song.id, -1);
+              }}
+              disabled={isFirst}
+              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title={t("moveUp")}
+              aria-label={t("moveUp")}
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                moveSong(song.id, 1);
+              }}
+              disabled={isLast}
+              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title={t("moveDown")}
+              aria-label={t("moveDown")}
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="flex items-center gap-0.5">
         {folders.length > 0 && (
           <div className="relative">
             <button
@@ -1420,7 +1449,7 @@ export default function SunoPlayer() {
               <FolderOpen className="w-3.5 h-3.5" />
             </button>
             {assignFolderSongId === song.id && (
-              <div className="absolute right-0 top-8 z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px]">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1493,6 +1522,8 @@ export default function SunoPlayer() {
         >
           <Trash2 className="w-4 h-4" />
         </button>
+          </div>
+        </div>
       </motion.div>
     );
   };
