@@ -1322,7 +1322,7 @@ export default function SunoPlayer() {
         onClick={() => playSong(globalIndex)}
       >
         {/* Up/Down move buttons */}
-        <div className="flex flex-col gap-0.5 shrink-0">
+        <div className="hidden sm:flex flex-col gap-0.5 shrink-0">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -1408,7 +1408,34 @@ export default function SunoPlayer() {
           )}
         </div>
         {/* Song controls: on mobile these move to their own row above the title */}
-        <div className="order-first flex w-full items-center justify-end gap-0.5 shrink-0 sm:order-none sm:w-auto">
+        <div className="order-first flex w-full items-center justify-between gap-1 shrink-0 sm:order-none sm:w-auto sm:justify-end sm:gap-0.5">
+          <div className="flex items-center gap-0.5 sm:hidden">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                moveSong(song.id, -1);
+              }}
+              disabled={isFirst}
+              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title={t("moveUp")}
+              aria-label={t("moveUp")}
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                moveSong(song.id, 1);
+              }}
+              disabled={isLast}
+              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title={t("moveDown")}
+              aria-label={t("moveDown")}
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="flex items-center gap-0.5">
         {folders.length > 0 && (
           <div className="relative">
             <button
@@ -1495,6 +1522,7 @@ export default function SunoPlayer() {
         >
           <Trash2 className="w-4 h-4" />
         </button>
+          </div>
         </div>
       </motion.div>
     );
