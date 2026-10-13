@@ -1407,6 +1407,8 @@ export default function SunoPlayer() {
             <p className="text-[10px] text-muted-foreground truncate">{song.folder}</p>
           )}
         </div>
+        {/* Song controls: on mobile these move to their own row above the title */}
+        <div className="order-first flex w-full items-center justify-end gap-0.5 shrink-0 sm:order-none sm:w-auto">
         {folders.length > 0 && (
           <div className="relative">
             <button
@@ -1493,6 +1495,7 @@ export default function SunoPlayer() {
         >
           <Trash2 className="w-4 h-4" />
         </button>
+        </div>
       </motion.div>
     );
   };
