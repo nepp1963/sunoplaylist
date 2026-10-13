@@ -35,6 +35,8 @@ import {
   VolumeX,
   Volume1,
   Lock,
+  Shield,
+  ShieldCheck,
   Unlock,
   ArrowUpToLine,
   ArrowDownToLine,
@@ -64,6 +66,8 @@ interface Song {
   title: string;
   image?: string;
   folder?: string;
+  /** "delete" = Deletion Lock, "immutable" = Immutable Lock (no delete, no reorder) */
+  lock?: "delete" | "immutable";
 }
 
 type SortMode = "original" | "az" | "za";
@@ -322,6 +326,7 @@ export default function SunoPlayer() {
     const idx = songs.findIndex((s) => s.id === id);
     if (idx < 0) return;
     const song = songs[idx];
+    if (song.lock) return;
     const removedSunoId = extractSunoId(song.url) ?? extractSunoId(song.audioUrl);
     if (removedSunoId) songKeysRef.current.delete(`id:${removedSunoId}`);
     songKeysRef.current.delete(`url:${song.url.toLowerCase()}`);
@@ -391,6 +396,14 @@ export default function SunoPlayer() {
   };
 
   const moveSong = (id: string, direction: -1 | 1) => {
+    {
+      const idx = songs.findIndex((s) => s.id === id);
+      if (idx < 0 || songs[idx].lock === "immutable") return;
+      const key = songs[idx].folder ?? null;
+      const group = songs.filter((s) => (s.folder ?? null) === key);
+      const neighbor = group[group.indexOf(songs[idx]) + direction];
+      if (neighbor?.lock === "immutable") return;
+    }
     let movedToIdx: number | null = null;
     let movedFromIdx: number | null = null;
     setSongs((prev) => {
@@ -769,7 +782,18 @@ export default function SunoPlayer() {
     });
   };
 
+  const toggleSongLock = (songId: string, kind: "delete" | "immutable") => {
+    setSongs((prev) =>
+      prev.map((s) => {
+        if (s.id !== songId) return s;
+        if (kind === "delete" && s.lock === "immutable") return s;
+        return { ...s, lock: s.lock === kind ? undefined : kind };
+      }),
+    );
+  };
+
   const assignToFolder = (songId: string, folder: string | undefined) => {
+    if (songs.find((s) => s.id === songId)?.lock === "immutable") return;
     setSongs((prev) => prev.map((s) => (s.id === songId ? { ...s, folder } : s)));
     setAssignFolderSongId(null);
   };
@@ -1134,6 +1158,7 @@ export default function SunoPlayer() {
         title: s.title,
         image: s.image,
         folder: s.folder,
+        lock: s.lock,
       })),
       folders: displayedFolderOrder,
       folderOrder: displayedFolderOrder,
@@ -1202,6 +1227,7 @@ export default function SunoPlayer() {
               title: s.title || extractSunoTitle(url),
               image: s.image,
               folder: s.folder,
+              lock: s.lock === "delete" || s.lock === "immutable" ? s.lock : undefined,
             };
           });
 
@@ -1300,8 +1326,12 @@ export default function SunoPlayer() {
 
   const renderSongItem = (song: Song, posInGroup: number, groupSize: number) => {
     const globalIndex = songs.indexOf(song);
-    const isFirst = posInGroup === 0;
-    const isLast = posInGroup === groupSize - 1;
+    const groupSongs = songs.filter((s) => (s.folder ?? null) === (song.folder ?? null));
+    const isImmutable = song.lock === "immutable";
+    const prevImmutable = groupSongs[posInGroup - 1]?.lock === "immutable";
+    const nextImmutable = groupSongs[posInGroup + 1]?.lock === "immutable";
+    const isFirst = posInGroup === 0 || isImmutable || prevImmutable;
+    const isLast = posInGroup === groupSize - 1 || isImmutable || nextImmutable;
     return (
       <motion.div
         key={song.id}
@@ -1436,6 +1466,31 @@ export default function SunoPlayer() {
             </button>
           </div>
           <div className="flex items-center gap-0.5">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleSongLock(song.id, "delete");
+          }}
+          disabled={isImmutable}
+          aria-pressed={song.lock === "delete"}
+          className={`p-1.5 rounded-lg transition-all hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed ${song.lock === "delete" ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
+          title={isImmutable ? t("deletionLockDisabled") : song.lock === "delete" ? t("deletionLockOff") : t("deletionLockOn")}
+          aria-label={t("deletionLock")}
+        >
+          {song.lock === "delete" ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleSongLock(song.id, "immutable");
+          }}
+          aria-pressed={isImmutable}
+          className={`p-1.5 rounded-lg transition-all hover:bg-primary/10 ${isImmutable ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
+          title={isImmutable ? t("immutableLockOff") : t("immutableLockOn")}
+          aria-label={t("immutableLock")}
+        >
+          {isImmutable ? <ShieldCheck className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+        </button>
         {folders.length > 0 && (
           <div className="relative">
             <button
@@ -1443,8 +1498,9 @@ export default function SunoPlayer() {
                 e.stopPropagation();
                 setAssignFolderSongId(assignFolderSongId === song.id ? null : song.id);
               }}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-              title={t("assignToFolder")}
+              disabled={isImmutable}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              title={isImmutable ? t("immutableLockHint") : t("assignToFolder")}
             >
               <FolderOpen className="w-3.5 h-3.5" />
             </button>
@@ -1517,8 +1573,9 @@ export default function SunoPlayer() {
             e.stopPropagation();
             removeSong(song.id);
           }}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-          title={t("removeSong")}
+          disabled={!!song.lock}
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+          title={song.lock ? t("lockedSongHint") : t("removeSong")}
         >
           <Trash2 className="w-4 h-4" />
         </button>
