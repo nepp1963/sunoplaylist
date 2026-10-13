@@ -1314,7 +1314,7 @@ export default function SunoPlayer() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
         transition={{ layout: { type: "spring", stiffness: 500, damping: 40 } }}
-        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-1 group cursor-pointer transition-colors ${
+        className={`flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-2 rounded-xl mb-1 group cursor-pointer transition-colors ${
           globalIndex === currentIndex
             ? "bg-primary/10 border border-primary/20"
             : "hover:bg-secondary/60"
@@ -1420,7 +1420,7 @@ export default function SunoPlayer() {
               <FolderOpen className="w-3.5 h-3.5" />
             </button>
             {assignFolderSongId === song.id && (
-              <div className="absolute right-0 top-8 z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[140px]">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
