@@ -80,6 +80,15 @@ export type TranslationKey =
   | "lockFolder"
   | "unlockFolder"
   | "lockedFolderHint"
+  | "deletionLock"
+  | "deletionLockOn"
+  | "deletionLockOff"
+  | "deletionLockDisabled"
+  | "immutableLock"
+  | "immutableLockOn"
+  | "immutableLockOff"
+  | "immutableLockHint"
+  | "lockedSongHint"
   | "moveFolderUp"
   | "moveFolderDown"
   | "sortFoldersAZ"
@@ -112,6 +121,15 @@ type Dict = Record<TranslationKey, string>;
 type PartialDict = Partial<Dict>;
 
 const en: Dict = {
+  deletionLock: "Deletion Lock",
+  deletionLockOn: "Turn on Deletion Lock (song can't be deleted)",
+  deletionLockOff: "Turn off Deletion Lock",
+  deletionLockDisabled: "Deletion Lock is unavailable while the Immutable Lock is on",
+  immutableLock: "Immutable Lock",
+  immutableLockOn: "Turn on Immutable Lock (no deleting, no reordering)",
+  immutableLockOff: "Turn off Immutable Lock",
+  immutableLockHint: "Immutable Lock is on — this song can't be moved",
+  lockedSongHint: "Song is locked. Unlock it to delete.",
   title: "SUNO Playlist",
   subtitle: "Drop SUNO links or paste them below to build your playlist",
   nowPlaying: "Now Playing",
@@ -216,6 +234,15 @@ By using this software, you acknowledge and accept that it is provided "as is," 
 };
 
 const es: PartialDict = {
+  deletionLock: "Bloqueo de eliminación",
+  deletionLockOn: "Activar bloqueo de eliminación (no se puede borrar)",
+  deletionLockOff: "Desactivar bloqueo de eliminación",
+  deletionLockDisabled: "No disponible mientras el bloqueo inmutable esté activo",
+  immutableLock: "Bloqueo inmutable",
+  immutableLockOn: "Activar bloqueo inmutable (sin borrar ni reordenar)",
+  immutableLockOff: "Desactivar bloqueo inmutable",
+  immutableLockHint: "Bloqueo inmutable activo: no se puede mover",
+  lockedSongHint: "Canción bloqueada. Desbloquéala para borrarla.",
   title: "Lista SUNO",
   subtitle: "Suelta enlaces de SUNO o pégalos abajo para crear tu lista",
   nowPlaying: "Reproduciendo",
@@ -275,6 +302,15 @@ const es: PartialDict = {
 };
 
 const pt: PartialDict = {
+  deletionLock: "Bloqueio de eliminação",
+  deletionLockOn: "Ativar bloqueio de eliminação (não pode ser apagada)",
+  deletionLockOff: "Desativar bloqueio de eliminação",
+  deletionLockDisabled: "Indisponível enquanto o bloqueio imutável estiver ativo",
+  immutableLock: "Bloqueio imutável",
+  immutableLockOn: "Ativar bloqueio imutável (sem apagar nem reordenar)",
+  immutableLockOff: "Desativar bloqueio imutável",
+  immutableLockHint: "Bloqueio imutável ativo: não pode ser movida",
+  lockedSongHint: "Música bloqueada. Desbloqueie para apagar.",
   title: "Lista SUNO",
   subtitle: "Solte links do SUNO ou cole abaixo para criar sua lista",
   nowPlaying: "Tocando agora",
@@ -334,6 +370,15 @@ const pt: PartialDict = {
 };
 
 const it: PartialDict = {
+  deletionLock: "Blocco eliminazione",
+  deletionLockOn: "Attiva blocco eliminazione (non eliminabile)",
+  deletionLockOff: "Disattiva blocco eliminazione",
+  deletionLockDisabled: "Non disponibile con il blocco immutabile attivo",
+  immutableLock: "Blocco immutabile",
+  immutableLockOn: "Attiva blocco immutabile (niente eliminazione né riordino)",
+  immutableLockOff: "Disattiva blocco immutabile",
+  immutableLockHint: "Blocco immutabile attivo: non si può spostare",
+  lockedSongHint: "Brano bloccato. Sbloccalo per eliminarlo.",
   title: "Playlist SUNO",
   subtitle: "Trascina link SUNO o incollali qui sotto per creare la tua playlist",
   nowPlaying: "In riproduzione",
@@ -393,6 +438,15 @@ const it: PartialDict = {
 };
 
 const de: PartialDict = {
+  deletionLock: "Löschsperre",
+  deletionLockOn: "Löschsperre aktivieren (Titel kann nicht gelöscht werden)",
+  deletionLockOff: "Löschsperre deaktivieren",
+  deletionLockDisabled: "Nicht verfügbar, solange die Unveränderlich-Sperre aktiv ist",
+  immutableLock: "Unveränderlich-Sperre",
+  immutableLockOn: "Unveränderlich-Sperre aktivieren (kein Löschen, kein Umsortieren)",
+  immutableLockOff: "Unveränderlich-Sperre deaktivieren",
+  immutableLockHint: "Unveränderlich-Sperre aktiv – Titel kann nicht verschoben werden",
+  lockedSongHint: "Titel ist gesperrt. Zum Löschen entsperren.",
   title: "SUNO Playlist",
   subtitle: "Ziehe SUNO-Links hierher oder füge sie unten ein, um deine Playlist zu erstellen",
   nowPlaying: "Wird gespielt",
@@ -452,6 +506,15 @@ const de: PartialDict = {
 };
 
 const fr: PartialDict = {
+  deletionLock: "Verrou de suppression",
+  deletionLockOn: "Activer le verrou de suppression (impossible à supprimer)",
+  deletionLockOff: "Désactiver le verrou de suppression",
+  deletionLockDisabled: "Indisponible tant que le verrou immuable est actif",
+  immutableLock: "Verrou immuable",
+  immutableLockOn: "Activer le verrou immuable (ni suppression ni réordonnancement)",
+  immutableLockOff: "Désactiver le verrou immuable",
+  immutableLockHint: "Verrou immuable actif : impossible à déplacer",
+  lockedSongHint: "Morceau verrouillé. Déverrouillez-le pour le supprimer.",
   title: "Playlist SUNO",
   subtitle: "Déposez des liens SUNO ou collez-les ci-dessous pour créer votre playlist",
   nowPlaying: "En lecture",
@@ -511,6 +574,15 @@ const fr: PartialDict = {
 };
 
 const hi: PartialDict = {
+  deletionLock: "डिलीशन लॉक",
+  deletionLockOn: "डिलीशन लॉक चालू करें (गाना हटाया नहीं जा सकता)",
+  deletionLockOff: "डिलीशन लॉक बंद करें",
+  deletionLockDisabled: "इम्यूटेबल लॉक चालू रहते उपलब्ध नहीं",
+  immutableLock: "इम्यूटेबल लॉक",
+  immutableLockOn: "इम्यूटेबल लॉक चालू करें (न हटाना, न क्रम बदलना)",
+  immutableLockOff: "इम्यूटेबल लॉक बंद करें",
+  immutableLockHint: "इम्यूटेबल लॉक चालू है — यह गाना हिलाया नहीं जा सकता",
+  lockedSongHint: "गाना लॉक है। हटाने के लिए अनलॉक करें।",
   title: "SUNO प्लेलिस्ट",
   subtitle: "अपनी प्लेलिस्ट बनाने के लिए SUNO लिंक यहाँ छोड़ें या नीचे पेस्ट करें",
   nowPlaying: "अभी चल रहा है",
@@ -570,6 +642,15 @@ const hi: PartialDict = {
 };
 
 const ar: PartialDict = {
+  deletionLock: "قفل الحذف",
+  deletionLockOn: "تفعيل قفل الحذف (لا يمكن حذف الأغنية)",
+  deletionLockOff: "إيقاف قفل الحذف",
+  deletionLockDisabled: "غير متاح أثناء تفعيل القفل الثابت",
+  immutableLock: "القفل الثابت",
+  immutableLockOn: "تفعيل القفل الثابت (لا حذف ولا إعادة ترتيب)",
+  immutableLockOff: "إيقاف القفل الثابت",
+  immutableLockHint: "القفل الثابت مفعّل — لا يمكن نقل هذه الأغنية",
+  lockedSongHint: "الأغنية مقفلة. ألغِ القفل لحذفها.",
   title: "قائمة SUNO",
   subtitle: "أسقط روابط SUNO أو الصقها أدناه لإنشاء قائمتك",
   nowPlaying: "يُشغَّل الآن",
@@ -629,6 +710,15 @@ const ar: PartialDict = {
 };
 
 const ms: PartialDict = {
+  deletionLock: "Kunci Padam",
+  deletionLockOn: "Hidupkan Kunci Padam (lagu tidak boleh dipadam)",
+  deletionLockOff: "Matikan Kunci Padam",
+  deletionLockDisabled: "Tidak tersedia semasa Kunci Kekal aktif",
+  immutableLock: "Kunci Kekal",
+  immutableLockOn: "Hidupkan Kunci Kekal (tiada padam, tiada susun semula)",
+  immutableLockOff: "Matikan Kunci Kekal",
+  immutableLockHint: "Kunci Kekal aktif — lagu ini tidak boleh dialih",
+  lockedSongHint: "Lagu dikunci. Buka kunci untuk memadam.",
   title: "Senarai Main SUNO",
   subtitle: "Lepaskan pautan SUNO atau tampal di bawah untuk membina senarai main anda",
   nowPlaying: "Sedang Dimainkan",
@@ -688,6 +778,15 @@ const ms: PartialDict = {
 };
 
 const id: PartialDict = {
+  deletionLock: "Kunci Hapus",
+  deletionLockOn: "Aktifkan Kunci Hapus (lagu tak bisa dihapus)",
+  deletionLockOff: "Matikan Kunci Hapus",
+  deletionLockDisabled: "Tidak tersedia saat Kunci Tetap aktif",
+  immutableLock: "Kunci Tetap",
+  immutableLockOn: "Aktifkan Kunci Tetap (tanpa hapus, tanpa ubah urutan)",
+  immutableLockOff: "Matikan Kunci Tetap",
+  immutableLockHint: "Kunci Tetap aktif — lagu ini tak bisa dipindah",
+  lockedSongHint: "Lagu terkunci. Buka kunci untuk menghapus.",
   title: "Daftar Putar SUNO",
   subtitle: "Letakkan tautan SUNO atau tempel di bawah untuk membuat daftar putar Anda",
   nowPlaying: "Sedang Diputar",
@@ -747,6 +846,15 @@ const id: PartialDict = {
 };
 
 const vi: PartialDict = {
+  deletionLock: "Khóa xóa",
+  deletionLockOn: "Bật khóa xóa (không thể xóa bài)",
+  deletionLockOff: "Tắt khóa xóa",
+  deletionLockDisabled: "Không dùng được khi khóa bất biến đang bật",
+  immutableLock: "Khóa bất biến",
+  immutableLockOn: "Bật khóa bất biến (không xóa, không đổi thứ tự)",
+  immutableLockOff: "Tắt khóa bất biến",
+  immutableLockHint: "Khóa bất biến đang bật — không thể di chuyển bài này",
+  lockedSongHint: "Bài hát đã khóa. Mở khóa để xóa.",
   title: "Danh sách SUNO",
   subtitle: "Thả liên kết SUNO hoặc dán bên dưới để tạo danh sách phát",
   nowPlaying: "Đang phát",
@@ -806,6 +914,15 @@ const vi: PartialDict = {
 };
 
 const th: PartialDict = {
+  deletionLock: "ล็อกการลบ",
+  deletionLockOn: "เปิดล็อกการลบ (ลบเพลงไม่ได้)",
+  deletionLockOff: "ปิดล็อกการลบ",
+  deletionLockDisabled: "ใช้ไม่ได้ขณะเปิดล็อกถาวร",
+  immutableLock: "ล็อกถาวร",
+  immutableLockOn: "เปิดล็อกถาวร (ห้ามลบ ห้ามสลับลำดับ)",
+  immutableLockOff: "ปิดล็อกถาวร",
+  immutableLockHint: "เปิดล็อกถาวรอยู่ — ย้ายเพลงนี้ไม่ได้",
+  lockedSongHint: "เพลงถูกล็อก ปลดล็อกก่อนจึงจะลบได้",
   title: "เพลย์ลิสต์ SUNO",
   subtitle: "วางลิงก์ SUNO หรือวางด้านล่างเพื่อสร้างเพลย์ลิสต์",
   nowPlaying: "กำลังเล่น",
@@ -865,6 +982,15 @@ const th: PartialDict = {
 };
 
 const ja: PartialDict = {
+  deletionLock: "削除ロック",
+  deletionLockOn: "削除ロックをオン（曲を削除できません）",
+  deletionLockOff: "削除ロックをオフ",
+  deletionLockDisabled: "不変ロック中は使用できません",
+  immutableLock: "不変ロック",
+  immutableLockOn: "不変ロックをオン（削除・並べ替え不可）",
+  immutableLockOff: "不変ロックをオフ",
+  immutableLockHint: "不変ロック中 — この曲は移動できません",
+  lockedSongHint: "曲はロックされています。削除するには解除してください。",
   title: "SUNO プレイリスト",
   subtitle: "SUNO のリンクをドロップするか、下に貼り付けてプレイリストを作成",
   nowPlaying: "再生中",
@@ -924,6 +1050,15 @@ const ja: PartialDict = {
 };
 
 const zh: PartialDict = {
+  deletionLock: "删除锁",
+  deletionLockOn: "开启删除锁（歌曲无法删除）",
+  deletionLockOff: "关闭删除锁",
+  deletionLockDisabled: "不可变锁开启时无法使用",
+  immutableLock: "不可变锁",
+  immutableLockOn: "开启不可变锁（不可删除、不可调整顺序）",
+  immutableLockOff: "关闭不可变锁",
+  immutableLockHint: "不可变锁已开启——无法移动此歌曲",
+  lockedSongHint: "歌曲已锁定，解锁后才能删除。",
   title: "SUNO 播放列表",
   subtitle: "拖入 SUNO 链接或在下方粘贴以建立你的播放列表",
   nowPlaying: "正在播放",
@@ -983,6 +1118,15 @@ const zh: PartialDict = {
 };
 
 const ko: PartialDict = {
+  deletionLock: "삭제 잠금",
+  deletionLockOn: "삭제 잠금 켜기(곡 삭제 불가)",
+  deletionLockOff: "삭제 잠금 끄기",
+  deletionLockDisabled: "불변 잠금이 켜져 있는 동안 사용할 수 없습니다",
+  immutableLock: "불변 잠금",
+  immutableLockOn: "불변 잠금 켜기(삭제 및 순서 변경 불가)",
+  immutableLockOff: "불변 잠금 끄기",
+  immutableLockHint: "불변 잠금 켜짐 — 이 곡은 이동할 수 없습니다",
+  lockedSongHint: "곡이 잠겨 있습니다. 삭제하려면 잠금을 해제하세요.",
   title: "SUNO 재생목록",
   subtitle: "SUNO 링크를 끌어다 놓거나 아래에 붙여넣어 재생목록을 만드세요",
   nowPlaying: "재생 중",
@@ -1042,6 +1186,15 @@ const ko: PartialDict = {
 };
 
 const yue: PartialDict = {
+  deletionLock: "刪除鎖",
+  deletionLockOn: "開啟刪除鎖（首歌唔可以刪除）",
+  deletionLockOff: "關閉刪除鎖",
+  deletionLockDisabled: "不可變鎖開咗嘅時候用唔到",
+  immutableLock: "不可變鎖",
+  immutableLockOn: "開啟不可變鎖（唔可以刪除、唔可以改次序）",
+  immutableLockOff: "關閉不可變鎖",
+  immutableLockHint: "不可變鎖已開——首歌唔可以移動",
+  lockedSongHint: "首歌已鎖定，解鎖先可以刪除。",
   title: "SUNO 播放清單",
   subtitle: "拖入 SUNO 連結或喺下面貼上嚟整你嘅播放清單",
   nowPlaying: "正在播放",
