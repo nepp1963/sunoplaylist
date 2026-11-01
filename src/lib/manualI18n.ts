@@ -1264,19 +1264,200 @@ const QUICK_CONTROLS: Record<LangCode, ManualSection> = {
   ]},
 };
 
+const SONG_LOCKS: Record<LangCode, ManualSection> = {
+  en: { heading: "11. Song Locks", blocks: [
+    { p: "Every song has two small lock icons in its controls, so you can protect your tracklist exactly as you created it." },
+    { ul: [
+      "<strong>Deletion Lock (padlock)</strong> — the song cannot be deleted; its delete button is greyed out while the lock is on.",
+      "<strong>Immutable Lock (shield)</strong> — the strongest protection: the song cannot be deleted, moved up or down, or moved to another folder, and no other song can be pushed past its position.",
+      "<strong>How they work together</strong> — while the Immutable Lock is on, the Deletion Lock button is disabled. Turn the Immutable Lock off first if you want to change the Deletion Lock.",
+      "<strong>Sorting</strong> — when you sort the playlist A–Z or Z–A, Immutable-Locked songs keep their exact position, and only the unlocked songs between them are rearranged.",
+      "<strong>Folders</strong> — a folder containing an Immutable-Locked song cannot be deleted until you unlock that song.",
+      "<strong>Saving</strong> — both locks are stored in this browser and inside saved playlist files, so they stay on when you load the playlist on another device or in another browser.",
+    ]},
+  ]},
+  es: { heading: "11. Bloqueos de canciones", blocks: [
+    { p: "Cada canción tiene dos pequeños iconos de candado en sus controles, para que puedas proteger tu lista tal como la creaste." },
+    { ul: [
+      "<strong>Bloqueo de eliminación (candado)</strong> — la canción no se puede borrar; su botón de eliminar queda desactivado mientras el bloqueo esté activo.",
+      "<strong>Bloqueo inmutable (escudo)</strong> — la protección más fuerte: la canción no se puede borrar, mover arriba o abajo, ni pasar a otra carpeta, y ninguna otra canción puede colocarse delante de su posición.",
+      "<strong>Cómo funcionan juntos</strong> — con el Bloqueo inmutable activado, el botón de Bloqueo de eliminación queda desactivado. Desactiva primero el Bloqueo inmutable si quieres cambiar el Bloqueo de eliminación.",
+      "<strong>Ordenación</strong> — al ordenar la lista de la A a la Z o de la Z a la A, las canciones con Bloqueo inmutable conservan su posición exacta y solo se reordenan las canciones desbloqueadas entre ellas.",
+      "<strong>Carpetas</strong> — una carpeta que contenga una canción con Bloqueo inmutable no se puede eliminar hasta que desbloquees esa canción.",
+      "<strong>Guardado</strong> — ambos bloqueos se guardan en este navegador y dentro de los archivos de playlist, por lo que siguen activos al cargar la lista en otro dispositivo o navegador.",
+    ]},
+  ]},
+  pt: { heading: "11. Bloqueios de músicas", blocks: [
+    { p: "Cada música tem dois pequenos ícones de cadeado nos seus controlos, para poderes proteger a tua lista exatamente como a criaste." },
+    { ul: [
+      "<strong>Bloqueio de eliminação (cadeado)</strong> — a música não pode ser apagada; o botão de apagar fica inativo enquanto o bloqueio estiver ativado.",
+      "<strong>Bloqueio imutável (escudo)</strong> — a proteção mais forte: a música não pode ser apagada, movida para cima ou para baixo, nem passada para outra pasta, e nenhuma outra música pode ficar à frente da sua posição.",
+      "<strong>Como funcionam em conjunto</strong> — com o Bloqueio imutável ativado, o botão do Bloqueio de eliminação fica inativo. Desativa primeiro o Bloqueio imutável se quiseres alterar o Bloqueio de eliminação.",
+      "<strong>Ordenação</strong> — ao ordenar a lista de A a Z ou de Z a A, as músicas com Bloqueio imutável mantêm a sua posição exata e apenas as músicas desbloqueadas entre elas são reordenadas.",
+      "<strong>Pastas</strong> — uma pasta que contenha uma música com Bloqueio imutável não pode ser eliminada até desbloqueares essa música.",
+      "<strong>Gravação</strong> — ambos os bloqueios são guardados neste navegador e nos ficheiros de playlist, por isso continuam ativos ao carregares a lista noutro dispositivo ou navegador.",
+    ]},
+  ]},
+  it: { heading: "11. Blocchi dei brani", blocks: [
+    { p: "Ogni brano ha due piccole icone a lucchetto nei suoi controlli, così puoi proteggere la tua tracklist esattamente come l'hai creata." },
+    { ul: [
+      "<strong>Blocco di eliminazione (lucchetto)</strong> — il brano non può essere eliminato; il pulsante di eliminazione è disabilitato finché il blocco è attivo.",
+      "<strong>Blocco immutabile (scudo)</strong> — la protezione più forte: il brano non può essere eliminato, spostato su o giù, né trasferito in un'altra cartella, e nessun altro brano può essere collocato prima della sua posizione.",
+      "<strong>Come funzionano insieme</strong> — con il Blocco immutabile attivo, il pulsante del Blocco di eliminazione è disabilitato. Disattiva prima il Blocco immutabile se vuoi modificare il Blocco di eliminazione.",
+      "<strong>Ordinamento</strong> — quando ordini la playlist dalla A alla Z o dalla Z alla A, i brani con Blocco immutabile mantengono la loro posizione esatta e vengono riordinati solo i brani sbloccati tra essi.",
+      "<strong>Cartelle</strong> — una cartella che contiene un brano con Blocco immutabile non può essere eliminata finché non sblocchi quel brano.",
+      "<strong>Salvataggio</strong> — entrambi i blocchi vengono salvati in questo browser e nei file della playlist, quindi restano attivi quando carichi la playlist su un altro dispositivo o browser.",
+    ]},
+  ]},
+  de: { heading: "11. Titelsperren", blocks: [
+    { p: "Jeder Titel hat in seinen Steuerelementen zwei kleine Schloss-Symbole, damit du deine Titelliste genau so schützen kannst, wie du sie erstellt hast." },
+    { ul: [
+      "<strong>Löschen-Sperre (Schloss)</strong> — der Titel kann nicht gelöscht werden; seine Löschen-Schaltfläche ist ausgegraut, solange die Sperre aktiv ist.",
+      "<strong>Unveränderlich-Sperre (Schild)</strong> — der stärkste Schutz: der Titel kann weder gelöscht, noch nach oben oder unten verschoben, noch in einen anderen Ordner gelegt werden, und kein anderer Titel kann an seiner Position vorbeigeschoben werden.",
+      "<strong>Zusammenspiel</strong> — solange die Unveränderlich-Sperre aktiv ist, ist die Löschen-Sperre deaktiviert. Deaktiviere zuerst die Unveränderlich-Sperre, wenn du die Löschen-Sperre ändern möchtest.",
+      "<strong>Sortierung</strong> — beim Sortieren der Playlist von A–Z oder Z–A behalten Titel mit Unveränderlich-Sperre ihre exakte Position, und nur die entsperrten Titel dazwischen werden umgeordnet.",
+      "<strong>Ordner</strong> — ein Ordner mit einem Titel mit Unveränderlich-Sperre kann erst gelöscht werden, nachdem du den Titel entsperrt hast.",
+      "<strong>Speichern</strong> — beide Sperren werden in diesem Browser und in gespeicherten Playlist-Dateien abgelegt und bleiben beim Laden der Playlist auf einem anderen Gerät oder Browser aktiv.",
+    ]},
+  ]},
+  fr: { heading: "11. Verrous des morceaux", blocks: [
+    { p: "Chaque morceau possède deux petites icônes de cadenas dans ses commandes, pour que vous puissiez protéger votre liste exactement comme vous l'avez créée." },
+    { ul: [
+      "<strong>Verrou de suppression (cadenas)</strong> — le morceau ne peut pas être supprimé ; son bouton de suppression est grisé tant que le verrou est actif.",
+      "<strong>Verrou immuable (bouclier)</strong> — la protection la plus forte : le morceau ne peut être ni supprimé, ni déplacé vers le haut ou le bas, ni transféré dans un autre dossier, et aucun autre morceau ne peut se glisser devant sa position.",
+      "<strong>Comment ils fonctionnent ensemble</strong> — tant que le Verrou immuable est actif, le bouton du Verrou de suppression est désactivé. Désactivez d'abord le Verrou immuable si vous souhaitez modifier le Verrou de suppression.",
+      "<strong>Tri</strong> — lorsque vous triez la playlist de A à Z ou de Z à A, les morceaux munis du Verrou immuable conservent leur position exacte, et seuls les morceaux déverrouillés situés entre eux sont réordonnés.",
+      "<strong>Dossiers</strong> — un dossier contenant un morceau protégé par le Verrou immuable ne peut pas être supprimé tant que vous n'avez pas déverrouillé ce morceau.",
+      "<strong>Enregistrement</strong> — les deux verrous sont conservés dans ce navigateur et dans les fichiers de playlist enregistrés, et restent donc actifs lorsque vous chargez la playlist sur un autre appareil ou navigateur.",
+    ]},
+  ]},
+  zh: { heading: "11. 歌曲锁定", blocks: [
+    { p: "每首歌曲的控制图标中都有两个小锁图标，让你可以按照自己创作时的顺序完整保护歌单。" },
+    { ul: [
+      "<strong>删除锁（挂锁）</strong> — 歌曲无法删除；锁定期间，其删除按钮会变灰。",
+      "<strong>不可变锁（盾牌）</strong> — 最强的保护：歌曲无法删除、无法上移或下移、无法移动到其他文件夹，其他歌曲也不能越过它的位置。",
+      "<strong>两者如何配合</strong> — 不可变锁开启时，删除锁按钮会被禁用。如需更改删除锁，请先关闭不可变锁。",
+      "<strong>排序</strong> — 将歌单按 A–Z 或 Z–A 排序时，带不可变锁的歌曲保持原位，只重新排列它们之间未锁定的歌曲。",
+      "<strong>文件夹</strong> — 含有不可变锁歌曲的文件夹，需先解锁该歌曲后才能删除。",
+      "<strong>保存</strong> — 两种锁都会保存在本浏览器和歌单文件中，在其他设备或浏览器上加载歌单时仍然生效。",
+    ]},
+  ]},
+  yue: { heading: "11. 歌曲鎖定", blocks: [
+    { p: "每首歌嘅控制圖示度都有兩個小鎖圖示，令你可以完全照自己創作嘅次序保護歌單。" },
+    { ul: [
+      "<strong>刪除鎖（鎖頭）</strong> —首歌唔可以刪除；鎖住期間，佢個刪除掣會變灰。",
+      "<strong>不可變鎖（盾牌）</strong> —最強保護：首歌唔可以刪除、唔可以上移或者下移、亦唔可以搬去第個資料夾，其他歌亦唔可以越過佢嘅位置。",
+      "<strong>兩者點樣一齊用</strong> —不可變鎖開咗之後，刪除鎖掣會停用。想改刪除鎖，請先關閉不可變鎖。",
+      "<strong>排序</strong> —將歌單按 A–Z 或者 Z–A 排序嗰陣，有不可變鎖嘅歌會維持原位，只會重新排列佢哋之間未鎖嘅歌。",
+      "<strong>資料夾</strong> —有不可變鎖歌曲嘅資料夾，要先解鎖嗰首歌先可以刪除。",
+      "<strong>儲存</strong> —兩種鎖都會儲存喺呢個瀏覽器同歌單檔案入面，喺其他裝置或者瀏覽器載入歌單嗰陣依然生效。",
+    ]},
+  ]},
+  ja: { heading: "11. 曲のロック", blocks: [
+    { p: "すべての曲のコントロールには小さな鍵アイコンが2つあり、作った順序のままトラックリストを保護できます。" },
+    { ul: [
+      "<strong>削除ロック（鍵）</strong> — 曲を削除できなくなります。ロック中は削除ボタンが灰色になります。",
+      "<strong>不変ロック（盾）</strong> — 最も強い保護：曲を削除・上下移動・別のフォルダへの移動がすべてできなくなり、他の曲もその位置を越えて移動できません。",
+      "<strong>両者の関係</strong> — 不変ロックが有効な間、削除ロックのボタンは無効になります。削除ロックを変更したい場合は、先に不変ロックを解除してください。",
+      "<strong>並べ替え</strong> — プレイリストをA–ZまたはZ–Aで並べ替えても、不変ロックされた曲は正確な位置を保ち、その間のロックされていない曲だけが並べ替えられます。",
+      "<strong>フォルダ</strong> — 不変ロックされた曲が入っているフォルダは、その曲のロックを解除するまで削除できません。",
+      "<strong>保存</strong> — どちらのロックもこのブラウザーと保存したプレイリストファイルに記録されるため、別の端末やブラウザーで読み込んでも維持されます。",
+    ]},
+  ]},
+  ko: { heading: "11. 곡 잠금", blocks: [
+    { p: "모든 곡의 컨트롤에는 작은 잠금 아이콘이 두 개 있어, 만든 순서 그대로 트랙 목록을 보호할 수 있습니다." },
+    { ul: [
+      "<strong>삭제 잠금 (자물쇠)</strong> — 곡을 삭제할 수 없습니다. 잠금 중에는 삭제 버튼이 회색으로 비활성화됩니다.",
+      "<strong>고정 잠금 (방패)</strong> — 가장 강력한 보호: 곡을 삭제하거나 위아래로 이동하거나 다른 폴더로 옮길 수 없고, 다른 곡도 그 위치를 넘어 이동할 수 없습니다.",
+      "<strong>두 잠금의 관계</strong> — 고정 잠금이 켜져 있는 동안 삭제 잠금 버튼은 비활성화됩니다. 삭제 잠금을 바꾸려면 먼저 고정 잠금을 해제하세요.",
+      "<strong>정렬</strong> — 재생목록을 A–Z 또는 Z–A로 정렬할 때 고정 잠금된 곡은 정확한 위치를 유지하고, 그 사이의 잠금 해제된 곡만 다시 정렬됩니다.",
+      "<strong>폴더</strong> — 고정 잠금된 곡이 들어 있는 폴더는 해당 곡의 잠금을 해제하기 전까지 삭제할 수 없습니다.",
+      "<strong>저장</strong> — 두 잠금 모두 이 브라우저와 저장된 재생목록 파일에 함께 저장되므로, 다른 기기나 브라우저에서 불러와도 유지됩니다.",
+    ]},
+  ]},
+  hi: { heading: "11. गाना लॉक", blocks: [
+    { p: "हर गाने के नियंत्रणों में दो छोटे ताले के आइकन होते हैं, ताकि आप अपनी गाना सूची को बिल्कुल वैसे ही सुरक्षित रख सकें जैसे आपने उसे बनाया था।" },
+    { ul: [
+      "<strong>हटाने का लॉक (ताला)</strong> — गाना हटाया नहीं जा सकता; लॉक चालू होने पर उसका हटाने वाला बटन धूसर हो जाता है।",
+      "<strong>अपरिवर्तनीय लॉक (कवच)</strong> — सबसे मज़बूत सुरक्षा: गाना न हटाया जा सकता है, न ऊपर-नीचे ले जाया जा सकता है, न किसी दूसरे फ़ोल्डर में रखा जा सकता है, और कोई दूसरा गाना उसकी जगह से आगे नहीं आ सकता।",
+      "<strong>दोनों कैसे साथ काम करते हैं</strong> — अपरिवर्तनीय लॉक चालू होने पर हटाने के लॉक का बटन अक्षम रहता है। हटाने का लॉक बदलने के लिए पहले अपरिवर्तनीय लॉक बंद करें।",
+      "<strong>क्रमबद्ध करना</strong> — प्लेलिस्ट को A–Z या Z–A में क्रमबद्ध करते समय अपरिवर्तनीय लॉक वाले गाने अपनी सटीक जगह पर रहते हैं, और उनके बीच के अनलॉक गाने ही दोबारा क्रमबद्ध होते हैं।",
+      "<strong>फ़ोल्डर</strong> — अपरिवर्तनीय लॉक वाले गाने वाला फ़ोल्डर तब तक नहीं हटाया जा सकता जब तक आप उस गाने को अनलॉक न करें।",
+      "<strong>सहेजना</strong> — दोनों लॉक इस ब्राउज़र और सहेजी गई प्लेलिस्ट फ़ाइल में सुरक्षित रहते हैं, इसलिए दूसरे डिवाइस या ब्राउज़र में प्लेलिस्ट लोड करने पर भी चालू रहते हैं।",
+    ]},
+  ]},
+  ar: { heading: "11. أقفال الأغاني", blocks: [
+    { p: "لكل أغنية أيقونتا قفل صغيرتان في أدوات التحكم، حتى تتمكن من حماية قائمتك كما أنشأتها تمامًا." },
+    { ul: [
+      "<strong>قفل الحذف (قفل)</strong> — لا يمكن حذف الأغنية؛ يتعذر زر الحذف الخاص بها طوال فترة تفعيل القفل.",
+      "<strong>القفل الثابت (درع)</strong> — الحماية الأقوى: لا يمكن حذف الأغنية أو تحريكها لأعلى أو لأسفل أو نقلها إلى مجلد آخر، ولا يمكن لأي أغنية أخرى تجاوز موقعها.",
+      "<strong>كيف يعملان معًا</strong> — أثناء تفعيل القفل الثابت، يكون زر قفل الحذف معطلًا. أوقف القفل الثابت أولًا إذا أردت تغيير قفل الحذف.",
+      "<strong>الفرز</strong> — عند فرز قائمة التشغيل من أ إلى ي أو من ي إلى أ، تحتفظ الأغنيات المقفلة بالقفل الثابت بموقعها الدقيق، ويُعاد ترتيب الأغنيات غير المقفلة الواقعة بينها فقط.",
+      "<strong>المجلدات</strong> — لا يمكن حذف مجلد يحتوي على أغنية مقفلة بالقفل الثابت حتى تلغي قفل تلك الأغنية.",
+      "<strong>الحفظ</strong> — يُحفظ كلا القفلين في هذا المتصفح وفي ملفات قائمة التشغيل، فيبقيان مفعّلين عند تحميل القائمة على جهاز أو متصفح آخر.",
+    ]},
+  ]},
+  ms: { heading: "11. Kunci Lagu", blocks: [
+    { p: "Setiap lagu mempunyai dua ikon kunci kecil dalam kawalannya, supaya anda boleh melindungi senarai anda tepat seperti yang anda ciptakan." },
+    { ul: [
+      "<strong>Kunci Padam (gembok)</strong> — lagu tidak boleh dipadam; butang padamnya dilumpuhkan selagi kunci aktif.",
+      "<strong>Kunci Kekal (perisai)</strong> — perlindungan paling kuat: lagu tidak boleh dipadam, digerak ke atas atau ke bawah, atau dipindah ke folder lain, dan tiada lagu lain boleh melepasi kedudukannya.",
+      "<strong>Cara kedua-duanya berfungsi</strong> — selagi Kunci Kekal aktif, butang Kunci Padam dilumpuhkan. Matikan Kunci Kekal dahulu jika anda mahu menukar Kunci Padam.",
+      "<strong>Pengisihan</strong> — apabila senarai diisih A–Z atau Z–A, lagu dengan Kunci Kekal kekal di kedudukan tepatnya, dan hanya lagu tidak berkunci di antaranya disusun semula.",
+      "<strong>Folder</strong> — folder yang mengandungi lagu berkunci Kunci Kekal tidak boleh dipadam sehingga anda membuka kunci lagu tersebut.",
+      "<strong>Penyimpanan</strong> — kedua-dua kunci disimpan dalam pelayar ini dan dalam fail senarai main yang disimpan, jadi ia kekal aktif apabila senarai dimuatkan pada peranti atau pelayar lain.",
+    ]},
+  ]},
+  id: { heading: "11. Kunci Lagu", blocks: [
+    { p: "Setiap lagu memiliki dua ikon kunci kecil di kontrolnya, sehingga Anda dapat melindungi daftar Anda persis seperti saat Anda membuatnya." },
+    { ul: [
+      "<strong>Kunci Hapus (gembok)</strong> — lagu tidak dapat dihapus; tombol hapusnya dinonaktifkan selama kunci aktif.",
+      "<strong>Kunci Permanen (perisai)</strong> — perlindungan terkuat: lagu tidak dapat dihapus, dinaikkan atau diturunkan, atau dipindah ke folder lain, dan lagu lain tidak dapat melewati posisinya.",
+      "<strong>Cara keduanya bekerja</strong> — selama Kunci Permanen aktif, tombol Kunci Hapus dinonaktifkan. Matikan Kunci Permanen terlebih dahulu jika ingin mengubah Kunci Hapus.",
+      "<strong>Pengurutan</strong> — saat daftar diurutkan A–Z atau Z–A, lagu dengan Kunci Permanen mempertahankan posisi tepatnya, dan hanya lagu tak terkunci di antaranya yang diurutkan ulang.",
+      "<strong>Folder</strong> — folder yang berisi lagu dengan Kunci Permanen tidak dapat dihapus sampai Anda membuka kunci lagu tersebut.",
+      "<strong>Penyimpanan</strong> — kedua kunci disimpan di peramban ini dan di dalam berkas daftar putar, sehingga tetap aktif saat daftar dimuat di perangkat atau peramban lain.",
+    ]},
+  ]},
+  vi: { heading: "11. Khóa bài hát", blocks: [
+    { p: "Mỗi bài hát có hai biểu tượng khóa nhỏ trong các nút điều khiển, để bạn có thể bảo vệ danh sách của mình đúng như lúc bạn tạo ra nó." },
+    { ul: [
+      "<strong>Khóa xóa (ổ khóa)</strong> — bài hát không thể bị xóa; nút xóa của nó bị mờ đi trong khi khóa đang bật.",
+      "<strong>Bảo vệ bất biến (khiên)</strong> — bảo vệ mạnh nhất: bài hát không thể bị xóa, di chuyển lên hoặc xuống, hay chuyển sang thư mục khác, và không bài hát nào có thể vượt qua vị trí của nó.",
+      "<strong>Chúng phối hợp thế nào</strong> — khi Bảo vệ bất biến đang bật, nút Khóa xóa bị vô hiệu. Hãy tắt Bảo vệ bất biến trước nếu bạn muốn thay đổi Khóa xóa.",
+      "<strong>Sắp xếp</strong> — khi sắp xếp danh sách theo A–Z hoặc Z–A, các bài hát có Bảo vệ bất biến giữ nguyên vị trí chính xác, và chỉ các bài chưa khóa ở giữa chúng được sắp xếp lại.",
+      "<strong>Thư mục</strong> — thư mục có bài hát được Bảo vệ bất biến không thể xóa cho đến khi bạn mở khóa bài hát đó.",
+      "<strong>Lưu</strong> — cả hai khóa đều được lưu trong trình duyệt này và trong tệp danh sách đã lưu, nên chúng vẫn có hiệu lực khi bạn mở danh sách trên thiết bị hoặc trình duyệt khác.",
+    ]},
+  ]},
+  th: { heading: "11. ล็อกเพลง", blocks: [
+    { p: "ทุกเพลงมีไอคอนแม่กุญแจเล็กสองอันในส่วนควบคุม เพื่อให้คุณปกป้องรายการเพลงได้ตรงตามที่คุณสร้างไว้" },
+    { ul: [
+      "<strong>ล็อกการลบ (แม่กุญแจ)</strong> — เพลงจะถูกลบไม่ได้ ปุ่มลบจะเป็นสีจางในระหว่างที่ล็อกเปิดอยู่",
+      "<strong>ล็อกถาวร (โล่)</strong> — การป้องกันที่แข็งแรงที่สุด: เพลงจะถูกลบ ย้ายขึ้นหรือลง หรือย้ายไปโฟลเดอร์อื่นไม่ได้ และเพลงอื่นก็ข้ามตำแหน่งของมันไม่ได้",
+      "<strong>ทั้งสองทำงานร่วมกันอย่างไร</strong> — ขณะที่ล็อกถาวรเปิดอยู่ ปุ่มล็อกการลบจะถูกปิดใช้งาน หากต้องการเปลี่ยนล็อกการลบ ให้ปิดล็อกถาวรก่อน",
+      "<strong>การจัดเรียง</strong> — เมื่อจัดเรียงเพลย์ลิสต์แบบ A–Z หรือ Z–A เพลงที่มีล็อกถาวรจะอยู่ตำแหน่งเดิมเป๊ะ และมีเพียงเพลงที่ยังไม่ล็อกที่อยู่ระหว่างกลางเท่านั้นที่ถูกจัดเรียงใหม่",
+      "<strong>โฟลเดอร์</strong> — โฟลเดอร์ที่มีเพลงล็อกถาวรอยู่จะลบไม่ได้จนกว่าคุณจะปลดล็อกเพลงนั้น",
+      "<strong>การบันทึก</strong> — ล็อกทั้งสองจะถูกบันทึกไว้ในเบราว์เซอร์นี้และในไฟล์เพลย์ลิสต์ที่บันทึกไว้ จึงยังทำงานอยู่เมื่อคุณเปิดเพลย์ลิสต์บนอุปกรณ์หรือเบราว์เซอร์อื่น",
+    ]},
+  ]},
+};
+
 export function getManual(lang: LangCode): ManualContent {
   const base = MANUAL[lang] ?? en;
   const extra = QUICK_CONTROLS[lang] ?? QUICK_CONTROLS.en;
+  const locks = SONG_LOCKS[lang] ?? SONG_LOCKS.en;
   const sections = [...base.sections];
   const aboutIdx = sections.findIndex((s) => /^10\./.test(s.heading));
-  if (aboutIdx === -1) return { ...base, sections: [...sections, extra] };
+  if (aboutIdx === -1) return { ...base, sections: [...sections, extra, locks] };
   const [about] = sections.splice(aboutIdx, 1);
   return {
     ...base,
     sections: [
       ...sections,
       { ...extra, heading: extra.heading.replace(/^11\./, "10.") },
-      { ...about, heading: about.heading.replace(/^10\./, "11.") },
+      { ...locks, heading: locks.heading.replace(/^11\./, "11.") },
+      { ...about, heading: about.heading.replace(/^10\./, "12.") },
     ],
   };
 }
