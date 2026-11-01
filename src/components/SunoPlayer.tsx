@@ -445,16 +445,25 @@ export default function SunoPlayer() {
     setSortMode(mode);
     const currentSongId = currentSong?.id;
     setSongs((prev) => {
-      let sorted: Song[];
+      // Immutable-Locked songs stay anchored at their current index; only the
+      // unlocked songs between them are sorted into the gaps.
+      const free = prev.filter((s) => s.lock !== "immutable");
+      let freeSorted: Song[];
       if (mode === "az") {
-        sorted = [...prev].sort((a, b) => a.title.localeCompare(b.title));
+        freeSorted = [...free].sort((a, b) => a.title.localeCompare(b.title));
       } else if (mode === "za") {
-        sorted = [...prev].sort((a, b) => b.title.localeCompare(a.title));
+        freeSorted = [...free].sort((a, b) => b.title.localeCompare(a.title));
       } else {
-        sorted = [...prev].sort(
+        freeSorted = [...free].sort(
           (a, b) => originalOrder.indexOf(a.id) - originalOrder.indexOf(b.id),
         );
       }
+      const sorted: Song[] = [];
+      let fi = 0;
+      prev.forEach((s) => {
+        if (s.lock === "immutable") sorted.push(s);
+        else sorted.push(freeSorted[fi++]);
+      });
       if (currentSongId) {
         const newIdx = sorted.findIndex((s) => s.id === currentSongId);
         if (newIdx >= 0) setCurrentIndex(newIdx);
@@ -653,6 +662,11 @@ export default function SunoPlayer() {
     // Collect this folder + all descendants
     const affectedFolders = folders.filter((f) => f === name || f.startsWith(name + "/"));
     const affectedSongs = songs.filter((s) => s.folder && affectedFolders.includes(s.folder));
+    // Immutable-Locked songs must not be moved out of their folder by a delete
+    if (affectedSongs.some((s) => s.lock === "immutable")) {
+      window.alert(t("immutableFolderBlock"));
+      return;
+    }
     const songCount = affectedSongs.length;
     const confirmMsg =
       `⚠️ DELETE FOLDER "${folderLeaf(name)}"?\n\n` +
