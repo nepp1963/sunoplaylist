@@ -89,6 +89,7 @@ export type TranslationKey =
   | "immutableLockOff"
   | "immutableLockHint"
   | "lockedSongHint"
+  | "immutableFolderBlock"
   | "moveFolderUp"
   | "moveFolderDown"
   | "sortFoldersAZ"
