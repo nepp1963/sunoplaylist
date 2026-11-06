@@ -1274,6 +1274,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Sorting</strong> — when you sort the playlist A–Z or Z–A, Immutable-Locked songs keep their exact position, and only the unlocked songs between them are rearranged.",
       "<strong>Folders</strong> — a folder containing an Immutable-Locked song cannot be deleted until you unlock that song.",
       "<strong>Saving</strong> — both locks are stored in this browser and inside saved playlist files, so they stay on when you load the playlist on another device or in another browser.",
+      "<strong>Folder locks</strong> — folders have the same two locks. A Deletion-Locked folder cannot be deleted; an Immutable-Locked folder cannot be deleted, renamed or moved, and keeps its place when folders are sorted. On phones, folder buttons sit on their own row above the folder name.",
     ]},
   ]},
   es: { heading: "11. Bloqueos de canciones", blocks: [
@@ -1285,6 +1286,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Ordenación</strong> — al ordenar la lista de la A a la Z o de la Z a la A, las canciones con Bloqueo inmutable conservan su posición exacta y solo se reordenan las canciones desbloqueadas entre ellas.",
       "<strong>Carpetas</strong> — una carpeta que contenga una canción con Bloqueo inmutable no se puede eliminar hasta que desbloquees esa canción.",
       "<strong>Guardado</strong> — ambos bloqueos se guardan en este navegador y dentro de los archivos de playlist, por lo que siguen activos al cargar la lista en otro dispositivo o navegador.",
+      "<strong>Bloqueos de carpetas</strong> — las carpetas tienen los mismos dos bloqueos. Una carpeta con Bloqueo de eliminación no se puede borrar; una con Bloqueo inmutable no se puede borrar, renombrar ni mover, y conserva su lugar al ordenar. En teléfonos, los botones de la carpeta están en una fila sobre su nombre.",
     ]},
   ]},
   pt: { heading: "11. Bloqueios de músicas", blocks: [
@@ -1296,6 +1298,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Ordenação</strong> — ao ordenar a lista de A a Z ou de Z a A, as músicas com Bloqueio imutável mantêm a sua posição exata e apenas as músicas desbloqueadas entre elas são reordenadas.",
       "<strong>Pastas</strong> — uma pasta que contenha uma música com Bloqueio imutável não pode ser eliminada até desbloqueares essa música.",
       "<strong>Gravação</strong> — ambos os bloqueios são guardados neste navegador e nos ficheiros de playlist, por isso continuam ativos ao carregares a lista noutro dispositivo ou navegador.",
+      "<strong>Bloqueios de pastas</strong> — as pastas têm os mesmos dois bloqueios. Uma pasta com Bloqueio de eliminação não pode ser apagada; uma com Bloqueio imutável não pode ser apagada, renomeada nem movida, e mantém o lugar ao ordenar. Nos telemóveis, os botões ficam numa linha acima do nome.",
     ]},
   ]},
   it: { heading: "11. Blocchi dei brani", blocks: [
@@ -1307,6 +1310,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Ordinamento</strong> — quando ordini la playlist dalla A alla Z o dalla Z alla A, i brani con Blocco immutabile mantengono la loro posizione esatta e vengono riordinati solo i brani sbloccati tra essi.",
       "<strong>Cartelle</strong> — una cartella che contiene un brano con Blocco immutabile non può essere eliminata finché non sblocchi quel brano.",
       "<strong>Salvataggio</strong> — entrambi i blocchi vengono salvati in questo browser e nei file della playlist, quindi restano attivi quando carichi la playlist su un altro dispositivo o browser.",
+      "<strong>Blocchi delle cartelle</strong> — le cartelle hanno gli stessi due blocchi. Una cartella con Blocco eliminazione non può essere eliminata; una con Blocco immutabile non può essere eliminata, rinominata o spostata e mantiene il suo posto nell'ordinamento. Sui telefoni i pulsanti stanno su una riga sopra il nome.",
     ]},
   ]},
   de: { heading: "11. Titelsperren", blocks: [
@@ -1318,6 +1322,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Sortierung</strong> — beim Sortieren der Playlist von A–Z oder Z–A behalten Titel mit Unveränderlich-Sperre ihre exakte Position, und nur die entsperrten Titel dazwischen werden umgeordnet.",
       "<strong>Ordner</strong> — ein Ordner mit einem Titel mit Unveränderlich-Sperre kann erst gelöscht werden, nachdem du den Titel entsperrt hast.",
       "<strong>Speichern</strong> — beide Sperren werden in diesem Browser und in gespeicherten Playlist-Dateien abgelegt und bleiben beim Laden der Playlist auf einem anderen Gerät oder Browser aktiv.",
+      "<strong>Ordnersperren</strong> — Ordner haben dieselben zwei Sperren. Ein Ordner mit Löschsperre kann nicht gelöscht werden; ein Ordner mit Unveränderlich-Sperre kann weder gelöscht, umbenannt noch verschoben werden und behält beim Sortieren seinen Platz. Auf Handys stehen die Ordner-Schaltflächen in einer eigenen Zeile über dem Namen.",
     ]},
   ]},
   fr: { heading: "11. Verrous des morceaux", blocks: [
@@ -1329,6 +1334,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Tri</strong> — lorsque vous triez la playlist de A à Z ou de Z à A, les morceaux munis du Verrou immuable conservent leur position exacte, et seuls les morceaux déverrouillés situés entre eux sont réordonnés.",
       "<strong>Dossiers</strong> — un dossier contenant un morceau protégé par le Verrou immuable ne peut pas être supprimé tant que vous n'avez pas déverrouillé ce morceau.",
       "<strong>Enregistrement</strong> — les deux verrous sont conservés dans ce navigateur et dans les fichiers de playlist enregistrés, et restent donc actifs lorsque vous chargez la playlist sur un autre appareil ou navigateur.",
+      "<strong>Verrous de dossiers</strong> — les dossiers ont les deux mêmes verrous. Un dossier avec Verrou de suppression ne peut pas être supprimé ; un dossier avec Verrou immuable ne peut être ni supprimé, ni renommé, ni déplacé, et garde sa place lors du tri. Sur téléphone, les boutons sont sur une ligne au-dessus du nom.",
     ]},
   ]},
   zh: { heading: "11. 歌曲锁定", blocks: [
@@ -1340,6 +1346,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>排序</strong> — 将歌单按 A–Z 或 Z–A 排序时，带不可变锁的歌曲保持原位，只重新排列它们之间未锁定的歌曲。",
       "<strong>文件夹</strong> — 含有不可变锁歌曲的文件夹，需先解锁该歌曲后才能删除。",
       "<strong>保存</strong> — 两种锁都会保存在本浏览器和歌单文件中，在其他设备或浏览器上加载歌单时仍然生效。",
+      "<strong>文件夹锁</strong> — 文件夹也有同样的两种锁。开启删除锁的文件夹无法删除；开启不可变锁的文件夹无法删除、重命名或移动，排序时也保持原位。在手机上，文件夹按钮位于名称上方的单独一行。",
     ]},
   ]},
   yue: { heading: "11. 歌曲鎖定", blocks: [
@@ -1351,6 +1358,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>排序</strong> —將歌單按 A–Z 或者 Z–A 排序嗰陣，有不可變鎖嘅歌會維持原位，只會重新排列佢哋之間未鎖嘅歌。",
       "<strong>資料夾</strong> —有不可變鎖歌曲嘅資料夾，要先解鎖嗰首歌先可以刪除。",
       "<strong>儲存</strong> —兩種鎖都會儲存喺呢個瀏覽器同歌單檔案入面，喺其他裝置或者瀏覽器載入歌單嗰陣依然生效。",
+      "<strong>資料夾鎖</strong> — 資料夾都有同樣兩種鎖。開咗刪除鎖嘅資料夾唔可以刪除；開咗不可變鎖嘅資料夾唔可以刪除、改名或者移動，排序時都會保持原位。喺手機上，資料夾按鈕會喺名稱上面獨立一行。",
     ]},
   ]},
   ja: { heading: "11. 曲のロック", blocks: [
@@ -1362,6 +1370,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>並べ替え</strong> — プレイリストをA–ZまたはZ–Aで並べ替えても、不変ロックされた曲は正確な位置を保ち、その間のロックされていない曲だけが並べ替えられます。",
       "<strong>フォルダ</strong> — 不変ロックされた曲が入っているフォルダは、その曲のロックを解除するまで削除できません。",
       "<strong>保存</strong> — どちらのロックもこのブラウザーと保存したプレイリストファイルに記録されるため、別の端末やブラウザーで読み込んでも維持されます。",
+      "<strong>フォルダのロック</strong> — フォルダにも同じ2種類のロックがあります。削除ロック中のフォルダは削除できず、不変ロック中のフォルダは削除・名前変更・移動ができず、並べ替えでも位置が変わりません。スマホではフォルダのボタンが名前の上の行に表示されます。",
     ]},
   ]},
   ko: { heading: "11. 곡 잠금", blocks: [
@@ -1373,6 +1382,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>정렬</strong> — 재생목록을 A–Z 또는 Z–A로 정렬할 때 고정 잠금된 곡은 정확한 위치를 유지하고, 그 사이의 잠금 해제된 곡만 다시 정렬됩니다.",
       "<strong>폴더</strong> — 고정 잠금된 곡이 들어 있는 폴더는 해당 곡의 잠금을 해제하기 전까지 삭제할 수 없습니다.",
       "<strong>저장</strong> — 두 잠금 모두 이 브라우저와 저장된 재생목록 파일에 함께 저장되므로, 다른 기기나 브라우저에서 불러와도 유지됩니다.",
+      "<strong>폴더 잠금</strong> — 폴더에도 같은 두 가지 잠금이 있습니다. 삭제 잠금 폴더는 삭제할 수 없고, 고정 잠금 폴더는 삭제·이름 변경·이동이 불가하며 정렬 시에도 위치가 유지됩니다. 휴대폰에서는 폴더 버튼이 이름 위의 별도 줄에 표시됩니다.",
     ]},
   ]},
   hi: { heading: "11. गाना लॉक", blocks: [
@@ -1384,6 +1394,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>क्रमबद्ध करना</strong> — प्लेलिस्ट को A–Z या Z–A में क्रमबद्ध करते समय अपरिवर्तनीय लॉक वाले गाने अपनी सटीक जगह पर रहते हैं, और उनके बीच के अनलॉक गाने ही दोबारा क्रमबद्ध होते हैं।",
       "<strong>फ़ोल्डर</strong> — अपरिवर्तनीय लॉक वाले गाने वाला फ़ोल्डर तब तक नहीं हटाया जा सकता जब तक आप उस गाने को अनलॉक न करें।",
       "<strong>सहेजना</strong> — दोनों लॉक इस ब्राउज़र और सहेजी गई प्लेलिस्ट फ़ाइल में सुरक्षित रहते हैं, इसलिए दूसरे डिवाइस या ब्राउज़र में प्लेलिस्ट लोड करने पर भी चालू रहते हैं।",
+      "<strong>फ़ोल्डर लॉक</strong> — फ़ोल्डरों में भी यही दो लॉक हैं। डिलीशन लॉक वाला फ़ोल्डर हटाया नहीं जा सकता; अपरिवर्तनीय लॉक वाला फ़ोल्डर हटाया, नाम बदला या खिसकाया नहीं जा सकता और छँटाई में अपनी जगह रखता है। फ़ोन पर फ़ोल्डर के बटन नाम के ऊपर अलग पंक्ति में होते हैं।",
     ]},
   ]},
   ar: { heading: "11. أقفال الأغاني", blocks: [
@@ -1395,6 +1406,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>الفرز</strong> — عند فرز قائمة التشغيل من أ إلى ي أو من ي إلى أ، تحتفظ الأغنيات المقفلة بالقفل الثابت بموقعها الدقيق، ويُعاد ترتيب الأغنيات غير المقفلة الواقعة بينها فقط.",
       "<strong>المجلدات</strong> — لا يمكن حذف مجلد يحتوي على أغنية مقفلة بالقفل الثابت حتى تلغي قفل تلك الأغنية.",
       "<strong>الحفظ</strong> — يُحفظ كلا القفلين في هذا المتصفح وفي ملفات قائمة التشغيل، فيبقيان مفعّلين عند تحميل القائمة على جهاز أو متصفح آخر.",
+      "<strong>أقفال المجلدات</strong> — للمجلدات القفلان نفسهما. لا يمكن حذف مجلد عليه قفل الحذف؛ والمجلد ذو القفل الثابت لا يمكن حذفه أو إعادة تسميته أو نقله، ويحتفظ بمكانه عند الفرز. على الهاتف تظهر أزرار المجلد في صف فوق اسمه.",
     ]},
   ]},
   ms: { heading: "11. Kunci Lagu", blocks: [
@@ -1406,6 +1418,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Pengisihan</strong> — apabila senarai diisih A–Z atau Z–A, lagu dengan Kunci Kekal kekal di kedudukan tepatnya, dan hanya lagu tidak berkunci di antaranya disusun semula.",
       "<strong>Folder</strong> — folder yang mengandungi lagu berkunci Kunci Kekal tidak boleh dipadam sehingga anda membuka kunci lagu tersebut.",
       "<strong>Penyimpanan</strong> — kedua-dua kunci disimpan dalam pelayar ini dan dalam fail senarai main yang disimpan, jadi ia kekal aktif apabila senarai dimuatkan pada peranti atau pelayar lain.",
+      "<strong>Kunci folder</strong> — folder mempunyai dua kunci yang sama. Folder dengan Kunci Padam tidak boleh dipadam; folder dengan Kunci Kekal tidak boleh dipadam, dinamakan semula atau dialih, dan kekal di tempatnya semasa disusun. Pada telefon, butang folder berada di baris atas nama folder.",
     ]},
   ]},
   id: { heading: "11. Kunci Lagu", blocks: [
@@ -1417,6 +1430,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Pengurutan</strong> — saat daftar diurutkan A–Z atau Z–A, lagu dengan Kunci Permanen mempertahankan posisi tepatnya, dan hanya lagu tak terkunci di antaranya yang diurutkan ulang.",
       "<strong>Folder</strong> — folder yang berisi lagu dengan Kunci Permanen tidak dapat dihapus sampai Anda membuka kunci lagu tersebut.",
       "<strong>Penyimpanan</strong> — kedua kunci disimpan di peramban ini dan di dalam berkas daftar putar, sehingga tetap aktif saat daftar dimuat di perangkat atau peramban lain.",
+      "<strong>Kunci folder</strong> — folder memiliki dua kunci yang sama. Folder dengan Kunci Hapus tidak dapat dihapus; folder dengan Kunci Permanen tidak dapat dihapus, diganti nama, atau dipindah, dan tetap di tempatnya saat diurutkan. Di ponsel, tombol folder berada di baris atas nama folder.",
     ]},
   ]},
   vi: { heading: "11. Khóa bài hát", blocks: [
@@ -1428,6 +1442,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>Sắp xếp</strong> — khi sắp xếp danh sách theo A–Z hoặc Z–A, các bài hát có Bảo vệ bất biến giữ nguyên vị trí chính xác, và chỉ các bài chưa khóa ở giữa chúng được sắp xếp lại.",
       "<strong>Thư mục</strong> — thư mục có bài hát được Bảo vệ bất biến không thể xóa cho đến khi bạn mở khóa bài hát đó.",
       "<strong>Lưu</strong> — cả hai khóa đều được lưu trong trình duyệt này và trong tệp danh sách đã lưu, nên chúng vẫn có hiệu lực khi bạn mở danh sách trên thiết bị hoặc trình duyệt khác.",
+      "<strong>Khóa thư mục</strong> — thư mục cũng có hai khóa giống vậy. Thư mục có Khóa xóa không thể bị xóa; thư mục có Khóa bất biến không thể bị xóa, đổi tên hay di chuyển, và giữ nguyên vị trí khi sắp xếp. Trên điện thoại, các nút của thư mục nằm ở một hàng phía trên tên.",
     ]},
   ]},
   th: { heading: "11. ล็อกเพลง", blocks: [
@@ -1439,6 +1454,7 @@ const SONG_LOCKS: Record<LangCode, ManualSection> = {
       "<strong>การจัดเรียง</strong> — เมื่อจัดเรียงเพลย์ลิสต์แบบ A–Z หรือ Z–A เพลงที่มีล็อกถาวรจะอยู่ตำแหน่งเดิมเป๊ะ และมีเพียงเพลงที่ยังไม่ล็อกที่อยู่ระหว่างกลางเท่านั้นที่ถูกจัดเรียงใหม่",
       "<strong>โฟลเดอร์</strong> — โฟลเดอร์ที่มีเพลงล็อกถาวรอยู่จะลบไม่ได้จนกว่าคุณจะปลดล็อกเพลงนั้น",
       "<strong>การบันทึก</strong> — ล็อกทั้งสองจะถูกบันทึกไว้ในเบราว์เซอร์นี้และในไฟล์เพลย์ลิสต์ที่บันทึกไว้ จึงยังทำงานอยู่เมื่อคุณเปิดเพลย์ลิสต์บนอุปกรณ์หรือเบราว์เซอร์อื่น",
+      "<strong>ล็อกโฟลเดอร์</strong> — โฟลเดอร์มีล็อกสองแบบเหมือนกัน โฟลเดอร์ที่มีล็อกการลบจะลบไม่ได้ ส่วนโฟลเดอร์ที่มีล็อกถาวรจะลบ เปลี่ยนชื่อ หรือย้ายไม่ได้ และคงตำแหน่งเดิมเมื่อจัดเรียง บนโทรศัพท์ ปุ่มของโฟลเดอร์จะอยู่แถวบนเหนือชื่อ",
     ]},
   ]},
 };

@@ -144,6 +144,7 @@ export default function SunoPlayer() {
   const [folderOrder, setFolderOrder] = useState<string[]>([]);
   const [folderSortMode, setFolderSortMode] = useState<FolderSortMode>("original");
   const [lockedFolders, setLockedFolders] = useState<string[]>([]);
+  const [immutableFolders, setImmutableFolders] = useState<string[]>([]);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const folderRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const songRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
@@ -658,7 +659,7 @@ export default function SunoPlayer() {
   };
 
   const removeFolder = (name: string) => {
-    if (lockedFolders.includes(name)) return;
+    if (lockedFolders.includes(name) || immutableFolders.includes(name)) return;
     // Collect this folder + all descendants
     const affectedFolders = folders.filter((f) => f === name || f.startsWith(name + "/"));
     const affectedSongs = songs.filter((s) => s.folder && affectedFolders.includes(s.folder));
@@ -706,7 +707,20 @@ export default function SunoPlayer() {
     );
   };
 
+  const toggleImmutableFolder = (name: string) => {
+    setImmutableFolders((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+    );
+  };
+
   const moveFolder = (name: string, direction: -1 | 1) => {
+    if (immutableFolders.includes(name)) return;
+    {
+      const parent = folderParent(name);
+      const siblings = folders.filter((f) => folderParent(f) === parent);
+      const neighbor = siblings[siblings.indexOf(name) + direction];
+      if (neighbor && immutableFolders.includes(neighbor)) return;
+    }
     setFolderSortMode("original");
     setFolders((prev) => {
       // Move within same parent group
@@ -741,8 +755,14 @@ export default function SunoPlayer() {
   const sortFolders = (mode: FolderSortMode) => {
     setFolderSortMode(mode);
     setFolders((prev) => {
+      // Immutable-Locked folders stay anchored; others are sorted into the gaps.
+      const anchor = (sortedAll: string[]) => {
+        const free = sortedAll.filter((f) => !immutableFolders.includes(f));
+        let fi = 0;
+        return prev.map((f) => (immutableFolders.includes(f) ? f : free[fi++]));
+      };
       if (mode === "original") {
-        return [...prev].sort((a, b) => folderOrder.indexOf(a) - folderOrder.indexOf(b));
+        return anchor([...prev].sort((a, b) => folderOrder.indexOf(a) - folderOrder.indexOf(b)));
       }
       // Sort hierarchically: keep parent before children, sort siblings by leaf name
       const sorted = [...prev].sort((a, b) => {
@@ -755,11 +775,12 @@ export default function SunoPlayer() {
         const cmp = folderLeaf(a).localeCompare(folderLeaf(b));
         return mode === "az" ? cmp : -cmp;
       });
-      return sorted;
+      return anchor(sorted);
     });
   };
 
   const startEditFolder = (name: string) => {
+    if (immutableFolders.includes(name)) return;
     setEditingFolder(name);
     setEditingFolderName(folderLeaf(name));
   };
@@ -780,6 +801,7 @@ export default function SunoPlayer() {
     setFolderOrder((prev) => prev.map(renameOne));
     setSongs((prev) => prev.map((s) => (s.folder ? { ...s, folder: renameOne(s.folder) } : s)));
     setLockedFolders((prev) => prev.map(renameOne));
+    setImmutableFolders((prev) => prev.map(renameOne));
     setExpandedFolders((prev) => {
       const next = new Set<string>();
       prev.forEach((f) => next.add(renameOne(f)));
@@ -842,6 +864,7 @@ export default function SunoPlayer() {
           if (Array.isArray(data.folderOrder)) setFolderOrder(data.folderOrder);
           else if (Array.isArray(data.folders)) setFolderOrder(data.folders);
           if (Array.isArray(data.lockedFolders)) setLockedFolders(data.lockedFolders);
+          if (Array.isArray(data.immutableFolders)) setImmutableFolders(data.immutableFolders);
         }
       }
       // Restore last played song + position
@@ -897,12 +920,12 @@ export default function SunoPlayer() {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ songs, folders, folderOrder, lockedFolders, originalOrder }),
+        JSON.stringify({ songs, folders, folderOrder, lockedFolders, immutableFolders, originalOrder }),
       );
     } catch {
       /* ignore */
     }
-  }, [songs, folders, folderOrder, lockedFolders, originalOrder, hydrated]);
+  }, [songs, folders, folderOrder, lockedFolders, immutableFolders, originalOrder, hydrated]);
 
   // Persist current playback position (throttled by timeupdate firing rate)
   useEffect(() => {
@@ -1177,6 +1200,7 @@ export default function SunoPlayer() {
       folders: displayedFolderOrder,
       folderOrder: displayedFolderOrder,
       lockedFolders,
+      immutableFolders,
       originalOrder,
     };
     const data = JSON.stringify(payload, null, 2);
@@ -1283,6 +1307,9 @@ export default function SunoPlayer() {
           setFolderOrder([]);
         }
         setLockedFolders(explicitLocked ?? []);
+        setImmutableFolders(
+          !Array.isArray(raw) && Array.isArray(raw?.immutableFolders) ? raw.immutableFolders : [],
+        );
 
         // Backfill missing audioUrl/title/image from network
         rebuilt.forEach((song) => {
@@ -2214,6 +2241,8 @@ export default function SunoPlayer() {
               const depth = folderDepth(name);
               const { idx: sIdx, total: sTotal } = siblingPos(name);
               const isLocked = lockedFolders.includes(name);
+              const isImmutable = immutableFolders.includes(name);
+              const siblingsOf = folders.filter((f) => folderParent(f) === folderParent(name));
               const leaf = folderLeaf(name);
               return (
                 <motion.div
@@ -2228,114 +2257,132 @@ export default function SunoPlayer() {
                   style={{ paddingLeft: `${12 + depth * 16}px` }}
                 >
                   <div
-                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group"
+                    className="flex flex-col gap-0.5 px-2 py-1.5 rounded-lg hover:bg-secondary/40 transition-colors cursor-pointer group sm:flex-row sm:items-center sm:gap-1"
                     onClick={() => editingFolder !== name && toggleFolder(name)}
                   >
-                    {/* Move buttons for folders */}
-                    <div className="flex flex-col gap-0.5 shrink-0">
+                    {/* Name row (below the controls on phones, left on wider screens) */}
+                    <div className="order-2 flex min-w-0 flex-1 items-center gap-1 sm:order-1">
+                      {expandedFolders.has(name) ? (
+                        <ChevronDown className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+                      )}
+                      <FolderOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                      {editingFolder === name ? (
+                        <input
+                          autoFocus
+                          type="text"
+                          value={editingFolderName}
+                          onChange={(e) => setEditingFolderName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") commitEditFolder();
+                            if (e.key === "Escape") {
+                              setEditingFolder(null);
+                              setEditingFolderName("");
+                            }
+                          }}
+                          onBlur={commitEditFolder}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      ) : (
+                        <>
+                          <span className="min-w-0 truncate text-xs font-medium text-foreground">{leaf}</span>
+                          <span className="shrink-0 text-[10px] text-muted-foreground">
+                            ({folderSongs.length})
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {/* Controls row (on top on phones) */}
+                    <div className="order-1 flex shrink-0 items-center justify-end gap-0.5 sm:order-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           moveFolder(name, -1);
                         }}
-                        disabled={sIdx === 0}
-                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        title={t("moveFolderUp")}
+                        disabled={sIdx === 0 || isImmutable || immutableFolders.includes(siblingsOf[sIdx - 1])}
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={isImmutable ? t("immutableFolderHint") : t("moveFolderUp")}
                         aria-label={t("moveFolderUp")}
                       >
-                        <ChevronUp className="w-3 h-3" />
+                        <ChevronUp className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           moveFolder(name, 1);
                         }}
-                        disabled={sIdx === sTotal - 1}
-                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        title={t("moveFolderDown")}
+                        disabled={sIdx === sTotal - 1 || isImmutable || immutableFolders.includes(siblingsOf[sIdx + 1])}
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        title={isImmutable ? t("immutableFolderHint") : t("moveFolderDown")}
                         aria-label={t("moveFolderDown")}
                       >
-                        <ChevronDown className="w-3 h-3" />
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                      {/* Deletion Lock */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleLockFolder(name);
+                        }}
+                        disabled={isImmutable}
+                        className={`p-1 rounded transition-all disabled:opacity-30 disabled:cursor-not-allowed ${isLocked ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                        title={isImmutable ? t("deletionLockDisabled") : isLocked ? t("unlockFolder") : t("lockFolder")}
+                        aria-label={t("deletionLock")}
+                        aria-pressed={isLocked}
+                      >
+                        {isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                      </button>
+                      {/* Immutable Lock */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleImmutableFolder(name);
+                        }}
+                        className={`p-1 rounded transition-all ${isImmutable ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                        title={isImmutable ? t("immutableLockOff") : t("immutableLockOn")}
+                        aria-label={t("immutableLock")}
+                        aria-pressed={isImmutable}
+                      >
+                        {isImmutable ? <ShieldCheck className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+                      </button>
+                      {editingFolder === name ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            commitEditFolder();
+                          }}
+                          className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
+                          title={t("saveFolderName")}
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEditFolder(name);
+                          }}
+                          disabled={isImmutable}
+                          className="p-1 rounded text-muted-foreground hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                          title={isImmutable ? t("immutableFolderHint") : t("renameFolder")}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFolder(name);
+                        }}
+                        disabled={isLocked || isImmutable}
+                        className="p-1 rounded text-muted-foreground hover:text-destructive transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                        title={isImmutable ? t("immutableFolderHint") : isLocked ? t("lockedFolderHint") : t("removeFolder")}
+                      >
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    {expandedFolders.has(name) ? (
-                      <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-                    )}
-                    <FolderOpen className="w-3.5 h-3.5 text-primary shrink-0" />
-                    {editingFolder === name ? (
-                      <input
-                        autoFocus
-                        type="text"
-                        value={editingFolderName}
-                        onChange={(e) => setEditingFolderName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") commitEditFolder();
-                          if (e.key === "Escape") {
-                            setEditingFolder(null);
-                            setEditingFolderName("");
-                          }
-                        }}
-                        onBlur={commitEditFolder}
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex-1 min-w-0 rounded-md bg-input px-2 py-0.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    ) : (
-                      <>
-                        <span className="text-xs font-medium text-foreground truncate">{leaf}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          ({folderSongs.length})
-                        </span>
-                      </>
-                    )}
-                    <div className="flex-1" />
-                    {/* Lock toggle */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleLockFolder(name);
-                      }}
-                      className={`p-1 rounded transition-all ${isLocked ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                      title={isLocked ? t("unlockFolder") : t("lockFolder")}
-                      aria-pressed={isLocked}
-                    >
-                      {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                    </button>
-                    {editingFolder === name ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          commitEditFolder();
-                        }}
-                        className="p-1 rounded text-primary hover:bg-primary/10 transition-all"
-                        title={t("saveFolderName")}
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          startEditFolder(name);
-                        }}
-                        className="p-1 rounded text-muted-foreground hover:text-primary transition-all"
-                        title={t("renameFolder")}
-                      >
-                        <Pencil className="w-3 h-3" />
-                      </button>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeFolder(name);
-                      }}
-                      disabled={isLocked}
-                      className="p-1 rounded text-muted-foreground hover:text-destructive transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                      title={isLocked ? t("lockedFolderHint") : t("removeFolder")}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
                   </div>
                   <div className={`pl-4 ${expandedFolders.has(name) ? "min-h-[12px]" : "min-h-0"}`}>
                     {expandedFolders.has(name) && (
