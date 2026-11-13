@@ -133,7 +133,7 @@ const en: Dict = {
   immutableLockHint: "Immutable Lock is on — this song can't be moved",
   lockedSongHint: "Song is locked. Unlock it to delete.",
   immutableFolderBlock: "This folder contains songs protected by the Immutable Lock. Unlock those songs first before deleting the folder.",
-  immutableFolderHint: "Immutable Lock is on — this folder can"t be moved, renamed or deleted",
+  immutableFolderHint: "Immutable Lock is on — this folder can't be moved, renamed or deleted",
   title: "SUNO Playlist",
   subtitle: "Drop SUNO links or paste them below to build your playlist",
   nowPlaying: "Now Playing",
