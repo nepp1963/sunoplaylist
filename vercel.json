@@ -1,0 +1,12 @@
+cat << 'EOF' > vercel.json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://sunoplaylist.lovable.app/:path*",
+      "permanent": true
+    }
+  ]
+}
+EOF
